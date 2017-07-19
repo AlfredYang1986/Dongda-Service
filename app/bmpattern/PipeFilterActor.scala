@@ -10,6 +10,7 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import bmmessages._
 import bmlogic.auth.{AuthModule, msg_AuthCommand}
+import bmlogic.phonecode.{PhoneCodeModule, msg_PhoneCodeCommand}
 
 object PipeFilterActor {
 	def prop(originSender : ActorRef, msr : MessageRoutes) : Props = {
@@ -41,6 +42,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 	var next : ActorRef = null
 	def receive = {
 		case cmd : msg_AuthCommand => dispatchImpl(cmd, AuthModule)
+		case cmd : msg_PhoneCodeCommand => dispatchImpl(cmd, PhoneCodeModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
 		case cmd : ParallelMessage => {

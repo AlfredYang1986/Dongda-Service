@@ -7,8 +7,6 @@ import play.api.libs.json.JsValue
   * Created by alfredyang on 01/06/2017.
   */
 trait DBTrait {
-    def initDatabase : Unit
-
     def insertObject(obj : DBObject, db_name : String, primary_key : String) : Unit
     def updateObject(obj : DBObject, db_name : String, primary_key : String) : Unit
 

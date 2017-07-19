@@ -2,8 +2,14 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# phone 用户发送手机验证码 End Point
+POST    /al/code/send                           controllers.PhoneSMSController.sendSMSCode
+POST    /al/code/check                          controllers.PhoneSMSController.checkSMSCode
+
 # auth 用户授权 End Point (详情参考概要设计，@Alfred)
-POST    /auth/pushUser                          controllers.AuthController.authPushUser
+# 这个是直接登陆，后面去掉不要直接调用
+POST    /al/auth                                controllers.AuthController.authLogin
+# POST    /al/auth/code                           controllers.Auth
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)

@@ -8,35 +8,47 @@ import play.api.libs.json.Json.toJson
   * Created by alfredyang on 01/06/2017.
   */
 trait AuthData {
-    
+
+    def conditions(data : JsValue) : DBObject = {
+        val builder = MongoDBObject.newBuilder
+
+        (data \ "phone").asOpt[String].map (x => builder += "auth_phone" -> x).getOrElse(Unit)
+        (data \ "user_id").asOpt[String].map (x => builder += "user_id" -> x).getOrElse(Unit)
+        (data \ "screen_name").asOpt[String].map (x => builder += "screen_name" -> x).getOrElse(Unit)
+
+        builder.result
+    }
+
     implicit val m2d : JsValue => DBObject = { js =>
-        val build = MongoDBObject.newBuilder
-        val user_name = (js \ "user_name").asOpt[String].map (x => x).getOrElse(throw new Exception("users input js error"))
-        val pwd = (js \ "pwd").asOpt[String].map (x => x).getOrElse(throw new Exception("users input js error"))
-        build += "user_name" -> user_name
-        build += "pwd" -> pwd
+        val builder = MongoDBObject.newBuilder
 
-        build += "screen_name" -> (js \ "screen_name").asOpt[String].map (x => x).getOrElse("")
-        build += "screen_photo" -> (js \ "screen_photo").asOpt[String].map (x => x).getOrElse("")
-        build += "phoneNo" -> (js \ "phoneNo").asOpt[String].map (x => x).getOrElse("")
-        build += "email" -> (js \ "email").asOpt[String].map (x => x).getOrElse("")
+        builder += "screen_name" -> (js \ "screen_name").asOpt[String].map (x => x).getOrElse("")
+        builder += "screen_photo" -> (js \ "screen_photo").asOpt[String].map (x => x).getOrElse("")
 
-        build += "company" -> (js \ "company").asOpt[String].map (x => x).getOrElse(throw new Exception("users input js error"))
-        build += "department" -> (js \ "department").asOpt[String].map (x => x).getOrElse(throw new Exception("users input js error"))
+        (js \ "phone").asOpt[String].map { x =>
+            builder += "auth_phone" -> x
+        }.getOrElse(Unit)
 
-        build.result
+        (js \ "third").asOpt[JsValue].map { x =>
+            val name = (x \ "provide_name").asOpt[String].map (x => x).getOrElse(throw new Exception("user push error"))
+
+            val third_builder = MongoDBObject.newBuilder
+            third_builder += "uid" -> (x \ "provide_uid").asOpt[String].map (x => x).getOrElse(throw new Exception("user push error"))
+            third_builder += "token" -> (x \ "provide_token").asOpt[String].map (x => x).getOrElse(throw new Exception("user push error"))
+
+            builder += "screen_name" -> (x \ "provide_screen_name").asOpt[String].map (x => x).getOrElse(throw new Exception("user push error"))
+            builder += "screen_photo" -> (x \ "provide_screen_photo").asOpt[String].map (x => x).getOrElse(throw new Exception("user push error"))
+            builder += name -> third_builder.result
+        }
+
+        builder.result
     }
 
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
         Map(
             "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "user_name" -> toJson(obj.getAs[String]("user_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "phoneNo" -> toJson(obj.getAs[String]("phoneNo").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "email" -> toJson(obj.getAs[String]("email").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "screen_name" -> toJson(obj.getAs[String]("screen_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "company" -> toJson(obj.getAs[String]("company").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "department" -> toJson(obj.getAs[String]("department").map (x => x).getOrElse(throw new Exception("db prase error")))
+            "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error")))
         )
     }
 }

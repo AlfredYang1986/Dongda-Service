@@ -16,11 +16,11 @@ import play.api.mvc._
 class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait) extends Controller {
     implicit val as = as_inject
 
-    def authPushUser = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+    def authLogin = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
             import bmpattern.LogMessage.common_log
             import bmpattern.ResultMessage.common_result
-            MessageRoutes(msg_log(toJson(Map("method" -> toJson("push user"))), jv)
-                :: msg_AuthPushUser(jv) :: msg_QueryCompanyWithPr() :: msg_GenerateToken()
+            MessageRoutes(msg_log(toJson(Map("method" -> toJson("dongda login"))), jv)
+                :: msg_AuthLogin(jv) :: msg_GenerateToken()
                 :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         })
 }
