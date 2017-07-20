@@ -9,7 +9,7 @@ import com.mongodb.casbah.Imports._
   */
 trait RSAEncryptTrait extends javaEncryptTrait with EncryptTrait {
       lazy val queryKeys : (String, String) = {
-        (from db() in "encrypt_config" where ("project" -> "PET") select (x => x)).toList match {
+        (from db() in "encrypt_config" where ("project" -> "Dongda") select (x => x)).toList match {
             case head :: Nil => {
                 (head.getAs[String]("public_key").get, head.getAs[String]("private_key").get)
             }
@@ -19,7 +19,7 @@ trait RSAEncryptTrait extends javaEncryptTrait with EncryptTrait {
                 val pri_key = RSAUtils.getPrivateKey(keyMap)
 
                 val builder = MongoDBObject.newBuilder
-                builder += "project" -> "PET"
+                builder += "project" -> "Dongda"
                 builder += "public_key" -> pub_key
                 builder += "private_key" -> pri_key
 

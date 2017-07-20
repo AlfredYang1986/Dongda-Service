@@ -35,11 +35,14 @@ object AuthModule extends ModuleTrait with AuthData {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
 
+            val auth_phone = (data \ "phone").asOpt[String].map (x => x).getOrElse("")
+            val third_uid = (data \ "third" \ "provide_uid").asOpt[String].map (x => x).getOrElse("")
+
+            if (auth_phone.isEmpty && third_uid.isEmpty) throw new Exception("user push error")
+
             val date = new Date().getTime
             val o : DBObject = data
 
-            val auth_phone = (data \ "phone").asOpt[String].map (x => x).getOrElse("")
-            val third_uid = (data \ "third" \ "provide_uid").asOpt[String].map (x => x).getOrElse("")
             val seed = auth_phone + third_uid + Sercurity.getTimeSpanWithMillSeconds
 
             o += "user_id" -> Sercurity.md5Hash(seed)
@@ -118,7 +121,8 @@ object AuthModule extends ModuleTrait with AuthData {
             val user = pr.get.get("user").get
             val date = new Date().getTime
             val result = toJson(user.as[JsObject].value.toMap + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
-            val auth_token = att.encrypt2Token(toJson(result))
+            val auth_token = att.encrypt2Token(result)
+            val tt = att.decrypt2JsValue(auth_token)
 
             (Some(Map("user" -> user, "auth_token" -> toJson(auth_token))), None)
 

@@ -17,6 +17,11 @@ object ErrorCode {
 
 		new ErrorNode("user push error", -201, "用户创建失败"),
         new ErrorNode("user already exist", -202, "用户已经存在"),
+		new ErrorNode("user not exist", -203, "用户已经存在"),
+		new ErrorNode("profile query input error", -204, "搜索用户没有提供用户ID"),
+		new ErrorNode("profile multi query input error", -205, "搜索多用户没有提供用户ID列表"),
+		new ErrorNode("profile update input error", -206, "修改用户信息修改错误"),
+		new ErrorNode("profile update no right", -207, "只有自己能修改自己的详细信息"),
 
         new ErrorNode("reg push error", -301, "由于上传数据原因，验证码发送失败"),
         new ErrorNode("reg phone or code error", -302, "电话号码或者验证码出错"),

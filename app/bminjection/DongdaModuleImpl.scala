@@ -1,7 +1,7 @@
 package bminjection
 
 import bminjection.db.MongoDB.MongoDBImpl
-import bminjection.token.PETToken.DongaTokenTrait
+import bminjection.token.DongdaToken.DongaTokenTrait
 
 /**
   * Created by alfredyang on 01/06/2017.

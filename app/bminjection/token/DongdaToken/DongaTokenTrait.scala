@@ -1,4 +1,4 @@
-package bminjection.token.PETToken
+package bminjection.token.DongdaToken
 
 import java.nio.charset.StandardCharsets
 import it.sauronsoftware.base64.Base64

@@ -56,4 +56,45 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def queryProfile(user_id : String, token : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/profile/query")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token), "condition" -> toJson(Map("user_id" -> user_id)))))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def searchProfile(screen_name : String, token : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/profile/search")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token), "condition" -> toJson(Map("screen_name" -> screen_name)))))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def queryMultiProfile(token : String, lst : List[String]) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/profile/multi")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token), "condition" -> toJson(Map("lst" -> toJson(lst))))))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def updateProfile(token : String, user_id : String, screen_name : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/profile/update")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token), "condition" -> toJson(Map("user_id" -> user_id)),
+                            "profile" -> toJson(Map("screen_name" -> screen_name)))))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
 }

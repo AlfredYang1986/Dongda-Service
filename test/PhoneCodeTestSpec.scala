@@ -16,7 +16,7 @@ class PhoneCodeTestSpec extends Specification {
 
             The 'dongda' phone code functions should
                 phone code with phone 13720200856                             $phoneCodeSend
-                phone code with phone 13720200860                             $phoneCodeSendAgain
+                phone code with phone 13720200870                             $phoneCodeSendAgain
                 phone code with phone 13720200861                             $phoneCodeCheck
                                                                               """
 
@@ -37,12 +37,12 @@ class PhoneCodeTestSpec extends Specification {
     def phoneCodeSendAgain =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").phoneCodeSend("13720200860"), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9000").phoneCodeSend("13720200870"), time_out)
             (reVal \ "status").asOpt[String].get must_== "ok"
 
             val result = (reVal \ "result").asOpt[JsValue].get
 
-            (result \ "reg" \ "phone").asOpt[String].get must_== "13720200860"
+            (result \ "reg" \ "phone").asOpt[String].get must_== "13720200870"
             (result \ "reg" \ "reg_token").asOpt[String].get.length must_!= 0
             (result \ "reg" \ "is_reg").asOpt[Int].get must_== 0
             (result \ "reg" \ "code").asOpt[String].get must_== "1111"
