@@ -12,6 +12,9 @@ POST    /al/profile/search                      controllers.ProfileController.se
 POST    /al/profile/multi                       controllers.ProfileController.queryMultiProfile
 POST    /al/profile/update                      controllers.ProfileController.updateProfile
 
+# kidnap 用户服务向光功能
+POST    /al/kidnap/push
+
 # auth 用户授权 End Point (详情参考概要设计，@Alfred)
 # 这个是直接登陆，后面去掉不要直接调用
 POST    /al/auth                                controllers.AuthController.authLogin

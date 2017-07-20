@@ -26,6 +26,8 @@ object ErrorCode {
         new ErrorNode("reg push error", -301, "由于上传数据原因，验证码发送失败"),
         new ErrorNode("reg phone or code error", -302, "电话号码或者验证码出错"),
 
+		new ErrorNode("push service input error", -401, "添加服务时参数错误"),
+
 		new ErrorNode("no db connection", -901, "没找到数据库链接"),
 		new ErrorNode("db prase error", -902, "数据库结构发现错误"),
 		new ErrorNode("no encrypt impl", -903, "权限加密方式不清晰或者Token不存在"),
