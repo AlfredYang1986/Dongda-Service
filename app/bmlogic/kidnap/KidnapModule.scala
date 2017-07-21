@@ -131,6 +131,8 @@ object KidnapModule extends ModuleTrait {
             val o : DBObject = data
             val reVal = db.queryObject(o, "kidnap") { obj =>
 
+                // TODO: 修改流程
+
                 import inner_traits.dr
                 obj - "date" - "update_date"
             }

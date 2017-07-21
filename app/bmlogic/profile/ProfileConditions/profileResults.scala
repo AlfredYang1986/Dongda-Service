@@ -21,7 +21,7 @@ trait profileResults {
                 "company" -> toJson(x.getAs[String]("company").map (x => x).getOrElse(throw new Exception("db prase error"))),
                 "description" -> toJson(x.getAs[String]("description").map (x => x).getOrElse(throw new Exception("db prase error"))),
                 "address" -> toJson(x.getAs[String]("address").map (x => x).getOrElse(throw new Exception("db prase error"))),
-                "contact_no" -> toJson(x.getAs[List[String]]("contact_no").map (x => x).getOrElse(throw new Exception("db prase error")))
+                "contact_no" -> toJson(x.getAs[String]("contact_no").map (x => x).getOrElse(throw new Exception("db prase error")))
             )
         }.getOrElse(Map.empty[String, JsValue])
 

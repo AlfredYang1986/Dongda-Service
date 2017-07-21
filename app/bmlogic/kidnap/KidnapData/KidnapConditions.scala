@@ -45,7 +45,7 @@ trait KidnapConditions {
             lb += "city" -> (js \ "location" \ "city").asOpt[String].map (x => x).getOrElse("")
             lb += "district" -> (js \ "location" \ "district").asOpt[String].map (x => x).getOrElse("")
             lb += "address" -> (js \ "location" \ "address").asOpt[String].map (x => x).getOrElse("")
-            lb += "adjust_address" -> (js \ "location" \ "adjust_address").asOpt[String].map (x => x).getOrElse("")
+            lb += "adjust" -> (js \ "location" \ "adjust").asOpt[String].map (x => x).getOrElse("")
 
             builder += "location" -> lb.result
         }
@@ -85,7 +85,7 @@ trait KidnapConditions {
 
             detail += "capacity" -> (js \ "detail" \ "capacity").asOpt[Int].map (tmp => tmp).getOrElse(0.intValue)    // 可容纳多少还是，现在没用
             detail += "least_hours" -> (js \ "detail" \ "least_hours").asOpt[Int].map (x => x).getOrElse(0)           // 至少预定时长，现阶段和运营跟不上也没用
-            detail += "allow_leave" -> (js \ "detail" \ "allow_leave").asOpt[Int].map (x => x).getOrElse(0)           // 纯显示，属于后期完善提醒功能
+            detail += "allow_leaves" -> (js \ "detail" \ "allow_leaves").asOpt[Int].map (x => x).getOrElse(0)           // 纯显示，属于后期完善提醒功能
             detail += "least_times" -> (js \ "detail" \ "least_times").asOpt[Int].map (x => x).getOrElse(0)           // 至少预定次数
             detail += "lecture_length" -> (js \ "detail" \ "lecture_length").asOpt[Int].map (x => x).getOrElse(0)     // 单位为分
             detail += "servant_no" -> (js \ "detail" \ "servant_no").asOpt[Int].map (x => x).getOrElse(1)             // 课程老师人数, 牵强信息

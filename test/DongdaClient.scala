@@ -97,4 +97,24 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def becomeServiceProvider(token : String, user_id : String, info : JsValue) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/profile/update")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token), "condition" -> toJson(Map("user_id" -> user_id)), "profile" -> info)))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def pushService(token : String, user_id : String, info : JsValue) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/kidnap/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token), "condition" -> toJson(Map("user_id" -> user_id)), "service" -> info)))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
 }

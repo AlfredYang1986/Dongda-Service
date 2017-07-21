@@ -60,28 +60,3 @@ object ErrorCode {
 		Json.toJson(Map("status" -> toJson("error"), "error" ->
 			toJson(Map("code" -> toJson(this.getErrorCodeByName(name)), "message" -> toJson(this.getErrorMessageByName(name))))))
 }
-
-		new ErrorNode("no db connection", -901, "没找到数据库链接"),
-		new ErrorNode("db prase error", -902, "数据库结构发现错误"),
-		new ErrorNode("no encrypt impl", -903, "权限加密方式不清晰或者Token不存在"),
-		new ErrorNode("token parse error", -904, "token数据解析出现错误"),
-		new ErrorNode("token expired", -905, "token过期"),
-		new ErrorNode("db aggregation error", -906, "数据Map Reduce操作发生错误"),
-
-  		new ErrorNode("unknown error", -999, "unknown error")
-  	)
-  
-  	def getErrorCodeByName(name : String) : Int = (xls.find(x => x.name == name)) match {
-  			case Some(y) => y.code
-  			case None => -9999
-  		}
-  	
-   	def getErrorMessageByName(name : String) : String = (xls.find(x => x.name == name)) match {
-  			case Some(y) => y.message
-  			case None => "unknow error"
-  		}
-   	
-   	def errorToJson(name : String) : JsValue =
-  		Json.toJson(Map("status" -> toJson("error"), "error" -> 
-  				toJson(Map("code" -> toJson(this.getErrorCodeByName(name)), "message" -> toJson(this.getErrorMessageByName(name))))))
-}

@@ -12,6 +12,7 @@ import bmmessages._
 import bmlogic.auth.{AuthModule, msg_AuthCommand}
 import bmlogic.phonecode.{PhoneCodeModule, msg_PhoneCodeCommand}
 import bmlogic.profile.{ProfileModule, msg_ProfileCommand}
+import bmlogic.kidnap.{KidnapModule, msg_KidnapCommand}
 
 object PipeFilterActor {
 	def prop(originSender : ActorRef, msr : MessageRoutes) : Props = {
@@ -27,15 +28,16 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		module.dispatchMsg(cmd)(rst) match {
 			case (_, Some(err)) => {
 				originSender ! error(err)
-				cancelActor					
+				cancelActor
 			}
 			case (Some(r), _) => {
 //				println(r)
-				rst = Some(r) 
+				rst = Some(r)
+				rstReturn
+				cancelActor
 			}
 			case _ => println("never go here")
 		}
-		rstReturn
 	}
 	
 	var tmp : Option[Boolean] = None
@@ -45,6 +47,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		case cmd : msg_AuthCommand => dispatchImpl(cmd, AuthModule)
 		case cmd : msg_PhoneCodeCommand => dispatchImpl(cmd, PhoneCodeModule)
 		case cmd : msg_ProfileCommand => dispatchImpl(cmd, ProfileModule)
+		case cmd : msg_KidnapCommand => dispatchImpl(cmd, KidnapModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
 		case cmd : ParallelMessage => {
@@ -61,7 +64,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 	
 	val timeOutSchdule = context.system.scheduler.scheduleOnce(2000 second, self, new timeout)
 
-	def rstReturn = tmp match {
+	def rstReturn : Unit = tmp match {
 		case Some(_) => { rst match {
 			case Some(r) => 
 				msr.lst match {
@@ -82,7 +85,6 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 					}
 					case _ => println("msr error")
 				}
-				cancelActor
 			case _ => Unit
 		}}
 		case _ => println("never go here"); Unit
@@ -90,6 +92,6 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 	
 	def cancelActor = {
 		timeOutSchdule.cancel
-//		context.stop(self)
+//		context.stop(self) 		// 因为后创建的是前创建的子Actor，当父Actor stop的时候，子Actor 也同时Stop，不能进行传递了
 	}
 }
