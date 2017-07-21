@@ -99,6 +99,7 @@ trait KidnapConditions {
         builder += "date" -> date
         builder += "update_date" -> date
         builder += "data_source" -> (js \ "data_source").asOpt[String].map (x => x).getOrElse("")
+        builder += "talking" -> (js \ "talking").asOpt[String].map (x => x).getOrElse("")
 
         builder.result
     }
