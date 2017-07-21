@@ -123,6 +123,16 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map("token" -> toJson(token), "condition" -> toJson(Map("user_id" -> user_id, "owner_id" -> user_id, "service_id" -> service_id)))))
             .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def queryServiceDetail(token : String, service_id : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/kidnap/detail")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token), "condition" -> toJson(Map("service_id" -> service_id)))))
+            .map { response =>
                 println(response.json)
                 response.json
             }

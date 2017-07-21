@@ -77,6 +77,7 @@ class KidnapTestSpec extends Specification with BeforeAll {
                 push service with with no right                                 $pushServiceTest
                 push service with info                                          $pushServiceTestAgain
                 pop service                                                     $popServiceTest
+                query service detail                                            $queryServiceDetailTest
                                                                                 """
 
     override def beforeAll() : Unit = {
@@ -151,6 +152,27 @@ class KidnapTestSpec extends Specification with BeforeAll {
                     new DongdaClient(client, "http://127.0.0.1:9000").popService(token_2, user_id_2, service_id), time_out)
 
                 (reVal \ "status").asOpt[String].get must_== "ok"
+            }
+        }
+
+    def queryServiceDetailTest =
+        WsTestClient.withClient { client =>
+            val reVal = Await.result(
+                new DongdaClient(client, "http://127.0.0.1:9000").pushService(token_2, user_id_2, service_info(user_id_2)), time_out)
+
+            (reVal \ "status").asOpt[String].get must_== "ok"
+            val service_id = (reVal \ "result" \ "service" \ "service_id").asOpt[String].get
+            service_id.length must_!= 0
+
+            {
+                val reVal = Await.result(
+                    new DongdaClient(client, "http://127.0.0.1:9000").queryServiceDetail(token_2, service_id), time_out)
+
+                (reVal \ "status").asOpt[String].get must_== "ok"
+
+                val result = (reVal \ "result" \ "service").asOpt[JsValue].get
+
+                (result \ "title").asOpt[String].get must_== "service title"
             }
         }
 }
