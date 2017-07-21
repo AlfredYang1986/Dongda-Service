@@ -46,4 +46,22 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
             :: msg_KidnapDetail(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
+
+    def searchService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import bmpattern.LogMessage.common_log
+        import bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("search service"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_KidnapSearch(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
+
+    def multiQueryService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import bmpattern.LogMessage.common_log
+        import bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("multiple service"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_KidnapMultiQuery(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
 }

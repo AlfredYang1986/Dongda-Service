@@ -16,6 +16,8 @@ POST    /al/profile/update                      controllers.ProfileController.up
 POST    /al/kidnap/push                         controllers.KidnapController.pushService
 POST    /al/kidnap/pop                          controllers.KidnapController.popService
 POST    /al/kidnap/detail                       controllers.KidnapController.detailService
+POST    /al/kidnap/search                       controllers.KidnapController.searchService
+POST    /al/kidnap/multi                        controllers.KidnapController.multiQueryService
 
 # auth 用户授权 End Point (详情参考概要设计，@Alfred)
 # 这个是直接登陆，后面去掉不要直接调用
