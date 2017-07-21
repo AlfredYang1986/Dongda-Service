@@ -101,8 +101,11 @@ object ProfileModule extends ModuleTrait {
             import inner_conditions.sc
             import inner_conditions.sr
 
+            val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
+            val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
+
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-            val reVal = db.queryMultipleObject(data, "users")
+            val reVal = db.queryMultipleObject(data, "users", skip = skip, take = take)
             (Some(Map("profile" -> toJson(reVal))), None)
 
         } catch {

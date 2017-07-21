@@ -27,6 +27,39 @@ object ErrorCode {
         new ErrorNode("reg phone or code error", -302, "电话号码或者验证码出错"),
 
 		new ErrorNode("push service input error", -401, "添加服务时参数错误"),
+		new ErrorNode("search service input error", -402, "搜索服务时参数错误, 需要服务ID"),
+		new ErrorNode("service result error", -403, "服务信息数据出错"),
+		new ErrorNode("only can push own service", -404, "自己只能发自己的服务"),
+		new ErrorNode("only service provider can push service", -405, "只有成为服务者才能发布信息"),
+		new ErrorNode("pop service input error", -405, "删除服务时需要服务ID和发布者ID"),
+		new ErrorNode("only can pop own service", -406, "自己只能删除自己的服务"),
+		new ErrorNode("only can update own service", -407, "自己只能修改自己的服务"),
+		new ErrorNode("service not exist", -408, "服务不存在"),
+
+		new ErrorNode("no db connection", -901, "没找到数据库链接"),
+		new ErrorNode("db prase error", -902, "数据库结构发现错误"),
+		new ErrorNode("no encrypt impl", -903, "权限加密方式不清晰或者Token不存在"),
+		new ErrorNode("token parse error", -904, "token数据解析出现错误"),
+		new ErrorNode("token expired", -905, "token过期"),
+		new ErrorNode("db aggregation error", -906, "数据Map Reduce操作发生错误"),
+
+		new ErrorNode("unknown error", -999, "unknown error")
+	)
+
+	def getErrorCodeByName(name : String) : Int = (xls.find(x => x.name == name)) match {
+		case Some(y) => y.code
+		case None => -9999
+	}
+
+	def getErrorMessageByName(name : String) : String = (xls.find(x => x.name == name)) match {
+		case Some(y) => y.message
+		case None => "unknow error"
+	}
+
+	def errorToJson(name : String) : JsValue =
+		Json.toJson(Map("status" -> toJson("error"), "error" ->
+			toJson(Map("code" -> toJson(this.getErrorCodeByName(name)), "message" -> toJson(this.getErrorMessageByName(name))))))
+}
 
 		new ErrorNode("no db connection", -901, "没找到数据库链接"),
 		new ErrorNode("db prase error", -902, "数据库结构发现错误"),
