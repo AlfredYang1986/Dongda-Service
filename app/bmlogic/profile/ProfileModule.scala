@@ -18,10 +18,28 @@ object ProfileModule extends ModuleTrait {
         case msg_ProfileMultiQuery(data) => multiProfileQuery(data)
         case msg_ProfileUpdate(data) => updateProfile(data)
         case msg_ProfileCanUpdate(data) => canUpdate(data)(pr)
+        case msg_ProfileWithToken(data) => profileWithToken(pr)
         case _ => ???
     }
 
     object inner_conditions extends queryConditions with multiQueryConditions with searchConditions with profileResults
+
+    def profileWithToken(pr : Option[Map[String, JsValue]])
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val auth = pr.get.get("auth").get
+            val user_id = (auth \ "user_id").asOpt[String].get
+            import inner_conditions.dr
+            val reVal = db.queryObject(DBObject("user_id" -> user_id), "users").map (x => x).getOrElse(throw new Exception("user not exist"))
+            (Some(Map("profile" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
 
     def queryProfile(data : JsValue)
                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {

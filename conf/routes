@@ -14,6 +14,7 @@ POST    /al/profile/update                      controllers.ProfileController.up
 
 # kidnap 用户服务向光功能
 POST    /al/kidnap/push                         controllers.KidnapController.pushService
+POST    /al/kidnap/pop                          controllers.KidnapController.popService
 
 # auth 用户授权 End Point (详情参考概要设计，@Alfred)
 # 这个是直接登陆，后面去掉不要直接调用

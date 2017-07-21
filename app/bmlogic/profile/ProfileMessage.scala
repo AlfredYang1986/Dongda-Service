@@ -6,6 +6,7 @@ import bmmessages.CommonMessage
 abstract class msg_ProfileCommand extends CommonMessage
 
 object ProfileMessage {
+    case class msg_ProfileWithToken(data : JsValue) extends msg_ProfileCommand
     case class msg_ProfileQuery(data : JsValue) extends msg_ProfileCommand
     case class msg_ProfileUpdate(data : JsValue) extends msg_ProfileCommand
     case class msg_ProfileSearch(data : JsValue) extends msg_ProfileCommand

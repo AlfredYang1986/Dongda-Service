@@ -76,6 +76,7 @@ class KidnapTestSpec extends Specification with BeforeAll {
             The 'dongda' kidnap functions should
                 push service with with no right                                 $pushServiceTest
                 push service with info                                          $pushServiceTestAgain
+                pop service                                                     $popServiceTest
                                                                                 """
 
     override def beforeAll() : Unit = {
@@ -124,5 +125,32 @@ class KidnapTestSpec extends Specification with BeforeAll {
                 new DongdaClient(client, "http://127.0.0.1:9000").pushService(token_2, user_id_2, service_info(user_id_2)), time_out)
 
             (reVal \ "status").asOpt[String].get must_== "ok"
+        }
+
+    def popServiceTest =
+        WsTestClient.withClient { client =>
+            val reVal = Await.result(
+                new DongdaClient(client, "http://127.0.0.1:9000").pushService(token_2, user_id_2, service_info(user_id_2)), time_out)
+
+            (reVal \ "status").asOpt[String].get must_== "ok"
+            val service_id = (reVal \ "result" \ "service" \ "service_id").asOpt[String].get
+            service_id.length must_!= 0
+
+            {
+                val reVal = Await.result(
+                    new DongdaClient(client, "http://127.0.0.1:9000").popService(token_1, user_id_2, service_id), time_out)
+
+                (reVal \ "status").asOpt[String].get must_== "error"
+
+                val error = (reVal \ "error").asOpt[JsValue].get
+                (error \ "code").asOpt[Int].get must_== -407
+            }
+
+            {
+                val reVal = Await.result(
+                    new DongdaClient(client, "http://127.0.0.1:9000").popService(token_2, user_id_2, service_id), time_out)
+
+                (reVal \ "status").asOpt[String].get must_== "ok"
+            }
         }
 }
