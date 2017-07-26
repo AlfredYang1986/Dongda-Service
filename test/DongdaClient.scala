@@ -133,7 +133,36 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map("token" -> toJson(token), "condition" -> toJson(Map("service_id" -> service_id)))))
             .map { response =>
-                println(response.json)
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def pushOrder(token : String, user_id : String, service_id : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/order/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token),
+                             "order" -> toJson(Map(
+                                 "user_id" -> toJson(user_id),
+                                 "service_id" -> toJson(service_id),
+                                 "total_fee" -> toJson(1)
+                             )))))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def popOrder(token : String, user_id : String, order_id : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/order/pop")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "user_id" -> user_id,
+                    "order_id" -> order_id
+                )))))
+            .map { response =>
+//                println(response.json)
                 response.json
             }
     }

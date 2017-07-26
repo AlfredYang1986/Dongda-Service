@@ -19,6 +19,10 @@ POST    /al/kidnap/detail                       controllers.KidnapController.det
 POST    /al/kidnap/search                       controllers.KidnapController.searchService
 POST    /al/kidnap/multi                        controllers.KidnapController.multiQueryService
 
+# order 相关功能
+POST    /al/order/push                          controllers.OrderController.pushOrder
+POST    /al/order/pop                           controllers.OrderController.popOrder
+
 # auth 用户授权 End Point (详情参考概要设计，@Alfred)
 # 这个是直接登陆，后面去掉不要直接调用
 POST    /al/auth                                controllers.AuthController.authLogin
