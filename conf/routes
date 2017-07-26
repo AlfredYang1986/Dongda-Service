@@ -41,5 +41,9 @@ POST    /al/auth                                controllers.AuthController.authL
 POST    /post/uploadFile                            controllers.FopController.uploadFile
 GET     /query/downloadFile/:name                   controllers.FopController.downloadFile(name)
 
+# alipay相关
+POST	/alipay/callback							controllers.v2.AlipayController.alipaycallback
+POST	/alipay/redirect							controllers.v2.AlipayController.redirecturi
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
