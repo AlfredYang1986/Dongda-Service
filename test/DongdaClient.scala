@@ -142,6 +142,9 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
         ws.url(baseUrl + "/al/order/push")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map("token" -> toJson(token),
+                             "condition" -> toJson(Map(
+                                 "service_id" -> toJson(service_id)
+                             )),
                              "order" -> toJson(Map(
                                  "user_id" -> toJson(user_id),
                                  "service_id" -> toJson(service_id),
@@ -163,6 +166,51 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 )))))
             .map { response =>
 //                println(response.json)
+                response.json
+            }
+    }
+
+    def detailOrder(token : String, user_id : String, order_id : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/order/detail")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "user_id" -> user_id,
+                    "order_id" -> order_id
+                )))))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def searchOrders(token : String, user_id : String, owner_id : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/order/search")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map("token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "owner_id" -> owner_id
+                )))))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def updateOrder(token : String, order_id : String, order_title : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/order/update")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "order_id" -> toJson(order_id)
+                )),
+                "order" -> toJson(Map(
+                    "order_title" -> toJson(order_title)
+                ))
+            )))
+            .map { response =>
+                println(response.json)
                 response.json
             }
     }

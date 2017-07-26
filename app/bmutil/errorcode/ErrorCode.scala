@@ -39,6 +39,8 @@ object ErrorCode {
 		new ErrorNode("push order input error", -501, "添加订单时输入参数错误"),
         new ErrorNode("order output error", -502, "订单数据返回解析错误"),
         new ErrorNode("order detail condition error", -503, "缺少订单id"),
+        new ErrorNode("query multi order condition error", -504, "缺少订单id列表"),
+        new ErrorNode("order not exist", -505, "查询的订单不存在"),
 
 		new ErrorNode("no db connection", -901, "没找到数据库链接"),
 		new ErrorNode("db prase error", -902, "数据库结构发现错误"),

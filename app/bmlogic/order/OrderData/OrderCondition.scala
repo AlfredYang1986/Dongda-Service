@@ -1,5 +1,7 @@
 package bmlogic.order.OrderData
 
+import java.util.Date
+
 import bmlogic.common.sercurity.Sercurity
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
@@ -42,6 +44,11 @@ trait OrderCondition {
         builder += "total_fee" -> (js \ "total_fee").asOpt[Int].map (x => x).getOrElse(throw new Exception("push Order input error"))
         builder += "further_message" -> (js \ "further_message").asOpt[String].map (x => x).getOrElse("")
         builder += "prepay_id" -> ""
+
+        builder += "date" -> new Date().getTime
+        builder += "pay_date" -> -1
+
+        builder += "status" -> orderStatus.posted.t
 
         builder.result
     }

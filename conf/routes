@@ -22,11 +22,24 @@ POST    /al/kidnap/multi                        controllers.KidnapController.mul
 # order 相关功能
 POST    /al/order/push                          controllers.OrderController.pushOrder
 POST    /al/order/pop                           controllers.OrderController.popOrder
+POST    /al/order/detail                        controllers.OrderController.detailOrder
+POST    /al/order/search                        controllers.OrderController.searchOrders
+POST    /al/order/multi                         controllers.OrderController.queryMultiOrders
+POST    /al/order/update                        controllers.OrderController.updateOrder
+
+POST    /al/order/accept                        controllers.OrderController.acceptOrder
+POST    /al/order/reject                        controllers.OrderController.rejectOrder
+POST    /al/order/cancel                        controllers.OrderController.cancelOrder
+POST    /al/order/accomplish                    controllers.OrderController.accomplishOrder
 
 # auth 用户授权 End Point (详情参考概要设计，@Alfred)
 # 这个是直接登陆，后面去掉不要直接调用
 POST    /al/auth                                controllers.AuthController.authLogin
 # POST    /al/auth/code                           controllers.Auth
+
+# 文件相关
+POST    /post/uploadFile                            controllers.FopController.uploadFile
+GET     /query/downloadFile/:name                   controllers.FopController.downloadFile(name)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
