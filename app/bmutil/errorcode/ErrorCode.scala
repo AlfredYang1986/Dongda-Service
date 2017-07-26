@@ -42,6 +42,9 @@ object ErrorCode {
         new ErrorNode("query multi order condition error", -504, "缺少订单id列表"),
         new ErrorNode("order not exist", -505, "查询的订单不存在"),
 
+        new ErrorNode("tm input error", -601, "添加时间管理参数错误"),
+        new ErrorNode("tm output error", -602, "时间管理数据返回解析错误"),
+
 		new ErrorNode("no db connection", -901, "没找到数据库链接"),
 		new ErrorNode("db prase error", -902, "数据库结构发现错误"),
 		new ErrorNode("no encrypt impl", -903, "权限加密方式不清晰或者Token不存在"),
