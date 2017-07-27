@@ -15,6 +15,7 @@ import bmlogic.profile.{ProfileModule, msg_ProfileCommand}
 import bmlogic.kidnap.{KidnapModule, msg_KidnapCommand}
 import bmlogic.order.{OrderModule, msg_OrderCommand}
 import bmlogic.timemanager.{TimemanagerModule, msg_TMCommand}
+import bmlogic.collections.{CollectionsModule, msg_CollectionsCommand}
 
 object PipeFilterActor {
 	def prop(originSender : ActorRef, msr : MessageRoutes) : Props = {
@@ -52,6 +53,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		case cmd : msg_KidnapCommand => dispatchImpl(cmd, KidnapModule)
 		case cmd : msg_OrderCommand => dispatchImpl(cmd, OrderModule)
 		case cmd : msg_TMCommand => dispatchImpl(cmd, TimemanagerModule)
+		case cmd : msg_CollectionsCommand => dispatchImpl(cmd, CollectionsModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
 		case cmd : ParallelMessage => {

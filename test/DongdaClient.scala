@@ -282,4 +282,74 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def pushCollection(token : String, user_id : String, service_id : String) = {
+        ws.url(baseUrl + "/al/collections/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "user_id" -> toJson(user_id),
+                    "service_id" -> toJson(service_id)
+                )),
+                "collections" -> toJson(Map(
+                    "user_id" -> toJson(user_id),
+                    "service_id" -> toJson(service_id)
+                ))
+            )))
+            .map { response =>
+                println(response.json)
+                response.json
+            }
+    }
+
+    def popCollection(token : String, user_id : String, service_id : String) = {
+        ws.url(baseUrl + "/al/collections/pop")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "user_id" -> toJson(user_id),
+                    "service_id" -> toJson(service_id)
+                )),
+                "collections" -> toJson(Map(
+                    "user_id" -> toJson(user_id),
+                    "service_id" -> toJson(service_id)
+                ))
+            )))
+            .map { response =>
+                println(response.json)
+                response.json
+            }
+    }
+
+    def queryUserCollections(token : String, user_id : String) = {
+        ws.url(baseUrl + "/al/user/collections")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "user_id" -> toJson(user_id)
+                ))
+            )))
+            .map { response =>
+                println(response.json)
+                response.json
+            }
+    }
+
+    def queryCollectedUsers(token : String, service_id : String) = {
+        ws.url(baseUrl + "/al/collected/users")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "service_id" -> toJson(service_id)
+                ))
+            )))
+            .map { response =>
+                println(response.json)
+                response.json
+            }
+    }
 }

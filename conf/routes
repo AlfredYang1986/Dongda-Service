@@ -51,5 +51,11 @@ POST    /al/tm/query                                controllers.TimemanagerContr
 POST    /al/tm/pop                                  controllers.TimemanagerController.popTM
 POST    /al/tm/update                               controllers.TimemanagerController.updateTM
 
+# collection 用户收藏相关
+POST    /al/collections/push                         controllers.CollectionsController.pushCollection
+POST    /al/collections/pop                          controllers.CollectionsController.popCollection
+POST    /al/user/collections                         controllers.CollectionsController.queryUserCollections
+POST    /al/collected/users                          controllers.CollectionsController.queryCollectedUser
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
