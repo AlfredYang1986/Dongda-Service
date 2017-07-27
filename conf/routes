@@ -35,7 +35,8 @@ POST    /al/order/accomplish                    controllers.OrderController.acco
 # auth 用户授权 End Point (详情参考概要设计，@Alfred)
 # 这个是直接登陆，后面去掉不要直接调用
 POST    /al/auth                                controllers.AuthController.authLogin
-# POST    /al/auth/code                           controllers.Auth
+POST    /al/auth/code                           controllers.AuthController.authWithPhoneCode
+POST    /al/auth/sns                            controllers.AuthController.authWithSNS
 
 # 文件相关
 POST    /post/uploadFile                            controllers.FopController.uploadFile
