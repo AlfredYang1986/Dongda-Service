@@ -210,7 +210,75 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 ))
             )))
             .map { response =>
-                println(response.json)
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def pushTM(token : String, service_id : String, tms : List[JsValue]) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/tm/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "service_id" -> toJson(service_id)
+                )),
+                "timemanager" -> toJson(Map(
+                    "service_id" -> toJson(service_id),
+                    "tms" -> toJson(tms)
+                ))
+            )))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def popTM(token : String, service_id : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/tm/pop")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "service_id" -> toJson(service_id)
+                ))
+            )))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def queryTM(token : String, service_id : String) : Future[JsValue] = {
+        ws.url(baseUrl + "/al/tm/query")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "service_id" -> toJson(service_id)
+                ))
+            )))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def updateTM(token : String, service_id : String, tms : List[JsValue]) = {
+        ws.url(baseUrl + "/al/tm/update")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "service_id" -> toJson(service_id)
+                )),
+                "timemanager" -> toJson(Map(
+                    "service_id" -> toJson(service_id),
+                    "tms" -> toJson(tms)
+                ))
+            )))
+            .map { response =>
+//                println(response.json)
                 response.json
             }
     }

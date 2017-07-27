@@ -1,11 +1,14 @@
 package controllers
 
+import javax.inject.Inject
+
+import akka.actor.ActorSystem
 import play.api.mvc._
-
 import bmlogic.email.EmailModule
+import bmlogic.common.requestArgsQuery
 
-import controllers.common.requestArgsQuery.{requestArgs}
+class emailController @Inject() (as_inject : ActorSystem) extends Controller {
+	implicit val as = as_inject
 
-class emailController extends Controller {
-	def sendEmail = Action (request => requestArgs(request)(EmailModule.sendEmail))
+	def sendEmail = Action (request => requestArgsQuery().requestArgs(request)(EmailModule.sendEmail))
 }

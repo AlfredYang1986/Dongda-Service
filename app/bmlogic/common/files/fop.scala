@@ -1,24 +1,25 @@
-package module.common.files
+package bmlogic.common.files
 
 import java.io.File
+
 import play.api.libs.Files
 import java.io.FileInputStream
 
+import bmutil.errorcode.ErrorCode
 import play.api.mvc.MultipartFormData
 import play.api.libs.Files.TemporaryFile
-
 import play.api.libs.json.Json
 import play.api.libs.json.Json._
 import play.api.libs.json.JsValue
 
-import util.errorcode.ErrorCode
-
 object fop {
 	def uploadFile(data : MultipartFormData[TemporaryFile]) : JsValue = {
 	  	data.file("upload").map { x =>
-	  	  	Files.moveFile(x.ref.file, new File("upload/" + x.filename), true, true)
-	  
-			Json.toJson(Map("status" -> toJson("ok"), "result" -> toJson("success")))
+            Files.TemporaryFile(x.ref.file).moveTo(new File("upload/" + x.filename), true)
+
+			Json.toJson(Map("status" -> toJson("ok"),
+                            "file_name" -> toJson(x.filename),
+                            "result" -> toJson("success")))
 	  	  	
 	  	}.getOrElse {
 			ErrorCode.errorToJson("post image error")

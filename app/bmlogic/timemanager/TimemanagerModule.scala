@@ -13,14 +13,14 @@ import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 
-class TimemanagerModule extends ModuleTrait {
+object TimemanagerModule extends ModuleTrait {
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
 
         case msg_pushTMCommand(data) => pushServiceTM(data)
         case msg_popTMCommand(data) => popServiceTM(data)
         case msg_queryTMCommand(data) => queryServiceTM(data)
-//        case msg_updateTMCommand(data) => updateServiceTM(data)(pr)
-        case msg_queryMultipleTMCommand(data) => queryMultipleServiceTM(data)(pr)
+        case msg_updateTMCommand(data) => updateServiceTM(data)
+        case msg_queryMultipleTMCommand(data) => queryMultipleServiceTM(data)
 
         case _ => ???
     }
@@ -140,7 +140,8 @@ class TimemanagerModule extends ModuleTrait {
                 obj - "date"
             }
 
-            (Some(Map("timermanager" -> toJson(reVal))), None)
+            if (reVal.isEmpty) pushServiceTM(data)
+            else (Some(Map("timemanager" -> toJson(reVal.get))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
