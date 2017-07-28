@@ -16,7 +16,7 @@ POST    /al/profile/update                      controllers.ProfileController.up
 POST    /al/kidnap/push                         controllers.KidnapController.pushService
 POST    /al/kidnap/pop                          controllers.KidnapController.popService
 POST    /al/kidnap/detail                       controllers.KidnapController.detailService
-POST    /al/kidnap/search                       controllers.KidnapController.searchService
+POST    /al/kidnap/search                        controllers.KidnapController.searchService
 POST    /al/kidnap/multi                        controllers.KidnapController.multiQueryService
 
 # order 相关功能
@@ -57,6 +57,9 @@ POST    /al/collections/push                         controllers.CollectionsCont
 POST    /al/collections/pop                          controllers.CollectionsController.popCollection
 POST    /al/user/collections                         controllers.CollectionsController.queryUserCollections
 POST    /al/collected/users                          controllers.CollectionsController.queryCollectedUser
+
+# 邮件发送相关
+POST    /al/email/privacy                            controllers.emailController.sendEmail
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
