@@ -64,7 +64,7 @@ object OrderModule extends ModuleTrait {
             import inner_trait.dr
             val o : DBObject = data
             o += "owner_id" -> owner_id
-            db.insertObject(o, "order", "order_id")
+            db.insertObject(o, "orders", "order_id")
             val reVal = toJson(o - "date" - "pay_date")
 
             (Some(Map("order" -> reVal)), None)
@@ -82,7 +82,7 @@ object OrderModule extends ModuleTrait {
 
             import inner_trait.dc
             val o : DBObject = data
-            db.deleteObject(o, "order", "order_id")
+            db.deleteObject(o, "orders", "order_id")
 
             (Some(Map("pop" -> toJson("success"))), None)
 
@@ -100,7 +100,7 @@ object OrderModule extends ModuleTrait {
             import inner_trait.dc
             import inner_trait.dr
             val o : DBObject = data
-            val reVal = db.queryObject(o, "order")
+            val reVal = db.queryObject(o, "orders")
 
             if (reVal.isEmpty) throw new Exception("order not exist")
             else (Some(Map("order" -> toJson(reVal.get - "date" - "pay_date"))), None)
@@ -121,7 +121,7 @@ object OrderModule extends ModuleTrait {
             import inner_trait.sc
             import inner_trait.dr
             val o : DBObject = data
-            val reVal = db.queryMultipleObject(o, "order", skip = skip, take = take)
+            val reVal = db.queryMultipleObject(o, "orders", skip = skip, take = take)
 
             (Some(Map("orders" -> toJson(reVal))), None)
 
@@ -142,7 +142,7 @@ object OrderModule extends ModuleTrait {
             import inner_trait.mc
             import inner_trait.dr
             val o : DBObject = data
-            val reVal = db.queryMultipleObject(o, "order", skip = skip, take = take)
+            val reVal = db.queryMultipleObject(o, "orders", skip = skip, take = take)
 
             (Some(Map("orders" -> toJson(reVal))), None)
 
@@ -166,7 +166,7 @@ object OrderModule extends ModuleTrait {
                 (data \ "order" \ "further_message").asOpt[String].map (x => obj += "further_message" -> x).getOrElse(Unit)
                 (data \ "order" \ "status").asOpt[Int].map (x => obj += "status" -> x.asInstanceOf[Number]).getOrElse(Unit)
 
-                db.updateObject(obj, "order", "order_id")
+                db.updateObject(obj, "orders", "order_id")
 
                 import inner_trait.dr
                 obj - "date" - "pay_date"
