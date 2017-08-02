@@ -7,5 +7,5 @@ import javax.inject.Singleton
 /**
   * Created by alfredyang on 01/06/2017.
   */
-//@Singleton
+@Singleton
 class DongdaModuleImpl extends DongaTokenTrait with MongoDBImpl
