@@ -36,6 +36,10 @@ trait KidnapSearchConditions {
             // TODO: 应该有价格区间和年龄区间
         }
 
-        $and((Some(builder.result) :: loction_condition :: Nil).filterNot(_ == None).map (_.get))
+        (Some(builder.result) :: loction_condition :: Nil).filterNot(_ == None).map (_.get) match {
+            case Nil => DBObject()
+            case head :: Nil => head
+            case lst : List[DBObject] => $and(lst)
+        }
     }
 }

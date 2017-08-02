@@ -12,8 +12,8 @@ trait KidnapResults {
                 "adjust" -> loc.getAs[String]("adjust").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "pin" -> toJson(
                     Map(
-                        "latitude" -> toJson(obj.getAs[MongoDBObject]("pin").get.getAs[Number]("latitude").get.floatValue),
-                        "longitude" -> toJson(obj.getAs[MongoDBObject]("pin").get.getAs[Number]("longitude").get.floatValue)
+                        "latitude" -> toJson(loc.getAs[MongoDBObject]("pin").get.getAs[Number]("latitude").get.floatValue),
+                        "longitude" -> toJson(loc.getAs[MongoDBObject]("pin").get.getAs[Number]("longitude").get.floatValue)
                     )
                 )
             )
@@ -31,8 +31,8 @@ trait KidnapResults {
                 "price" -> det.getAs[Number]("price").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),
                 "age_boundary" -> toJson(
                     Map(
-                        "lsl" -> toJson(obj.getAs[MongoDBObject]("age_boundary").get.getAs[Number]("lsl").get.floatValue),
-                        "usl" -> toJson(obj.getAs[MongoDBObject]("age_boundary").get.getAs[Number]("usl").get.floatValue)
+                        "lsl" -> toJson(det.getAs[MongoDBObject]("age_boundary").get.getAs[Number]("lsl").get.floatValue),
+                        "usl" -> toJson(det.getAs[MongoDBObject]("age_boundary").get.getAs[Number]("usl").get.floatValue)
                     )
                 )
             )

@@ -3,8 +3,7 @@ package bmlogic.common.http
 import collection.JavaConversions._
 import java.net._
 import java.io._
-import io.Source.fromInputStream
-import play.api.libs.json.Json
+//import io.Source.fromInputStream
 import play.api.libs.json.Json.{toJson, parse}
 import play.api.libs.json.JsValue
 

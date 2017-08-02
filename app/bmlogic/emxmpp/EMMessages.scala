@@ -1,4 +1,4 @@
-package bmlogic.notification
+package bmlogic.emxmpp
 
 import bmmessages.CommonMessage
 import play.api.libs.json.JsValue

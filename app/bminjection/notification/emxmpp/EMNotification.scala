@@ -1,18 +1,14 @@
-package bmlogic.notification
-
-import bmlogic.common.http._
-import play.api.libs.json.Json
-import play.api.libs.json.Json.{toJson}
-import play.api.libs.json.JsValue
-
-import bmutil.dao.from
-import bmutil.dao._data_connection
-import bmutil.errorcode.ErrorCode
-import com.mongodb.casbah.Imports._
+package bminjection.notification.emxmpp
 
 import java.util.Date
 
-object DDNEMNotification {
+import bmlogic.common.http._
+import bmutil.dao.{_data_connection, from}
+import com.mongodb.casbah.Imports._
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json.toJson
+
+object EMNotification {
   	val app_key = "blackmirror#dongda"
   	val org_name = "blackmirror"
   	val app_name = "dongda"
@@ -20,8 +16,8 @@ object DDNEMNotification {
   	val client_id = "YXA6A-uzcDn4Eeag6S9CRYv19Q"
   	val client_secret = "YXA6cXkx9z9LnMdNWHRrcNugX4-M354"
   	
-//	  val notification_account = "dongda_master"
-//	  val notification_password = "Passw0rd"
+	  val notification_account = "dongda_master"
+	  val notification_password = "Passw0rd"
 	
 	  val em_host = "https://a1.easemob.com/"
 	  

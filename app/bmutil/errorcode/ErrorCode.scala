@@ -17,7 +17,7 @@ object ErrorCode {
 
 		new ErrorNode("user push error", -201, "用户创建失败"),
         new ErrorNode("user already exist", -202, "用户已经存在"),
-		new ErrorNode("user not exist", -203, "用户已经存在"),
+		new ErrorNode("user not exist", -203, "用户不存在"),
 		new ErrorNode("profile query input error", -204, "搜索用户没有提供用户ID"),
 		new ErrorNode("profile multi query input error", -205, "搜索多用户没有提供用户ID列表"),
 		new ErrorNode("profile update input error", -206, "修改用户信息修改错误"),
@@ -54,6 +54,8 @@ object ErrorCode {
 		new ErrorNode("token parse error", -904, "token数据解析出现错误"),
 		new ErrorNode("token expired", -905, "token过期"),
 		new ErrorNode("db aggregation error", -906, "数据Map Reduce操作发生错误"),
+		new ErrorNode("notification module not exist", -907, "用户提醒服务模块不存在"),
+		new ErrorNode("akka module not exist", -908, "系统并发分发模块不存在"),
 
 		new ErrorNode("unknown error", -999, "unknown error")
 	)
