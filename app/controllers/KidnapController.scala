@@ -55,7 +55,7 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
         import bmpattern.ResultMessage.common_result
         implicit val cm = (CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search service"))), jv)
-//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_KidnapSearch(jv)
             ::
             ParallelMessage(
