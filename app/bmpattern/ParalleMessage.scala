@@ -12,6 +12,9 @@ object ParallelMessage {
 	}
 }
 
-case class ParallelMessage(msgs : List[MessageRoutes], merge : List[Map[String, JsValue]] => Map[String, JsValue]) extends MessageDefines
+case class ParallelMessage(msgs : List[MessageRoutes],
+						   merge : List[Map[String, JsValue]] =>
+										Option[Map[String, JsValue]] =>
+										Map[String, JsValue]) extends MessageDefines
 case class ParalleMessageSuccess(r : Map[String, JsValue]) extends CommonMessage
 case class ParalleMessageFailed(e : JsValue) extends CommonMessage

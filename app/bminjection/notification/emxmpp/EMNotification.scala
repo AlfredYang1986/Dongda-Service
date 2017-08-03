@@ -17,7 +17,7 @@ object EMNotification {
   	val client_secret = "YXA6cXkx9z9LnMdNWHRrcNugX4-M354"
   	
 	  val notification_account = "dongda_master"
-	  val notification_password = "Passw0rd"
+	  val notification_password = "PassW0rd"
 	
 	  val em_host = "https://a1.easemob.com/"
 	  

@@ -9,7 +9,6 @@ trait KidnapResults {
         val loc_map = obj.getAs[MongoDBObject]("location").map { loc =>
             Map(
                 "address" -> loc.getAs[String]("address").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
-                "adjust" -> loc.getAs[String]("adjust").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "pin" -> toJson(
                     Map(
                         "latitude" -> toJson(loc.getAs[MongoDBObject]("pin").get.getAs[Number]("latitude").get.floatValue),
@@ -22,6 +21,7 @@ trait KidnapResults {
         val category_map = obj.getAs[MongoDBObject]("category").map { cat =>
             Map(
                 "service_cat" -> cat.getAs[String]("service_cat").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
+                "cans_cat" -> cat.getAs[String]("cans_cat").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "concert" -> cat.getAs[String]("concert").map (x => toJson(x)).getOrElse(throw new Exception("service result error"))
             )
         }.getOrElse(throw new Exception("service result error"))
@@ -38,12 +38,14 @@ trait KidnapResults {
             )
         }.getOrElse(throw new Exception("service result error"))
 
+        val images = obj.getAs[MongoDBList]("images").get.toList.asInstanceOf[List[String]]
+
         Map(
             "owner_id" -> toJson(obj.getAs[String]("owner_id").get),
             "service_id" -> toJson(obj.getAs[String]("service_id").get),
             "title" -> toJson(obj.getAs[String]("title").get),
-            "description" -> toJson(obj.getAs[String]("description").get),
-            "images" -> toJson(obj.getAs[MongoDBList]("images").get.toList.asInstanceOf[List[String]])
+            "images" -> toJson(if (images.isEmpty) ""
+                               else images.head)
         ) + ("location" -> toJson(loc_map)) + ("category" -> toJson(category_map)) + ("detail" -> toJson(detail_map))
     }
 

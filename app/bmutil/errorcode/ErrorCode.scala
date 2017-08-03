@@ -56,6 +56,7 @@ object ErrorCode {
 		new ErrorNode("db aggregation error", -906, "数据Map Reduce操作发生错误"),
 		new ErrorNode("notification module not exist", -907, "用户提醒服务模块不存在"),
 		new ErrorNode("akka module not exist", -908, "系统并发分发模块不存在"),
+		new ErrorNode("merge result error", -909, "合并多结果失败"),
 
 		new ErrorNode("unknown error", -999, "unknown error")
 	)

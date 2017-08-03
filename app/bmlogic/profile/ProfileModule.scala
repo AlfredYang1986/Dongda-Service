@@ -1,6 +1,7 @@
 package bmlogic.profile
 
 import bminjection.db.DBTrait
+import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.profile.ProfileConditions._
 import bmlogic.profile.ProfileMessage.{msg_ProfileCanUpdate, _}
 import bmmessages.{CommonModules, MessageDefines}
@@ -14,8 +15,8 @@ object ProfileModule extends ModuleTrait {
 
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_ProfileQuery(data) => queryProfile(data)
-        case msg_ProfileSearch(data) => searchProfile(data)
-        case msg_ProfileMultiQuery(data) => multiProfileQuery(data)
+        case msg_ProfileSearch(data) => searchProfile(data)(pr)
+        case msg_ProfileMultiQuery(data) => multiProfileQuery(data)(pr)
         case msg_ProfileUpdate(data) => updateProfile(data)
         case msg_ProfileCanUpdate(data) => canUpdate(data)(pr)
         case msg_ProfileWithToken(data) => profileWithToken(pr)
@@ -97,6 +98,7 @@ object ProfileModule extends ModuleTrait {
     }
 
     def multiProfileQuery(data : JsValue)
+                         (pr : Option[Map[String, JsValue]])
                          (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
@@ -104,8 +106,10 @@ object ProfileModule extends ModuleTrait {
             import inner_conditions.sr
 
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-            val reVal = db.queryMultipleObject(data, "users")
-            (Some(Map("profile" -> toJson(reVal))), None)
+            val o : DBObject = MergeStepResult(data, pr)
+            val reVal = db.queryMultipleObject(o, "users")
+
+            (Some(Map("profiles" -> toJson(reVal))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -113,6 +117,7 @@ object ProfileModule extends ModuleTrait {
     }
 
     def searchProfile(data : JsValue)
+                     (pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {

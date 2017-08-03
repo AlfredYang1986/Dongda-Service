@@ -1,13 +1,16 @@
 package bmlogic.kidnap
 
+import java.util.Date
+
 import bminjection.db.DBTrait
+import bmlogic.common.mergestepresult.MergeParallelResult
 import bmlogic.kidnap.KidnapData._
 import bmlogic.kidnap.KidnapMessage._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
 import com.mongodb.casbah.Imports._
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
 object KidnapModule extends ModuleTrait {
@@ -158,10 +161,21 @@ object KidnapModule extends ModuleTrait {
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
 
+            val date = (data \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
+
             val o : DBObject = data
             val reVal = db.queryMultipleObject(o, "kidnap", skip = skip, take = take)
 
-            (Some(Map("services" -> toJson(reVal))), None)
+            val lst = reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+
+            (Some(Map("date" -> toJson(date),
+                      "count" -> toJson(skip + take),
+                      "services" -> toJson(reVal),
+                      "condition" -> toJson(Map(
+                                        "lst" -> toJson(lst),
+                                        "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
+                                    ))
+                 )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -203,5 +217,32 @@ object KidnapModule extends ModuleTrait {
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
+    }
+
+    def serviceResultMerge(lst : List[Map[String, JsValue]])
+                          (pr : Option[Map[String, JsValue]]) : Map[String, JsValue] = {
+
+        val para = MergeParallelResult(lst)
+
+        val services = pr.get.get("services").get.asOpt[List[JsValue]].get
+        val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
+        val collections = (para.get("collections").get \ "services").asOpt[List[String]].map (x => x).getOrElse(Nil)
+
+        val result =
+            services.map { iter =>
+                val service_id = (iter \ "service_id").asOpt[String].get
+                val owner_id = (iter \ "owner_id").asOpt[String].get
+                val user = profiles.find(p => (p \ "user_id").asOpt[String].get == owner_id).get
+
+                val isCollections = if (collections.contains(service_id)) 1
+                                    else 0
+
+                iter.as[JsObject].value.toMap -
+                    "owner_id" +
+                    ("owner" -> user) +
+                    ("isCollections" -> toJson(isCollections))
+            }
+
+        Map("services" -> toJson(result))
     }
 }

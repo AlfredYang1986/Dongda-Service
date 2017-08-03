@@ -33,7 +33,7 @@ class ScatterGatherActor(originSender : ActorRef, msr : MessageRoutes) extends A
 	var sub_act = Seq[ActorRef]()
 	var excepted = 0
 	val tmp_result : Ref[List[Map[String, JsValue]]] = Ref(Nil) 
-	var f : List[Map[String, JsValue]] => Map[String, JsValue] = null
+	var f : List[Map[String, JsValue]] => Option[Map[String, JsValue]] => Map[String, JsValue] = null
 	var rst : Option[Map[String, JsValue]] = msr.rst
 	
 	def receive = {
@@ -65,17 +65,17 @@ class ScatterGatherActor(originSender : ActorRef, msr : MessageRoutes) extends A
 	def rstReturn = {
 		msr.lst match {
 			case Nil => {
-				originSender ! result(toJson(f(tmp_result.single.get)))
+				originSender ! result(toJson(f(tmp_result.single.get)(rst)))
 			}
 			case head :: tail => {
-				val rst = Some(f(tmp_result.single.get))
+				val f_rst = Some(f(tmp_result.single.get)(rst))
 				head match {
 					case p : ParallelMessage => {
-						next = context.actorOf(ScatterGatherActor.prop(originSender, MessageRoutes(tail, rst)), "scat")
+						next = context.actorOf(ScatterGatherActor.prop(originSender, MessageRoutes(tail, f_rst)), "scat")
 						next ! head
 					}
 					case c : CommonMessage => {
-						next = context.actorOf(PipeFilterActor.prop(originSender, MessageRoutes(tail, rst)), "pipe")
+						next = context.actorOf(PipeFilterActor.prop(originSender, MessageRoutes(tail, f_rst)), "pipe")
 						next ! head
 					}
 				}
