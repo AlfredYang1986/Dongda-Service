@@ -13,6 +13,11 @@ trait KidnapSearchConditions {
         (js \ "condition" \ "service_id").asOpt[String].map (x => builder += "service_id" -> x).getOrElse(Unit)
 
         /**
+          * 时间相关
+          */
+        val date_condition = (js \ "condition" \ "date").asOpt[Long].map (x => Some("date" $lte x)).getOrElse(None)
+
+        /**
           * 地址相关
           */
         val loction_condition =
@@ -36,7 +41,7 @@ trait KidnapSearchConditions {
             // TODO: 应该有价格区间和年龄区间
         }
 
-        (Some(builder.result) :: loction_condition :: Nil).filterNot(_ == None).map (_.get) match {
+        (Some(builder.result) :: date_condition :: loction_condition :: Nil).filterNot(_ == None).map (_.get) match {
             case Nil => DBObject()
             case head :: Nil => head
             case lst : List[DBObject] => $and(lst)

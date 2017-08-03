@@ -161,7 +161,7 @@ object KidnapModule extends ModuleTrait {
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
 
-            val date = (data \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
+            val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
 
             val o : DBObject = data
             val reVal = db.queryMultipleObject(o, "kidnap", skip = skip, take = take)
@@ -224,6 +224,7 @@ object KidnapModule extends ModuleTrait {
 
         val para = MergeParallelResult(lst)
 
+        val date = pr.get.get("date").get
         val services = pr.get.get("services").get.asOpt[List[JsValue]].get
         val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
         val collections = (para.get("collections").get \ "services").asOpt[List[String]].map (x => x).getOrElse(Nil)
@@ -243,6 +244,6 @@ object KidnapModule extends ModuleTrait {
                     ("isCollections" -> toJson(isCollections))
             }
 
-        Map("services" -> toJson(result))
+        Map("services" -> toJson(result), "date" -> date)
     }
 }
