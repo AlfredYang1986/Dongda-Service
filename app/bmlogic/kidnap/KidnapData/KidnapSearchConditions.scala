@@ -24,7 +24,17 @@ trait KidnapSearchConditions {
             (js \ "condition" \ "location" \ "pin").asOpt[JsValue].map { loc =>
                 val lat = (loc \ "latitude").asOpt[Float].map (x => x).getOrElse(throw new Exception("search service input error"))
                 val log = (loc \ "longitude").asOpt[Float].map (x => x).getOrElse(throw new Exception("search service input error"))
-                Some("location.pin" $near (lat, log))
+
+                val tmp = MongoDBObject(
+                    "location.pin" -> MongoDBObject(
+                        "$nearSphere" -> MongoDBObject(
+                            "type" -> "Point",
+                            "coordinates" -> MongoDBList(log, lat)
+                        ),
+                        "$maxDistance" -> 1 ))
+
+                println(tmp)
+                Some(tmp)
             }.getOrElse (None)
 
         /**

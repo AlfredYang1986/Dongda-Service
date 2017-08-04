@@ -25,17 +25,7 @@ object OrderModule extends ModuleTrait {
         case msg_OrderCancel(data) => updateOrder(data)
         case msg_OrderAccomplish(data) => updateOrder(data)
 
-//            case class msg_OrderUpdate(data : JsValue) extends msg_OrderCommand
-//            case class msg_OrderSearch(data : JsValue) extends msg_OrderCommand
-//            case class msg_OrderDetail(data : JsValue) extends msg_OrderCommand
-//            case class msg_OrderQueryMulti(data : JsValue) extends msg_OrderCommand
-//
 //            case class msg_OrderSplit(data : JsValue) extends msg_OrderCommand
-//
-//            case class msg_OrderAccept(data : JsValue) extends msg_OrderCommand
-//            case class msg_OrderReject(data : JsValue) extends msg_OrderCommand
-//            case class msg_OrderCancel(data : JsValue) extends msg_OrderCommand
-//            case class msg_OrderAccomplish(data : JsValue) extends msg_OrderCommand
 //
 //            case class msg_OrderPrepay(data : JsValue) extends msg_OrderCommand
 //            case class msg_OrderPay(data : JsValue) extends msg_OrderCommand

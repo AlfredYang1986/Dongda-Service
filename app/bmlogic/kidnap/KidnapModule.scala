@@ -191,9 +191,15 @@ object KidnapModule extends ModuleTrait {
             import inner_traits.dc
             import inner_traits.dr
             val o : DBObject = data
-            val reVal = db.queryObject(o, "kidnap")
+            val reVal = db.queryObject(o, "kidnap").map (x => x).getOrElse(throw new Exception("service not exist"))
+            val owner_id = reVal.get("owner_id").get.asOpt[String].get
 
-            (Some(Map("service" -> toJson(reVal))), None)
+            (Some(Map("service" -> toJson(reVal),
+                      "condition" -> toJson(Map(
+                                        "owner_id" -> toJson(owner_id),
+                                        "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
+                                    ))
+                  )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -245,5 +251,26 @@ object KidnapModule extends ModuleTrait {
             }
 
         Map("services" -> toJson(result), "date" -> date)
+    }
+
+    def detailResultMerge(lst : List[Map[String, JsValue]])
+                         (pr : Option[Map[String, JsValue]]) : Map[String, JsValue] = {
+
+        val para = MergeParallelResult(lst)
+
+        val service = pr.get.get("service").get
+        val profile = para.get("profile").get
+        val collections = (para.get("collections").get \ "services").asOpt[List[String]].map (x => x).getOrElse(Nil)
+
+        val service_id = (service \ "service_id").asOpt[String].get
+        val isCollections = if (collections.contains(service_id)) 1
+                            else 0
+
+        val result = service.as[JsObject].value.toMap -
+                        "owner_id" +
+                        ("owner" -> profile) +
+                        ("isColllections" -> toJson(isCollections))
+
+        Map("service" -> toJson(result))
     }
 }

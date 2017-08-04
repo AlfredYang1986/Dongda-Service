@@ -8,7 +8,7 @@ package bmutil.dao
 import com.mongodb.casbah.Imports._
 
 object _data_connection {
-	def conn_name : String = "baby"
+	def conn_name : String = "baby_new_2"
 
 //	val addr = new com.mongodb.casbah.Imports.ServerAddress("localhost", 2017)
 //	val credentialsList = MongoCredential.createPlainCredential("dongdamaster", conn_name, "dongda@master".toCharArray)

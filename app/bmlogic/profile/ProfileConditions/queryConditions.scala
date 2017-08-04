@@ -9,4 +9,10 @@ trait queryConditions {
             (js \ "condition" \ "user_id")
                 .asOpt[String].getOrElse(throw new Exception("profile query input error")))
     }
+
+    implicit val oc : JsValue => DBObject = { js =>
+        DBObject("user_id" ->
+            (js \ "condition" \ "owner_id")
+                .asOpt[String].getOrElse(throw new Exception("profile query input error")))
+    }
 }

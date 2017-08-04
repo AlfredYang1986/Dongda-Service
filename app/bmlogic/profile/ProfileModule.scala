@@ -14,12 +14,13 @@ import play.api.libs.json.Json.toJson
 object ProfileModule extends ModuleTrait {
 
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
-        case msg_ProfileQuery(data) => queryProfile(data)
+        case msg_ProfileQuery(data) => queryProfile(data)(pr)
         case msg_ProfileSearch(data) => searchProfile(data)(pr)
         case msg_ProfileMultiQuery(data) => multiProfileQuery(data)(pr)
         case msg_ProfileUpdate(data) => updateProfile(data)
         case msg_ProfileCanUpdate(data) => canUpdate(data)(pr)
-        case msg_ProfileWithToken(data) => profileWithToken(pr)
+        case msg_ProfileWithToken(_) => profileWithToken(pr)
+        case msg_ProfileOwnerQuery(data) => queryOwnerProfile(data)(pr)
         case _ => ???
     }
 
@@ -42,7 +43,25 @@ object ProfileModule extends ModuleTrait {
         }
     }
 
+    def queryOwnerProfile(data : JsValue)
+                         (pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            import inner_conditions.oc
+            import inner_conditions.dr
+
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val o : DBObject = MergeStepResult(data, pr)
+            val reVal = db.queryObject(o, "users").map (x => x).getOrElse(throw new Exception("user not exist"))
+            (Some(Map("profile" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
     def queryProfile(data : JsValue)
+                    (pr : Option[Map[String, JsValue]])
                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
@@ -50,7 +69,8 @@ object ProfileModule extends ModuleTrait {
             import inner_conditions.dr
 
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-            val reVal = db.queryObject(data, "users").map (x => x).getOrElse(throw new Exception("user not exist"))
+            val o : DBObject = MergeStepResult(data, pr)
+            val reVal = db.queryObject(o, "users").map (x => x).getOrElse(throw new Exception("user not exist"))
             (Some(Map("profile" -> toJson(reVal))), None)
 
         } catch {
@@ -103,13 +123,17 @@ object ProfileModule extends ModuleTrait {
 
         try {
             import inner_conditions.mc
-            import inner_conditions.sr
+
+            println("multi")
 
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             val o : DBObject = MergeStepResult(data, pr)
-            val reVal = db.queryMultipleObject(o, "users")
 
-            (Some(Map("profiles" -> toJson(reVal))), None)
+            if (!o.isEmpty) {
+                import inner_conditions.sr
+                val reVal = db.queryMultipleObject(o, "users")
+                (Some(Map("profiles" -> toJson(reVal))), None)
+            } else (Some(Map("profiles" -> toJson(List[String]()))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

@@ -31,15 +31,22 @@ trait KidnapConditions {
         {
             val lb = MongoDBObject.newBuilder
 
-            val location = MongoDBObject.newBuilder
-            (js \ "location" \ "pin").asOpt[JsValue].map { loc =>
-                location += "latitude" -> (loc \ "latitude").asOpt[Float].map (tmp => tmp).getOrElse(0.0.floatValue)
-                location += "longitude" -> (loc \ "longitude").asOpt[Float].map (tmp => tmp).getOrElse(0.0.floatValue)
-            }.getOrElse {
-                location += "latitude" -> 0.0.floatValue
-                location += "longitude" -> 0.0.floatValue
-            }
-            lb += "pin" -> location.result
+            val pin = (js \ "location" \ "pin").asOpt[JsValue].map (x => Some(x)).getOrElse(None)
+
+            val (log, lat) =
+                pin.map { x =>
+                    (
+                        (x \ "longitude").asOpt[Float].map (tmp => tmp).getOrElse(0.0.floatValue),
+                        (x \ "latitude").asOpt[Float].map (tmp => tmp).getOrElse(0.0.floatValue)
+                    )
+                }.getOrElse ((0.toFloat, 0.toFloat))
+
+            val pin_obj = MongoDBObject(
+                "type" -> "Point",
+                "coordinates" -> MongoDBList(log, lat)
+            )
+
+            lb += "pin" -> pin_obj
 
             lb += "province" -> (js \ "location" \ "province").asOpt[String].map (x => x).getOrElse("")
             lb += "city" -> (js \ "location" \ "city").asOpt[String].map (x => x).getOrElse("")
