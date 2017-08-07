@@ -1,10 +1,8 @@
 package bmlogic.timemanager
 
-import java.util.function.DoubleBinaryOperator
-
 import bminjection.db.DBTrait
 import bmlogic.timemanager.TMMessages._
-import bmlogic.timemanager.TimemanagerData.{TimemanagerCondition, TimemanagerDetailCondition, TimemanagerMultiCondition, TimemanagerResult}
+import bmlogic.timemanager.TimemanagerData._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
@@ -29,6 +27,7 @@ object TimemanagerModule extends ModuleTrait {
                             with TimemanagerDetailCondition
                             with TimemanagerMultiCondition
                             with TimemanagerResult
+                            with TimemanagerDefaultResult
 
     def pushServiceTM(data : JsValue)
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -79,7 +78,12 @@ object TimemanagerModule extends ModuleTrait {
 
             val reVal = db.queryObject(o, "service_time")
 
-            (Some(Map("timemanager" -> toJson(reVal))), None)
+            if (reVal.isEmpty) {
+                import inner_traits.default
+                val d : Map[String, JsValue] = data
+                (Some(Map("timemanager" -> toJson(d))), None)
+            }
+            else (Some(Map("timemanager" -> toJson(reVal.get))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

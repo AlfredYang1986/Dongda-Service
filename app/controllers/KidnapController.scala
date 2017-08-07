@@ -11,6 +11,7 @@ import bmlogic.collections.CollectionsMessage.msg_QueryUserCollections
 import bmlogic.common.requestArgsQuery
 import bmlogic.kidnap.KidnapMessage._
 import bmlogic.profile.ProfileMessage.{msg_ProfileMultiQuery, msg_ProfileOwnerQuery, msg_ProfileWithToken}
+import bmlogic.timemanager.TMMessages.msg_queryTMCommand
 import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
 import bmpattern.ParallelMessage
@@ -51,6 +52,7 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
             ::
             // TODO: 严选数据以及热门数据的添加
             ParallelMessage(
+                MessageRoutes(msg_queryTMCommand(jv) :: Nil, None) ::
                 MessageRoutes(msg_QueryUserCollections(jv) :: Nil, None) ::
                 MessageRoutes(msg_ProfileOwnerQuery(jv) :: Nil, None) :: Nil, detailResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)

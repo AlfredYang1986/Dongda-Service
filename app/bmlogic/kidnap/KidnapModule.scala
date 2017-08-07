@@ -193,10 +193,12 @@ object KidnapModule extends ModuleTrait {
             val o : DBObject = data
             val reVal = db.queryObject(o, "kidnap").map (x => x).getOrElse(throw new Exception("service not exist"))
             val owner_id = reVal.get("owner_id").get.asOpt[String].get
+            val service_id = reVal.get("service_id").get.asOpt[String].get
 
             (Some(Map("service" -> toJson(reVal),
                       "condition" -> toJson(Map(
                                         "owner_id" -> toJson(owner_id),
+                                        "service_id" -> toJson(service_id),
                                         "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
                                     ))
                   )), None)
@@ -261,6 +263,7 @@ object KidnapModule extends ModuleTrait {
         val service = pr.get.get("service").get
         val profile = para.get("profile").get
         val collections = (para.get("collections").get \ "services").asOpt[List[String]].map (x => x).getOrElse(Nil)
+        val timemanager = (para.get("timemanager").get \ "tms").asOpt[JsValue].get
 
         val service_id = (service \ "service_id").asOpt[String].get
         val isCollections = if (collections.contains(service_id)) 1
@@ -269,6 +272,7 @@ object KidnapModule extends ModuleTrait {
         val result = service.as[JsObject].value.toMap -
                         "owner_id" +
                         ("owner" -> profile) +
+                        ("tms" -> timemanager) +
                         ("isColllections" -> toJson(isCollections))
 
         Map("service" -> toJson(result))

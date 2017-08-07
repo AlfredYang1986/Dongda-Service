@@ -124,8 +124,6 @@ object ProfileModule extends ModuleTrait {
         try {
             import inner_conditions.mc
 
-            println("multi")
-
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             val o : DBObject = MergeStepResult(data, pr)
 
