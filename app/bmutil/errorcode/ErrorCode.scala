@@ -51,6 +51,9 @@ object ErrorCode {
 		new ErrorNode("dongda selected input error", -801, "咚哒严选输入参数错误"),
         new ErrorNode("dongda selected output error", -802, "咚哒严选输出参数错误"),
 
+		new ErrorNode("category input error", -1001, "咚哒分类输入参数错误"),
+		new ErrorNode("category output error", -1002, "咚哒分类输出参数错误"),
+
 		new ErrorNode("no db connection", -901, "没找到数据库链接"),
 		new ErrorNode("db prase error", -902, "数据库结构发现错误"),
 		new ErrorNode("no encrypt impl", -903, "权限加密方式不清晰或者Token不存在"),

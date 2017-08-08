@@ -1,6 +1,5 @@
 package bmlogic.timemanager.TimemanagerData
 
-import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 
@@ -16,7 +15,7 @@ trait TimemanagerDefaultResult {
                                "startdate" -> toJson(0), // 1970-01-01
                                "enddate" -> toJson(-1), // to forever
                                "starthours" -> toJson(800), // 8:00 am
-                               "endhours" -> toJson(2000))
+                               "endhours" -> toJson(2000)) :: Nil
                 )
             )
         )
