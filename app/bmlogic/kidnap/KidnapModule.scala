@@ -250,6 +250,7 @@ object KidnapModule extends ModuleTrait {
         val services = pr.get.get("services").get.asOpt[List[JsValue]].get
         val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
         val collections = (para.get("collections").get \ "services").asOpt[List[String]].map (x => x).getOrElse(Nil)
+        val selected = (para.get("selected").get).asOpt[List[String]].map (x => x).getOrElse(Nil)
 
         val result =
             services.map { iter =>
@@ -260,10 +261,14 @@ object KidnapModule extends ModuleTrait {
                 val isCollections = if (collections.contains(service_id)) 1
                                     else 0
 
+                val isSelected = if (selected.contains(service_id)) 1
+                                 else 0
+
                 iter.as[JsObject].value.toMap -
                     "owner_id" +
                     ("owner" -> user) +
-                    ("isCollections" -> toJson(isCollections))
+                    ("isCollections" -> toJson(isCollections)) +
+                    ("isSelected" -> toJson(isSelected))
             }
 
         Map("services" -> toJson(result), "date" -> date)
@@ -278,6 +283,7 @@ object KidnapModule extends ModuleTrait {
         val profile = para.get("profile").get
         val collections = (para.get("collections").get \ "services").asOpt[List[String]].map (x => x).getOrElse(Nil)
         val timemanager = (para.get("timemanager").get \ "tms").asOpt[JsValue].get
+        val isSelected = para.get("isSelected").get
 
         val service_id = (service \ "service_id").asOpt[String].get
         val isCollections = if (collections.contains(service_id)) 1
@@ -287,7 +293,8 @@ object KidnapModule extends ModuleTrait {
                         "owner_id" +
                         ("owner" -> profile) +
                         ("tms" -> timemanager) +
-                        ("isColllections" -> toJson(isCollections))
+                        ("isColllections" -> toJson(isCollections)) +
+                        ("isSelected" -> isSelected)
 
         Map("service" -> toJson(result))
     }

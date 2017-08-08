@@ -9,6 +9,7 @@ import bminjection.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.collections.CollectionsMessage.msg_QueryUserCollections
 import bmlogic.common.requestArgsQuery
+import bmlogic.dongdaselectedservice.SelectedServiceMessages.{msg_IsServiceSelected, msg_LstServiceSelected}
 import bmlogic.kidnap.KidnapMessage._
 import bmlogic.profile.ProfileMessage.{msg_ProfileMultiQuery, msg_ProfileOwnerQuery, msg_ProfileWithToken}
 import bmlogic.timemanager.TMMessages.msg_queryTMCommand
@@ -52,6 +53,7 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
             ::
             // TODO: 严选数据以及热门数据的添加
             ParallelMessage(
+                MessageRoutes(msg_IsServiceSelected(jv) :: Nil, None) ::
                 MessageRoutes(msg_queryTMCommand(jv) :: Nil, None) ::
                 MessageRoutes(msg_QueryUserCollections(jv) :: Nil, None) ::
                 MessageRoutes(msg_ProfileOwnerQuery(jv) :: Nil, None) :: Nil, detailResultMerge)
@@ -64,11 +66,12 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
         import bmlogic.kidnap.KidnapModule.serviceResultMerge
         implicit val cm = (CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search service"))), jv)
-            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_KidnapSearch(jv)
             ::
             // TODO: 严选数据以及热门数据的添加
             ParallelMessage(
+                MessageRoutes(msg_LstServiceSelected(jv) :: Nil, None) ::
                 MessageRoutes(msg_QueryUserCollections(jv) :: Nil, None) ::
                 MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) :: Nil, serviceResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)

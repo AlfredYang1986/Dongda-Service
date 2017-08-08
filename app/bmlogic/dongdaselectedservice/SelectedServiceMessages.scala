@@ -3,10 +3,13 @@ package bmlogic.dongdaselectedservice
 import bmmessages.CommonMessage
 import play.api.libs.json.JsValue
 
-abstract class msg_SelectedMessageCommand extends CommonMessage
+abstract class msg_SelectedServiceCommand extends CommonMessage
 
 object SelectedServiceMessages {
-    case class msg_PushSelectedSelected(data : JsValue) extends msg_SelectedMessageCommand
-    case class msg_PopSelectedSelected(data : JsValue) extends msg_SelectedMessageCommand
-    case class msg_QuerySelectedSelected(data : JsValue) extends msg_SelectedMessageCommand
+    case class msg_PushSelectedService(data : JsValue) extends msg_SelectedServiceCommand
+    case class msg_PopSelectedService(data : JsValue) extends msg_SelectedServiceCommand
+    case class msg_QuerySelectedService(data : JsValue) extends msg_SelectedServiceCommand
+
+    case class msg_IsServiceSelected(data : JsValue) extends msg_SelectedServiceCommand
+    case class msg_LstServiceSelected(data : JsValue) extends msg_SelectedServiceCommand
 }
