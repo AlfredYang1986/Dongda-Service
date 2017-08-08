@@ -1,3 +1,4 @@
+import java.util.Date
 import javax.inject.Inject
 
 import play.api.libs.json.JsValue
@@ -349,6 +350,56 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             )))
             .map { response =>
                 println(response.json)
+                response.json
+            }
+    }
+
+    def pushSelectedTest(token : String, user_id : String, service_id : String) = {
+        ws.url(baseUrl + "/al/selected/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "service_id" -> toJson(service_id),
+                    "user_id" -> toJson(service_id)
+                )),
+                "selected" -> toJson(Map(
+                    "service_id" -> toJson(service_id)
+                ))
+            )))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def popSelectedTest(token : String, service_id : String) = {
+        ws.url(baseUrl + "/al/selected/pop")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "service_id" -> toJson(service_id)
+                ))
+            )))
+            .map { response =>
+//                println(response.json)
+                response.json
+            }
+    }
+
+    def searchSelectedTest(token : String, user_id : String) = {
+        ws.url(baseUrl + "/al/selected/search")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "user_id" -> toJson(user_id),
+                    "date" -> toJson(new Date().getTime)
+                ))
+            )))
+            .map { response =>
+//                println(response.json)
                 response.json
             }
     }
