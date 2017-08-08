@@ -16,7 +16,7 @@ POST    /al/profile/update                      controllers.ProfileController.up
 POST    /al/kidnap/push                         controllers.KidnapController.pushService
 POST    /al/kidnap/pop                          controllers.KidnapController.popService
 POST    /al/kidnap/detail                       controllers.KidnapController.detailService
-POST    /al/kidnap/search                        controllers.KidnapController.searchService
+POST    /al/kidnap/search                       controllers.KidnapController.searchService
 POST    /al/kidnap/multi                        controllers.KidnapController.multiQueryService
 
 # order 相关功能
@@ -39,32 +39,32 @@ POST    /al/auth/code                           controllers.AuthController.authW
 POST    /al/auth/sns                            controllers.AuthController.authWithSNS
 
 # 文件相关
-POST    /post/uploadFile                            controllers.FopController.uploadFile
-GET     /query/downloadFile/:name                   controllers.FopController.downloadFile(name)
+POST    /post/uploadFile                        controllers.FopController.uploadFile
+GET     /query/downloadFile/:name               controllers.FopController.downloadFile(name)
 
 # alipay相关
-POST	/alipay/callback							controllers.AlipayController.alipaycallback
-POST	/alipay/redirect							controllers.AlipayController.redirecturi
+POST	/alipay/callback						controllers.AlipayController.alipaycallback
+POST	/alipay/redirect						controllers.AlipayController.redirecturi
 
 # time manage 相关
-POST    /al/tm/push                                 controllers.TimemanagerController.pushTM
-POST    /al/tm/query                                controllers.TimemanagerController.detailTM
-POST    /al/tm/pop                                  controllers.TimemanagerController.popTM
-POST    /al/tm/update                               controllers.TimemanagerController.updateTM
+POST    /al/tm/push                             controllers.TimemanagerController.pushTM
+POST    /al/tm/query                            controllers.TimemanagerController.detailTM
+POST    /al/tm/pop                              controllers.TimemanagerController.popTM
+POST    /al/tm/update                           controllers.TimemanagerController.updateTM
 
 # collection 用户收藏相关
-POST    /al/collections/push                         controllers.CollectionsController.pushCollection
-POST    /al/collections/pop                          controllers.CollectionsController.popCollection
-POST    /al/user/collections                         controllers.CollectionsController.queryUserCollections
-POST    /al/collected/users                          controllers.CollectionsController.queryCollectedUser
+POST    /al/collections/push                    controllers.CollectionsController.pushCollection
+POST    /al/collections/pop                     controllers.CollectionsController.popCollection
+POST    /al/user/collections                    controllers.CollectionsController.queryUserCollections
+POST    /al/collected/users                     controllers.CollectionsController.queryCollectedUser
 
 # 邮件发送相关
-POST    /al/email/privacy                            controllers.emailController.sendEmail
+POST    /al/email/privacy                       controllers.emailController.sendEmail
 
 # Dongda严选相关
-POST    /al/selected/push                            controllers.SelectedController.pushSelectedService
-POST    /al/selected/pop                             controllers.SelectedController.popSelectedService
-POST    /al/selected/search                          controllers.SelectedController.searchSelectedService
+POST    /al/selected/push                       controllers.SelectedController.pushSelectedService
+POST    /al/selected/pop                        controllers.SelectedController.popSelectedService
+POST    /al/selected/search                     controllers.SelectedController.searchSelectedService
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)

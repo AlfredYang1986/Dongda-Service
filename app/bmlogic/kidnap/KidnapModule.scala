@@ -20,7 +20,7 @@ object KidnapModule extends ModuleTrait {
         case msg_KidnapCanPop(data) => canPopService(data)(pr)
         case msg_KidnapPop(data) => popService(data)
         case msg_KidnapDetail(data) => detailService(data)
-        case msg_KidnapMultiQuery(data) => multiQueryService(data)
+        case msg_KidnapMultiQuery(data) => multiQueryService(data)(pr)
         case msg_KidnapSearch(data) => searchService(data)
         case msg_KidnapUpdate(data) => updateService(data)
         case msg_KidnapCanUpdate(data) => canUpdateService(data)(pr)
@@ -209,6 +209,7 @@ object KidnapModule extends ModuleTrait {
     }
 
     def multiQueryService(data: JsValue)
+                         (pr : Option[Map[String, JsValue]])
                          (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
@@ -217,10 +218,23 @@ object KidnapModule extends ModuleTrait {
             import inner_traits.mc
             import inner_traits.sr
 
-            val o : DBObject = data
+            import bmlogic.common.mergestepresult.MergeStepResult
+            val o : DBObject = MergeStepResult(data, pr)
+
             val reVal = db.queryMultipleObject(o, "kidnap")
 
-            (Some(Map("services" -> toJson(reVal))), None)
+            val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
+            val lst = reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+
+            (Some(Map("date" -> toJson(date),
+                        "services" -> toJson(reVal),
+                        "condition" -> toJson(Map(
+                            "lst" -> toJson(lst),
+                            "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
+                        ))
+            )), None)
+
+//            (Some(Map("services" -> toJson(reVal))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

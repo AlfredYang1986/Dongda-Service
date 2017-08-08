@@ -61,7 +61,6 @@ trait KidnapResults {
             val latitude = toJson(cor.head.asInstanceOf[Number].floatValue)
             val longitude = toJson(cor.tail.head.asInstanceOf[Number].floatValue)
 
-
             Map(
                 "province" -> loc.getAs[String]("province").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "city" -> loc.getAs[String]("city").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),

@@ -74,8 +74,17 @@ object SelectedServiceModule extends ModuleTrait {
 
             import inner_trait.sr
             val reVal = db.queryMultipleObject(o, "dongda_selected", skip = skip, take = take)
+            val services =
+                reVal.map (x => x.get("service_id").
+                    map(y => Some(y)).getOrElse(None)).
+                    filterNot(_ == None).map(x => toJson(x.get))
 
-            (Some(Map("selected" -> toJson(reVal))), None)
+            (Some(Map(
+                "selected" -> toJson(reVal),
+                "condition" -> toJson(Map(
+                    "lst" -> services
+                ))
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
