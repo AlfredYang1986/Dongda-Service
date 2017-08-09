@@ -8,7 +8,7 @@ import bminjection.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.collections.CollectionsMessage.msg_QueryUserCollections
 import bmlogic.common.requestArgsQuery
-import bmlogic.dongdaselectedservice.SelectedServiceMessages.{msg_PopSelectedService, msg_PushSelectedService, msg_QuerySelectedService}
+import bmlogic.dongdaselectedservice.SelectedServiceMessages.{msg_LstServiceSelected, msg_PopSelectedService, msg_PushSelectedService, msg_QuerySelectedService}
 import bmlogic.kidnap.KidnapMessage.{msg_KidnapDetail, msg_KidnapMultiQuery}
 import bmlogic.profile.ProfileMessage.msg_ProfileMultiQuery
 import bmmessages.{CommonModules, MessageRoutes}
@@ -51,6 +51,7 @@ class SelectedController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att
             :: msg_KidnapMultiQuery(jv)
             ::
             ParallelMessage(
+                MessageRoutes(msg_LstServiceSelected(jv) :: Nil, None) ::
                 MessageRoutes(msg_QueryUserCollections(jv) :: Nil, None) ::
                 MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) :: Nil, serviceResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)

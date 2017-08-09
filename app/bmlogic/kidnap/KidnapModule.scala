@@ -167,11 +167,13 @@ object KidnapModule extends ModuleTrait {
             val reVal = db.queryMultipleObject(o, "kidnap", skip = skip, take = take)
 
             val lst = reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+            val slst = reVal.map (x => x.get("service_id").get.asOpt[String].get)
 
             (Some(Map("date" -> toJson(date),
                       "count" -> toJson(skip + take),
                       "services" -> toJson(reVal),
                       "condition" -> toJson(Map(
+                                        "slst" -> toJson(slst),
                                         "lst" -> toJson(lst),
                                         "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
                                     ))
@@ -225,10 +227,12 @@ object KidnapModule extends ModuleTrait {
 
             val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
             val lst = reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+            val slst = reVal.map (x => x.get("service_id").get.asOpt[String].get)
 
             (Some(Map("date" -> toJson(date),
                         "services" -> toJson(reVal),
                         "condition" -> toJson(Map(
+                            "slst" -> toJson(slst),
                             "lst" -> toJson(lst),
                             "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
                         ))
@@ -250,7 +254,7 @@ object KidnapModule extends ModuleTrait {
         val services = pr.get.get("services").get.asOpt[List[JsValue]].get
         val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
         val collections = (para.get("collections").get \ "services").asOpt[List[String]].map (x => x).getOrElse(Nil)
-        val selected = (para.get("selected").get).asOpt[List[String]].map (x => x).getOrElse(Nil)
+        val selected = (para.get("selected").get).asOpt[List[JsValue]].map (x => x).getOrElse(Nil)
 
         val result =
             services.map { iter =>
@@ -261,14 +265,24 @@ object KidnapModule extends ModuleTrait {
                 val isCollections = if (collections.contains(service_id)) 1
                                     else 0
 
-                val isSelected = if (selected.contains(service_id)) 1
-                                 else 0
+                val (isSelected, isHotCat) = {
+                    selected.find(p => (p \ "service_id").asOpt[String].get == service_id) match {
+                        case None => (0, 0)
+                        case Some(x) => (
+                                            if ((x \ "selected").asOpt[List[String]].get.isEmpty) 0
+                                            else 1 ,
+                                            if ((x \ "hotcate").asOpt[List[String]].get.isEmpty) 0
+                                            else 1
+                                        )
+                    }
+                }
 
                 iter.as[JsObject].value.toMap -
                     "owner_id" +
                     ("owner" -> user) +
                     ("isCollections" -> toJson(isCollections)) +
-                    ("isSelected" -> toJson(isSelected))
+                    ("isSelected" -> toJson(isSelected)) +
+                    ("isHotCat" -> toJson(isHotCat))
             }
 
         Map("services" -> toJson(result), "date" -> date)
@@ -279,22 +293,28 @@ object KidnapModule extends ModuleTrait {
 
         val para = MergeParallelResult(lst)
 
+        println(para)
+
         val service = pr.get.get("service").get
         val profile = para.get("profile").get
         val collections = (para.get("collections").get \ "services").asOpt[List[String]].map (x => x).getOrElse(Nil)
         val timemanager = (para.get("timemanager").get \ "tms").asOpt[JsValue].get
-        val isSelected = para.get("isSelected").get
+        val selected = para.get("selected").get.asOpt[JsValue].get
 
         val service_id = (service \ "service_id").asOpt[String].get
         val isCollections = if (collections.contains(service_id)) 1
                             else 0
+
+        val selected_lst = (selected \ "selected").asOpt[List[String]].get
+        val hotcate_lst = (selected \ "hotcate").asOpt[List[String]].get
 
         val result = service.as[JsObject].value.toMap -
                         "owner_id" +
                         ("owner" -> profile) +
                         ("tms" -> timemanager) +
                         ("isColllections" -> toJson(isCollections)) +
-                        ("isSelected" -> isSelected)
+                        ("selected" -> toJson(selected_lst)) +
+                        ("hotcate" -> toJson(hotcate_lst))
 
         Map("service" -> toJson(result))
     }

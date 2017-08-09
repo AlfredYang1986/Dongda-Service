@@ -5,8 +5,14 @@ import play.api.libs.json.JsValue
 
 trait SelectedServiceCondition {
     implicit val sc : JsValue => DBObject = { js =>
+        DBObject("selected_id" ->
+            (js \ "condition" \ "selected_id").asOpt[String].
+                map (x => x).getOrElse(throw new Exception("dongda selected input error")))
+    }
+
+     implicit val kc : JsValue => DBObject = { js =>
         DBObject("service_id" ->
             (js \ "condition" \ "service_id").asOpt[String].
                 map (x => x).getOrElse(throw new Exception("dongda selected input error")))
-    }
+     }
 }

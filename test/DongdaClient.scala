@@ -354,7 +354,7 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             }
     }
 
-    def pushSelectedTest(token : String, user_id : String, service_id : String) = {
+    def pushSelectedTest(token : String, user_id : String, service_id : String, cate : String) = {
         ws.url(baseUrl + "/al/selected/push")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map(
@@ -364,7 +364,8 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                     "user_id" -> toJson(service_id)
                 )),
                 "selected" -> toJson(Map(
-                    "service_id" -> toJson(service_id)
+                    "service_id" -> toJson(service_id),
+                    "category" -> toJson(cate)
                 ))
             )))
             .map { response =>
@@ -373,13 +374,13 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             }
     }
 
-    def popSelectedTest(token : String, service_id : String) = {
+    def popSelectedTest(token : String, selected_id : String) = {
         ws.url(baseUrl + "/al/selected/pop")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map(
                 "token" -> toJson(token),
                 "condition" -> toJson(Map(
-                    "service_id" -> toJson(service_id)
+                    "selected_id" -> toJson(selected_id)
                 ))
             )))
             .map { response =>
@@ -388,13 +389,14 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             }
     }
 
-    def searchSelectedTest(token : String, user_id : String) = {
+    def searchSelectedTest(token : String, user_id : String, cate : String) = {
         ws.url(baseUrl + "/al/selected/search")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map(
                 "token" -> toJson(token),
                 "condition" -> toJson(Map(
                     "user_id" -> toJson(user_id),
+                    "category" -> toJson(cate),
                     "date" -> toJson(new Date().getTime)
                 ))
             )))

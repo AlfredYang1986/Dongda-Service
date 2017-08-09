@@ -38,7 +38,7 @@ object SelectedServiceModule extends ModuleTrait {
             import inner_trait.sr
             val o : DBObject = data
 
-            db.insertObject(o, "dongda_selected", "service_id")
+            db.insertObject(o, "dongda_selected", "selected_id")
 
             (Some(Map("selected" -> toJson(o - "date"))), None)
 
@@ -56,7 +56,7 @@ object SelectedServiceModule extends ModuleTrait {
             import inner_trait.sc
             val o : DBObject = data
 
-            db.deleteObject(o, "dongda_selected", "service_id")
+            db.deleteObject(o, "dongda_selected", "selected_id")
 
             (Some(Map("pop" -> toJson("success"))), None)
 
@@ -103,17 +103,32 @@ object SelectedServiceModule extends ModuleTrait {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-            import inner_trait.sc
+            import inner_trait.kc
             import inner_trait.sr
-            val o : DBObject = MergeStepResult(data, pr)
+            val merge = MergeStepResult(data, pr)
+            val service_id = (merge \ "condition" \ "service_id").asOpt[String].
+                                map (x => x).getOrElse(throw new Exception("dongda selected input error"))
+            val o : DBObject = merge
 
             val reVal =
-                db.queryObject(o, "dongda_selected") match {
-                    case None => 0
-                    case Some(_) => 1
+                db.queryMultipleObject(o, "dongda_selected") match {
+                    case Nil => (Nil, Nil)
+                    case lst : List[Map[String, JsValue]] => {
+                        (
+                            (lst.filter(p => p.get("category").get.asOpt[String].get.
+                                startsWith("严选")).map (x => x.get("category").get.asOpt[String].get)),
+                            (lst.filterNot(p => p.get("category").get.asOpt[String].get.
+                                startsWith("严选")).map (x => x.get("category").get.asOpt[String].get))
+                        )
+                    }
                 }
 
-            (Some(Map("isSelected" -> toJson(reVal))), None)
+            (Some(Map("selected" -> toJson(Map(
+                        "service_id" -> toJson(service_id),
+                        "selected" -> toJson(reVal._1),
+                        "hotcate" -> toJson(reVal._2)
+                ))
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -132,14 +147,29 @@ object SelectedServiceModule extends ModuleTrait {
 
             val o : DBObject = MergeStepResult(data, pr)
 
-            val reVal = db.queryMultipleObject(o, "dangda_selected")
-            val services =
-                reVal.map (x => x.get("service_id").
-                    map(y => Some(y)).getOrElse(None)).
-                    filterNot(_ == None).map(x => toJson(x.get))
+            val reVal = db.queryMultipleObject(o, "dongda_selected")
+
+            val result = reVal.groupBy(_.get("service_id").get.asOpt[String].get).map { x => x._2 match {
+                case Nil => {
+                    toJson(Map(
+                        "service_id" -> toJson(x._1),
+                        "selected" -> toJson(List[String]()),
+                        "hotcate" -> toJson(List[String]())
+                    ))
+                }
+                case lst : List[Map[String, JsValue]] => {
+                    toJson(Map(
+                        "service_id" -> toJson(x._1),
+                        "selected" -> toJson(lst.filter(p => p.get("category").get.asOpt[String].get.
+                                                startsWith("严选")).map (x => x.get("category").get.asOpt[String].get)),
+                        "hotcate" -> toJson(lst.filterNot(p => p.get("category").get.asOpt[String].get.
+                                                startsWith("严选")).map (x => x.get("category").get.asOpt[String].get))
+                    ))
+                }
+            }}.toList
 
             (Some(Map(
-                "selected" -> toJson(services)
+                "selected" -> toJson(result)
             )), None)
 
         } catch {

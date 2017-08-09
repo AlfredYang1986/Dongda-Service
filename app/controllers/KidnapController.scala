@@ -48,10 +48,9 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
         import bmlogic.kidnap.KidnapModule.detailResultMerge
         implicit val cm = (CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("detail service"))), jv)
-            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_KidnapDetail(jv)
             ::
-            // TODO: 严选数据以及热门数据的添加
             ParallelMessage(
                 MessageRoutes(msg_IsServiceSelected(jv) :: Nil, None) ::
                 MessageRoutes(msg_queryTMCommand(jv) :: Nil, None) ::
@@ -66,10 +65,9 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
         import bmlogic.kidnap.KidnapModule.serviceResultMerge
         implicit val cm = (CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search service"))), jv)
-//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_KidnapSearch(jv)
             ::
-            // TODO: 严选数据以及热门数据的添加
             ParallelMessage(
                 MessageRoutes(msg_LstServiceSelected(jv) :: Nil, None) ::
                 MessageRoutes(msg_QueryUserCollections(jv) :: Nil, None) ::
