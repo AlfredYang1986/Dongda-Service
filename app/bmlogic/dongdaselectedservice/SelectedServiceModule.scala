@@ -115,10 +115,10 @@ object SelectedServiceModule extends ModuleTrait {
                     case Nil => (Nil, Nil)
                     case lst : List[Map[String, JsValue]] => {
                         (
-                            (lst.filter(p => p.get("category").get.asOpt[String].get.
-                                startsWith("严选")).map (x => x.get("category").get.asOpt[String].get)),
-                            (lst.filterNot(p => p.get("category").get.asOpt[String].get.
-                                startsWith("严选")).map (x => x.get("category").get.asOpt[String].get))
+                            (lst.filter(p => p.get("group").get.asOpt[String].get.
+                                equals("严选")).map (x => x.get("category").get.asOpt[String].get)),
+                            (lst.filter(p => p.get("group").get.asOpt[String].get.
+                                equals("热门")).map (x => x.get("category").get.asOpt[String].get))
                         )
                     }
                 }
@@ -160,10 +160,10 @@ object SelectedServiceModule extends ModuleTrait {
                 case lst : List[Map[String, JsValue]] => {
                     toJson(Map(
                         "service_id" -> toJson(x._1),
-                        "selected" -> toJson(lst.filter(p => p.get("category").get.asOpt[String].get.
-                                                startsWith("严选")).map (x => x.get("category").get.asOpt[String].get)),
-                        "hotcate" -> toJson(lst.filterNot(p => p.get("category").get.asOpt[String].get.
-                                                startsWith("严选")).map (x => x.get("category").get.asOpt[String].get))
+                        "selected" -> toJson(lst.filter(p => p.get("group").get.asOpt[String].get.
+                                                equals("严选")).map (x => x.get("category").get.asOpt[String].get)),
+                        "hotcate" -> toJson(lst.filter(p => p.get("group").get.asOpt[String].get.
+                                                equals("热门")).map (x => x.get("category").get.asOpt[String].get))
                     ))
                 }
             }}.toList

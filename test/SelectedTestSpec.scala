@@ -70,7 +70,9 @@ class SelectedTestSpec extends Specification with BeforeAll with AfterAll {
         )
     )
 
-    val category_1 = "严选*艺术"
+    val group_1 = "严选"
+    val group_2 = "热门"
+    val category_1 = "艺术"
     val category_2 = "测试标签"
 
     var selected_id_1 = ""
@@ -133,7 +135,7 @@ class SelectedTestSpec extends Specification with BeforeAll with AfterAll {
     def pushSelectedTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9999").pushSelectedTest(token_1, user_id_1, service_id_1, category_1), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").pushSelectedTest(token_1, user_id_1, service_id_1, category_1, group_1), time_out)
 
             (reVal \ "status").asOpt[String].get must_== "ok"
             selected_id_1 = (reVal \ "result" \ "selected" \ "selected_id").asOpt[String].get
@@ -144,7 +146,7 @@ class SelectedTestSpec extends Specification with BeforeAll with AfterAll {
     def pushSelectedTestAnother =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9999").pushSelectedTest(token_1, user_id_1, service_id_1, category_2), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").pushSelectedTest(token_1, user_id_1, service_id_1, category_2, group_2), time_out)
 
             (reVal \ "status").asOpt[String].get must_== "ok"
             selected_id_2 = (reVal \ "result" \ "selected" \ "selected_id").asOpt[String].get

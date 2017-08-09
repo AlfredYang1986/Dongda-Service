@@ -354,7 +354,7 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             }
     }
 
-    def pushSelectedTest(token : String, user_id : String, service_id : String, cate : String) = {
+    def pushSelectedTest(token : String, user_id : String, service_id : String, cate : String, group : String) = {
         ws.url(baseUrl + "/al/selected/push")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map(
@@ -365,7 +365,8 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 )),
                 "selected" -> toJson(Map(
                     "service_id" -> toJson(service_id),
-                    "category" -> toJson(cate)
+                    "category" -> toJson(cate),
+                    "group" -> toJson(group)
                 ))
             )))
             .map { response =>

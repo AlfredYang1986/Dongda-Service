@@ -12,10 +12,12 @@ trait SelectedServiceData {
 
         val service_id = (js \ "selected" \ "service_id").asOpt[String].map (x => x).getOrElse(throw new Exception("dongda selected input error"))
         val category = (js \ "selected" \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("dongda selected input error"))
+        val group = (js \ "selected" \ "group").asOpt[String].map (x => x).getOrElse(throw new Exception("dongda selected input error"))
 
         builder += "date" -> new Date().getTime
         builder += "service_id" -> service_id
         builder += "category" -> category
+        builder += "group" -> group
 
         builder += "selected_id" -> Sercurity.md5Hash(service_id + category)
 

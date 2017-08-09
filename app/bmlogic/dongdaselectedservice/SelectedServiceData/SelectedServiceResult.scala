@@ -9,6 +9,7 @@ trait SelectedServiceResult {
         Map(
             "selected_id" -> toJson(obj.getAs[String]("selected_id").map (x => x).getOrElse(throw new Exception("dongda selected output"))),
             "category" -> toJson(obj.getAs[String]("category").map (x => x).getOrElse(throw new Exception("dongda selected output"))),
+            "group" -> toJson(obj.getAs[String]("group").map (x => x).getOrElse(throw new Exception("dongda selected output"))),
             "service_id" -> toJson(obj.getAs[String]("service_id").map (x => x).getOrElse(throw new Exception("dongda selected output error")))
         )
     }
