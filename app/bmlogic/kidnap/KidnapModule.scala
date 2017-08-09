@@ -250,8 +250,6 @@ object KidnapModule extends ModuleTrait {
 
         val para = MergeParallelResult(lst)
 
-        println(para)
-
         val date = pr.get.get("date").get
         val services = pr.get.get("services").get.asOpt[List[JsValue]].get
         val profiles = para.get("profiles").get.asOpt[List[JsValue]].get

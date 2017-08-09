@@ -33,7 +33,6 @@ trait KidnapSearchConditions {
                         ),
                         "$maxDistance" -> 1 ))
 
-                println(tmp)
                 Some(tmp)
             }.getOrElse (None)
 

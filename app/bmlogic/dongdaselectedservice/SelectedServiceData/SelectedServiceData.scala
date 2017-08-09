@@ -19,7 +19,7 @@ trait SelectedServiceData {
         builder += "category" -> category
         builder += "group" -> group
 
-        builder += "selected_id" -> Sercurity.md5Hash(service_id + category)
+        builder += "selected_id" -> Sercurity.md5Hash(group + category + service_id)
 
         builder.result
     }
