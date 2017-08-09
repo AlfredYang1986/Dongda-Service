@@ -12,7 +12,7 @@ import bmlogic.common.requestArgsQuery
 import bmlogic.dongdaselectedservice.SelectedServiceMessages.{msg_IsServiceSelected, msg_LstServiceSelected}
 import bmlogic.kidnap.KidnapMessage._
 import bmlogic.profile.ProfileMessage.{msg_ProfileMultiQuery, msg_ProfileOwnerQuery, msg_ProfileWithToken}
-import bmlogic.timemanager.TMMessages.msg_queryTMCommand
+import bmlogic.timemanager.TMMessages.{msg_pushTMCommand, msg_queryTMCommand}
 import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
 import bmpattern.ParallelMessage
@@ -29,6 +29,7 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_ProfileWithToken(jv)
             :: msg_KidnapCanPush(jv) :: msg_KidnapPush(jv)
+            :: msg_pushTMCommand(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 

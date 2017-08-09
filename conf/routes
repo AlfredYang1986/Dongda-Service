@@ -61,7 +61,7 @@ POST    /al/collected/users                     controllers.CollectionsControlle
 # 邮件发送相关
 POST    /al/email/privacy                       controllers.emailController.sendEmail
 
-# Dongda严选相关
+# Dongda严选热门相关
 POST    /al/selected/push                       controllers.SelectedController.pushSelectedService
 POST    /al/selected/pop                        controllers.SelectedController.popSelectedService
 POST    /al/selected/search                     controllers.SelectedController.searchSelectedService

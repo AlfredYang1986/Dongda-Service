@@ -18,10 +18,10 @@ trait profileResults {
             Map(
                 "owner_name" -> toJson(x.getAs[String]("owner_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
                 "social_id" -> toJson(x.getAs[String]("social_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
-                "company" -> toJson(x.getAs[String]("company").map (x => x).getOrElse(throw new Exception("db prase error"))),
-                "description" -> toJson(x.getAs[String]("description").map (x => x).getOrElse(throw new Exception("db prase error"))),
-                "address" -> toJson(x.getAs[String]("address").map (x => x).getOrElse(throw new Exception("db prase error"))),
-                "contact_no" -> toJson(x.getAs[String]("contact_no").map (x => x).getOrElse(throw new Exception("db prase error")))
+                "company" -> toJson(x.getAs[String]("company").map (x => x).getOrElse("")),
+                "description" -> toJson(x.getAs[String]("description").map (x => x).getOrElse("")),
+                "address" -> toJson(x.getAs[String]("address").map (x => x).getOrElse("")),
+                "contact_no" -> toJson(x.getAs[String]("contact_no").map (x => x).getOrElse(""))
             )
         }.getOrElse(Map.empty[String, JsValue])
 

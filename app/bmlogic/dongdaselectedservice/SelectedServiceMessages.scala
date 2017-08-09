@@ -12,4 +12,6 @@ object SelectedServiceMessages {
 
     case class msg_IsServiceSelected(data : JsValue) extends msg_SelectedServiceCommand
     case class msg_LstServiceSelected(data : JsValue) extends msg_SelectedServiceCommand
+
+    case class msg_LstSelectedTags(data : JsValue) extends msg_SelectedServiceCommand
 }

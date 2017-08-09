@@ -65,7 +65,19 @@ object KidnapModule extends ModuleTrait {
 
             import inner_traits.dr
             val reVal = toJson(o - "date" - "update_date")
-            (Some(Map("service" -> reVal)), None)
+
+            val tms = (data \ "service" \ "tms").asOpt[JsValue].map (x => x).getOrElse(throw new Exception("push service input error"))
+            val service_id = (reVal \ "service_id").asOpt[String].get
+
+            val condition = toJson(Map(
+                "service_id" -> toJson(service_id),
+                "tms" -> tms
+            ))
+
+            (Some(Map(
+                "service" -> reVal,
+                "timemanager" -> condition
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -293,7 +305,6 @@ object KidnapModule extends ModuleTrait {
 
         val para = MergeParallelResult(lst)
 
-        println(para)
         val service = pr.get.get("service").get
         val profile = para.get("profile").get
         val collections = (para.get("collections").get \ "services").asOpt[List[String]].map (x => x).getOrElse(Nil)

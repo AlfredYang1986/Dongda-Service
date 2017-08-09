@@ -1,6 +1,7 @@
 package bmlogic.timemanager
 
 import bminjection.db.DBTrait
+import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.timemanager.TMMessages._
 import bmlogic.timemanager.TimemanagerData._
 import bmmessages.{CommonModules, MessageDefines}
@@ -14,10 +15,10 @@ import play.api.libs.json.Json.toJson
 object TimemanagerModule extends ModuleTrait {
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
 
-        case msg_pushTMCommand(data) => pushServiceTM(data)
+        case msg_pushTMCommand(data) => pushServiceTM(data)(pr)
         case msg_popTMCommand(data) => popServiceTM(data)
         case msg_queryTMCommand(data) => queryServiceTM(data)
-        case msg_updateTMCommand(data) => updateServiceTM(data)
+        case msg_updateTMCommand(data) => updateServiceTM(data)(pr)
         case msg_queryMultipleTMCommand(data) => queryMultipleServiceTM(data)
 
         case _ => ???
@@ -30,6 +31,7 @@ object TimemanagerModule extends ModuleTrait {
                             with TimemanagerDefaultResult
 
     def pushServiceTM(data : JsValue)
+                     (pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
@@ -37,12 +39,17 @@ object TimemanagerModule extends ModuleTrait {
 
             import inner_traits.pc
             import inner_traits.dr
-            val o : DBObject = data
+
+            val para = MergeStepResult(data, pr)
+
+            val o : DBObject = para
             db.insertObject(o, "service_time", "service_id")
 
             val reVal = o - "date"
 
-            (Some(Map("timemanager" -> toJson(reVal))), None)
+            (para \ "service").asOpt[JsValue].map { x =>
+                (Some(Map("service" -> x, "timemanager" -> toJson(reVal))), None)
+            }.getOrElse((Some(Map("timemanager" -> toJson(reVal))), None))
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -113,6 +120,7 @@ object TimemanagerModule extends ModuleTrait {
     }
 
     def updateServiceTM(data : JsValue)
+                       (pr : Option[Map[String, JsValue]])
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
@@ -144,7 +152,7 @@ object TimemanagerModule extends ModuleTrait {
                 obj - "date"
             }
 
-            if (reVal.isEmpty) pushServiceTM(data)
+            if (reVal.isEmpty) pushServiceTM(data)(pr)
             else (Some(Map("timemanager" -> toJson(reVal.get))), None)
 
         } catch {

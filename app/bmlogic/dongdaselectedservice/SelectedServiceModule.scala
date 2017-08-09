@@ -19,6 +19,9 @@ object SelectedServiceModule extends ModuleTrait {
         case msg_QuerySelectedService(data) => searchSelectedService(data)
         case msg_IsServiceSelected(data) => isServiceSelected(data)(pr)
         case msg_LstServiceSelected(data) => lstServiceSelected(data)(pr)
+
+        case msg_LstSelectedTags(data) => lstSelectedTags(data)
+
         case _ => ???
     }
 
@@ -171,6 +174,18 @@ object SelectedServiceModule extends ModuleTrait {
             (Some(Map(
                 "selected" -> toJson(result)
             )), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def lstSelectedTags(data : JsValue)
+                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            null
+
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
