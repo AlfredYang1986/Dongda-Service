@@ -15,7 +15,25 @@ trait OrderResult {
             "order_thumbs" -> toJson(obj.getAs[String]("order_thumbs").map (x => x).getOrElse(throw new Exception("order output error"))),
             "total_fee" -> toJson(obj.getAs[Number]("total_fee").map (x => x.intValue).getOrElse(throw new Exception("order output error"))),
             "further_message" -> toJson(obj.getAs[String]("further_message").map (x => x).getOrElse(throw new Exception("order output error"))),
-            "prepay_id" -> toJson(obj.getAs[String]("further_message").map (x => x).getOrElse(throw new Exception("order output error")))
+            "prepay_id" -> toJson(obj.getAs[String]("further_message").map (x => x).getOrElse(throw new Exception("order output error"))),
+            "order_date" -> OrderDate2Js(obj)
         )
+    }
+
+    def OrderDate2Js(x : MongoDBObject) : JsValue = {
+        try {
+            val lst = x.getAs[MongoDBList]("order_date").get.toList.asInstanceOf[List[BasicDBObject]]
+
+            val result = lst map { x =>
+                toJson(Map("start" -> toJson(x.getAs[Long]("start").get), "end" -> toJson(x.getAs[Long]("end").get)))
+            }
+
+            toJson(result)
+        } catch {
+            case ex : Exception =>
+                toJson(
+                    toJson(Map("start" -> toJson(x.getAs[MongoDBObject]("order_date").get.getAs[Long]("start").get),
+                        "end" -> toJson(x.getAs[MongoDBObject]("order_date").get.getAs[Long]("end").get))) :: Nil)
+        }
     }
 }
