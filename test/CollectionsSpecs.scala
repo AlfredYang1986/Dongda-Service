@@ -74,6 +74,15 @@ class CollectionsSpecs extends Specification with BeforeAll with AfterAll {
                     "cans" -> toJson("足球"),
                     "concert" -> toJson("篮球")
                 )
+            ),
+            "tms" -> toJson(
+                Map(
+                    "pattern" -> toJson(0),
+                    "startdate" -> toJson(0),
+                    "enddate" -> toJson(-1),
+                    "starthours" -> toJson(800),
+                    "endhours" -> toJson(2000)
+                ) :: Nil
             )
         )
     )
@@ -82,7 +91,7 @@ class CollectionsSpecs extends Specification with BeforeAll with AfterAll {
         WsTestClient.withClient { client =>
             {
                 val reVal = Await.result(
-                    new DongdaClient(client, "http://127.0.0.1:9000").authLoginWithPhone("13720200890", "alfred", "photo-1"), time_out)
+                    new DongdaClient(client, "http://127.0.0.1:9999").authLoginWithPhone("13720200890", "alfred", "photo-1"), time_out)
 
                 val result = (reVal \ "result").asOpt[JsValue].get
                 token_1 = (result \ "auth_token").asOpt[String].get
@@ -91,7 +100,7 @@ class CollectionsSpecs extends Specification with BeforeAll with AfterAll {
 
             {
                 val reVal = Await.result(
-                    new DongdaClient(client, "http://127.0.0.1:9000").authLoginWithPhone("13720200891", "alfredyang", "photo-2"), time_out)
+                    new DongdaClient(client, "http://127.0.0.1:9999").authLoginWithPhone("13720200891", "alfredyang", "photo-2"), time_out)
 
                 val result = (reVal \ "result").asOpt[JsValue].get
                 token_2 = (result \ "auth_token").asOpt[String].get
@@ -99,7 +108,7 @@ class CollectionsSpecs extends Specification with BeforeAll with AfterAll {
 
                 {
                     val reVal = Await.result(
-                        new DongdaClient(client, "http://127.0.0.1:9000").becomeServiceProvider(token_2, user_id_2, service_provider_info), time_out)
+                        new DongdaClient(client, "http://127.0.0.1:9999").becomeServiceProvider(token_2, user_id_2, service_provider_info), time_out)
 
                     (reVal \ "status").asOpt[String].get must_== "ok"
                 }
@@ -107,7 +116,7 @@ class CollectionsSpecs extends Specification with BeforeAll with AfterAll {
 
             {
                 val reVal = Await.result(
-                    new DongdaClient(client, "http://127.0.0.1:9000").pushService(token_2, user_id_2, service_info(user_id_2)), time_out)
+                    new DongdaClient(client, "http://127.0.0.1:9999").pushService(token_2, user_id_2, service_info(user_id_2)), time_out)
 
                 (reVal \ "status").asOpt[String].get must_== "ok"
 
@@ -132,7 +141,7 @@ class CollectionsSpecs extends Specification with BeforeAll with AfterAll {
     def pushCollectionTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").pushCollection(token_1, user_id_1, service_id), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").pushCollection(token_1, user_id_1, service_id), time_out)
 
             (reVal \ "status").asOpt[String].get must_== "ok"
         }
@@ -140,7 +149,7 @@ class CollectionsSpecs extends Specification with BeforeAll with AfterAll {
     def popCollectionTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").popCollection(token_1, user_id_1, service_id), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").popCollection(token_1, user_id_1, service_id), time_out)
 
             (reVal \ "status").asOpt[String].get must_== "ok"
         }
@@ -148,15 +157,17 @@ class CollectionsSpecs extends Specification with BeforeAll with AfterAll {
     def queryUserCollectionsTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").queryUserCollections(token_1, user_id_1), time_out)
+//                new DongdaClient(client, "http://127.0.0.1:9999").queryUserCollections(token_1, user_id_1), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").queryUserCollectedServices(token_1, user_id_1), time_out)
 
+            println(reVal)
             (reVal \ "status").asOpt[String].get must_== "ok"
         }
 
     def queryCollectedUserTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").queryCollectedUsers(token_1, service_id), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").queryCollectedUsers(token_1, service_id), time_out)
 
             (reVal \ "status").asOpt[String].get must_== "ok"
         }

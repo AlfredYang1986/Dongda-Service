@@ -3,6 +3,7 @@ package bmlogic.collections
 import bminjection.db.DBTrait
 import bmlogic.collections.CollectionData.{CollectionCondition, CollectionResult, CollectionsDetailCondition}
 import bmlogic.collections.CollectionsMessage._
+import bmlogic.common.mergestepresult.MergeStepResult
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
@@ -17,6 +18,7 @@ object CollectionsModule extends ModuleTrait {
         case msg_QueryCollectedUsers(data) => queryCollectedUsers(data)
         case msg_QueryUserCollections(data) => queryUserCollections(data)
         case msg_QueryIsCollected(data) => queryIsCollected(data)(pr)
+        case msg_UserCollectionsServices(data) => userCollectionServices(data)(pr)
         case _ => ???
     }
 
@@ -181,6 +183,27 @@ object CollectionsModule extends ModuleTrait {
 
             if (reVal.isEmpty) (Some(Map("collections" -> toJson(Map.empty[String, JsValue]))), None)
             else (Some(Map("collections" -> toJson(reVal.get))), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def userCollectionServices(data : JsValue)
+                              (pr : Option[Map[String, JsValue]])
+                              (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val js = MergeStepResult(data, pr)
+
+            val col = (js \ "collections").asOpt[JsValue].map (x => x).getOrElse(throw new Exception("collection outpu error"))
+            val services = (col \ "services").asOpt[List[String]].map (x => x).getOrElse(throw new Exception("collection outpu error"))
+
+            (Some(Map(
+                "condition" -> toJson(Map(
+                    "lst" -> toJson(services)
+                ))
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

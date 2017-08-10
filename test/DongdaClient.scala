@@ -355,6 +355,21 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             }
     }
 
+    def queryUserCollectedServices(token : String, user_id : String) = {
+        ws.url(baseUrl + "/al/user/collected/services")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "user_id" -> toJson(user_id)
+                ))
+            )))
+            .map { response =>
+                println(response.json)
+                response.json
+            }
+    }
+
     def pushSelectedTest(token : String, user_id : String, service_id : String, cate : String, group : String) = {
         ws.url(baseUrl + "/al/selected/push")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")

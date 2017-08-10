@@ -147,7 +147,65 @@ object KidnapModule extends ModuleTrait {
             val o : DBObject = data
             val reVal = db.queryObject(o, "kidnap") { obj =>
 
-                // TODO: 修改流程
+                /**
+                  * normal
+                  */
+                (data \ "service" \ "title").asOpt[String].map (x => obj += "title" -> x).getOrElse(Unit)
+                (data \ "service" \ "description").asOpt[String].map (x => obj += "description" -> x).getOrElse(Unit)
+                (data \ "service" \ "images").asOpt[String].map (x => obj += "images" -> x).getOrElse(Unit)
+
+                /**
+                  * location
+                  */
+                (data \ "service" \ "location").asOpt[JsValue].map { loc =>
+
+                    val loc_obj = obj.getAs[MongoDBObject]("location").map (x => x).getOrElse(throw new Exception("service result error"))
+
+                    (loc \ "province").asOpt[String].map (x => loc_obj += "province" -> x).getOrElse(Unit)
+                    (loc \ "city").asOpt[String].map (x => loc_obj += "city" -> x).getOrElse(Unit)
+                    (loc \ "district").asOpt[String].map (x => loc_obj += "district" -> x).getOrElse(Unit)
+                    (loc \ "address").asOpt[String].map (x => loc_obj += "address" -> x).getOrElse(Unit)
+                    (loc \ "adjust").asOpt[String].map (x => loc_obj += "adjust" -> x).getOrElse(Unit)
+
+                    obj += "location" -> loc_obj
+
+                }.getOrElse(Unit)
+
+                /**
+                  * category
+                  */
+                (data \ "service" \ "category").asOpt[JsValue].map { cat =>
+
+                    val cat_obj = obj.getAs[MongoDBObject]("category").map (x => x).getOrElse(throw new Exception("service result error"))
+
+                    (cat \ "service_cat").asOpt[String].map (x => cat_obj += "service_cat" -> x).getOrElse(Unit)
+                    (cat \ "cans_cat").asOpt[String].map (x => cat_obj += "cans_cat" -> x).getOrElse(Unit)
+                    (cat \ "cans").asOpt[String].map (x => cat_obj += "cans" -> x).getOrElse(Unit)
+                    (cat \ "concert").asOpt[String].map (x => cat_obj += "concert" -> x).getOrElse(Unit)
+
+                    obj += "category" -> cat_obj
+
+                }.getOrElse(Unit)
+
+                /**
+                  * detail
+                  */
+                (data \ "service" \ "detail").asOpt[JsValue].map { det =>
+
+                    val det_obj = obj.getAs[MongoDBObject]("category").map (x => x).getOrElse(throw new Exception("service result error"))
+
+                    (det \ "capacity").asOpt[Int].map (x => det_obj += "capacity" -> x.asInstanceOf[Number]).getOrElse(Unit)
+                    (det \ "least_hours").asOpt[Int].map (x => det_obj += "least_hours" -> x.asInstanceOf[Number]).getOrElse(Unit)
+                    (det \ "allow_leaves").asOpt[Int].map (x => det_obj += "allow_leaves" -> x.asInstanceOf[Number]).getOrElse(Unit)
+                    (det \ "least_times").asOpt[Int].map (x => det_obj += "least_times" -> x.asInstanceOf[Number]).getOrElse(Unit)
+                    (det \ "lecture_length").asOpt[Int].map (x => det_obj += "lecture_length" -> x.asInstanceOf[Number]).getOrElse(Unit)
+                    (det \ "servant_no").asOpt[Int].map (x => det_obj += "servant_no" -> x.asInstanceOf[Number]).getOrElse(Unit)
+
+                    obj += "detail" -> det_obj
+
+                }.getOrElse(Unit)
+
+                db.updateObject(obj, "kidnap", "service_id")
 
                 import inner_traits.dr
                 obj - "date" - "update_date"
