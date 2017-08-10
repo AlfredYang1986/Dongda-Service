@@ -1,6 +1,13 @@
 package bmlogic.order
 
+import java.util.Date
+
+import akka.actor.ActorSystem
 import bminjection.db.DBTrait
+import bminjection.notification.DDNTrait
+import bmlogic.ActionTypeDefines
+import bmlogic.common.mergestepresult.MergeStepResult
+import bmlogic.common.sercurity.Sercurity
 import bmlogic.order.OrderData._
 import bmlogic.order.OrderMessage._
 import bmmessages.{CommonModules, MessageDefines}
@@ -24,6 +31,8 @@ object OrderModule extends ModuleTrait {
         case msg_OrderReject(data) => updateOrder(data)
         case msg_OrderCancel(data) => updateOrder(data)
         case msg_OrderAccomplish(data) => updateOrder(data)
+
+        case msg_OrderChangedNotify(data) => orderStatusChangeNotify(data)
 
 //            case class msg_OrderSplit(data : JsValue) extends msg_OrderCommand
 //
@@ -167,5 +176,56 @@ object OrderModule extends ModuleTrait {
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
+    }
+
+    def orderStatusChangeNotify(data : JsValue)
+                               (pr : Option[Map[String, JsValue]])
+                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            implicit val as = cm.modules.get.get("as").map (x => x.asInstanceOf[ActorSystem]).getOrElse(throw new Exception("actor system get error"))
+            val ddn = cm.modules.get.get("ddn").map (x => x.asInstanceOf[DDNTrait]).getOrElse(throw new Exception("no db connection"))
+            val action = cm.modules.get.get("action").map (x => x.asInstanceOf[ActionTypeDefines]).getOrElse(throw new Exception("no db connection"))
+
+            val js = MergeStepResult(data, pr)
+
+            val user_id = (js \ "order" \ "user_id").asOpt[String].map (x => x).getOrElse(throw new Exception("order notify error"))
+            val owner_id = (js \ "order" \ "owner_id").asOpt[String].map (x => x).getOrElse(throw new Exception("order notify error"))
+            val order_id = (js \ "order" \ "order_id").asOpt[String].map (x => x).getOrElse(throw new Exception("order notify error"))
+            val service_id = (js \ "order" \ "service_id").asOpt[String].map (x => x).getOrElse(throw new Exception("order notify error"))
+            val opt_id = (js \ "condition" \ "user_id").asOpt[String].map (x => x).getOrElse(throw new Exception("order notify error"))
+
+            if (user_id == opt_id) {
+                sendStatusChangedNotification(pr.get, action.index, user_id, owner_id, order_id, service_id)(ddn)
+            } else if (owner_id == opt_id) {
+                sendStatusChangedNotification(pr.get, action.index, owner_id, user_id, order_id, service_id)(ddn)
+            } else throw new Exception("no right modify order")
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def sendStatusChangedNotification(m : Map[String, JsValue],
+                                      t : Int,
+                                      sender_id : String,
+                                      receiver_id : String,
+                                      order_id : String,
+                                      service_id : String)
+                                     (ddn : DDNTrait)(implicit as : ActorSystem) = {
+
+        var content : Map[String, JsValue] = Map.empty
+        content += "type" -> toJson(t)
+        content += "sender_id" -> toJson(sender_id)
+        content += "date" -> toJson(new Date().getTime)
+        content += "receiver_id" -> toJson(receiver_id)
+        content += "order_id" -> toJson(order_id)
+        content += "service_id" -> toJson(service_id)
+        content += "content" -> toJson(m)
+        content += "sign" -> toJson(Sercurity.md5Hash(sender_id + order_id + service_id + Sercurity.getTimeSpanWithMillSeconds))
+
+        ddn.notifyAsync("target_type" -> toJson("users"), "target" -> toJson(List(receiver_id).distinct),
+            "msg" -> toJson(Map("type" -> toJson("txt"), "msg"-> toJson(toJson(content).toString))),
+            "from" -> toJson("dongda_master"))
     }
 }

@@ -23,4 +23,6 @@ object OrderMessage {
     case class msg_OrderPrepay(data : JsValue) extends msg_OrderCommand
     case class msg_OrderPay(data : JsValue) extends msg_OrderCommand
     case class msg_OrderPostpay(data : JsValue) extends msg_OrderCommand
+
+    case class msg_OrderChangedNotify(data : JsValue) extends msg_OrderCommand
 }

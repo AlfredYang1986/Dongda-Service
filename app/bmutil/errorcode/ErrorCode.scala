@@ -41,6 +41,8 @@ object ErrorCode {
         new ErrorNode("order detail condition error", -503, "缺少订单id"),
         new ErrorNode("query multi order condition error", -504, "缺少订单id列表"),
         new ErrorNode("order not exist", -505, "查询的订单不存在"),
+        new ErrorNode("order notify error", -506, "订单状态修改发送提示失败"),
+        new ErrorNode("no right modify order", -507, "没有权限修改订单相关信息"),
 
         new ErrorNode("tm input error", -601, "添加时间管理参数错误"),
         new ErrorNode("tm output error", -602, "时间管理数据返回解析错误"),
@@ -63,6 +65,7 @@ object ErrorCode {
 		new ErrorNode("notification module not exist", -907, "用户提醒服务模块不存在"),
 		new ErrorNode("akka module not exist", -908, "系统并发分发模块不存在"),
 		new ErrorNode("merge result error", -909, "合并多结果失败"),
+		new ErrorNode("actor system get error", -910, "获取系统Actor System失败"),
 
 		new ErrorNode("unknown error", -999, "unknown error")
 	)
