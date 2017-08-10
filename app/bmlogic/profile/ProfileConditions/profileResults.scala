@@ -30,7 +30,8 @@ trait profileResults {
             "screen_name" -> toJson(obj.getAs[String]("screen_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "is_service_provider" -> toJson(if (spm.isEmpty) 0
-                                            else 1)
+                                            else 1),
+            "date" -> toJson(obj.getAs[Number]("date").map (x => x.longValue).getOrElse(0.toLong))
         ) ++ spm
     }
 }
