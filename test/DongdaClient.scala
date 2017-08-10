@@ -144,6 +144,7 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map("token" -> toJson(token),
                              "condition" -> toJson(Map(
+                                 "user_id" -> toJson(user_id),
                                  "service_id" -> toJson(service_id)
                              )),
                              "order" -> toJson(Map(

@@ -59,6 +59,8 @@ object KidnapModule extends ModuleTrait {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
+            val tms = (data \ "service" \ "tms").asOpt[JsValue].map (x => x).getOrElse(throw new Exception("push service input error"))
+
             import inner_traits.pc
             val o : DBObject = data
             db.insertObject(o, "kidnap", "service_id")
@@ -66,7 +68,6 @@ object KidnapModule extends ModuleTrait {
             import inner_traits.dr
             val reVal = toJson(o - "date" - "update_date")
 
-            val tms = (data \ "service" \ "tms").asOpt[JsValue].map (x => x).getOrElse(throw new Exception("push service input error"))
             val service_id = (reVal \ "service_id").asOpt[String].get
 
             val condition = toJson(Map(

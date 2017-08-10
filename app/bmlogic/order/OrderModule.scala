@@ -32,7 +32,7 @@ object OrderModule extends ModuleTrait {
         case msg_OrderCancel(data) => updateOrder(data)
         case msg_OrderAccomplish(data) => updateOrder(data)
 
-        case msg_OrderChangedNotify(data) => orderStatusChangeNotify(data)
+        case msg_OrderChangedNotify(data) => orderStatusChangeNotify(data)(pr)
 
 //            case class msg_OrderSplit(data : JsValue) extends msg_OrderCommand
 //
@@ -158,8 +158,9 @@ object OrderModule extends ModuleTrait {
 
             import inner_trait.dc
             val o : DBObject = data
-            val reVal = db.queryObject(o, "order") { obj =>
+            val reVal = db.queryObject(o, "orders") { obj =>
 
+                println(data)
                 (data \ "order" \ "order_title").asOpt[String].map (x => obj += "order_title" -> x).getOrElse(Unit)
                 (data \ "order" \ "order_thumbs").asOpt[String].map (x => obj += "order_thumbs" -> x).getOrElse(Unit)
                 (data \ "order" \ "further_message").asOpt[String].map (x => obj += "further_message" -> x).getOrElse(Unit)
@@ -200,6 +201,8 @@ object OrderModule extends ModuleTrait {
             } else if (owner_id == opt_id) {
                 sendStatusChangedNotification(pr.get, action.index, owner_id, user_id, order_id, service_id)(ddn)
             } else throw new Exception("no right modify order")
+
+            (pr, None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

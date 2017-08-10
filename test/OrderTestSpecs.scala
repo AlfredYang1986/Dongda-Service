@@ -72,6 +72,15 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
                     "cans" -> toJson("足球"),
                     "concert" -> toJson("篮球")
                 )
+            ),
+            "tms" -> toJson(
+                Map(
+                    "pattern" -> toJson(0),
+                    "startdate" -> toJson(0),
+                    "enddate" -> toJson(-1),
+                    "starthours" -> toJson(800),
+                    "endhours" -> toJson(2000)
+                ) :: Nil
             )
         )
     )
@@ -80,7 +89,7 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
         WsTestClient.withClient { client =>
             {
                 val reVal = Await.result(
-                    new DongdaClient(client, "http://127.0.0.1:9000").authLoginWithPhone("13720200890", "alfred", "photo-1"), time_out)
+                    new DongdaClient(client, "http://127.0.0.1:9999").authLoginWithPhone("13720200890", "alfred", "photo-1"), time_out)
 
                 val result = (reVal \ "result").asOpt[JsValue].get
                 token_1 = (result \ "auth_token").asOpt[String].get
@@ -89,7 +98,7 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
 
             {
                 val reVal = Await.result(
-                    new DongdaClient(client, "http://127.0.0.1:9000").authLoginWithPhone("13720200891", "alfredyang", "photo-2"), time_out)
+                    new DongdaClient(client, "http://127.0.0.1:9999").authLoginWithPhone("13720200891", "alfredyang", "photo-2"), time_out)
 
                 val result = (reVal \ "result").asOpt[JsValue].get
                 token_2 = (result \ "auth_token").asOpt[String].get
@@ -97,7 +106,7 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
 
                 {
                     val reVal = Await.result(
-                        new DongdaClient(client, "http://127.0.0.1:9000").becomeServiceProvider(token_2, user_id_2, service_provider_info), time_out)
+                        new DongdaClient(client, "http://127.0.0.1:9999").becomeServiceProvider(token_2, user_id_2, service_provider_info), time_out)
 
                     (reVal \ "status").asOpt[String].get must_== "ok"
                 }
@@ -105,7 +114,7 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
 
             {
                 val reVal = Await.result(
-                    new DongdaClient(client, "http://127.0.0.1:9000").pushService(token_2, user_id_2, service_info(user_id_2)), time_out)
+                    new DongdaClient(client, "http://127.0.0.1:9999").pushService(token_2, user_id_2, service_info(user_id_2)), time_out)
 
                 (reVal \ "status").asOpt[String].get must_== "ok"
 
@@ -132,7 +141,7 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
     def pushOrderTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").pushOrder(token_1, user_id_1, service_id), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").pushOrder(token_1, user_id_1, service_id), time_out)
 
             val result = (reVal \ "result").asOpt[JsValue].get
             order_id  = (result \ "order" \ "order_id").asOpt[String].get
@@ -143,7 +152,7 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
     def popOrderTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").popOrder(token_1, user_id_1, order_id), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").popOrder(token_1, user_id_1, order_id), time_out)
 
             (reVal \ "status").asOpt[String].get must_== "ok"
         }
@@ -151,27 +160,25 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
     def detailOrderTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").detailOrder(token_1, user_id_1, order_id), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").detailOrder(token_1, user_id_1, order_id), time_out)
 
 //            val result = (reVal \ "result").asOpt[JsValue].get
-//            println(result)
             (reVal \ "status").asOpt[String].get must_== "ok"
         }
 
     def searchOrdersTest =
          WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").searchOrders(token_1, user_id_1, user_id_2), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").searchOrders(token_1, user_id_1, user_id_2), time_out)
 
-            val result = (reVal \ "result").asOpt[JsValue].get
-//            println(result)
+//            val result = (reVal \ "result").asOpt[JsValue].get
             (reVal \ "status").asOpt[String].get must_== "ok"
         }
 
     def updateOrderTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9000").updateOrder(token_2, order_id, "alfred yang order test"), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").updateOrder(token_2, order_id, "alfred yang order test"), time_out)
 
             val result = (reVal \ "result").asOpt[JsValue].get
             (reVal \ "status").asOpt[String].get must_== "ok"
