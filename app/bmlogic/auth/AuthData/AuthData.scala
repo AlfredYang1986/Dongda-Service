@@ -45,10 +45,15 @@ trait AuthData {
     }
 
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
+        val spm = obj.getAs[MongoDBObject]("service_provider").map (x => 1).getOrElse(0)
+        val has_auth_phone = obj.getAs[String]("auth_phone").map (x => 1).getOrElse(0)
+
         Map(
             "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "screen_name" -> toJson(obj.getAs[String]("screen_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error")))
+            "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error"))),
+            "is_service_provider" -> toJson(spm),
+            "has_auth_phone" -> toJson(has_auth_phone)
         )
     }
 }
