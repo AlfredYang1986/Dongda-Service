@@ -119,4 +119,14 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
             :: msg_OrderAccomplish(jv) :: msg_OrderChangedNotify(jv)
             :: msg_CommonResultMessage() :: Nil, None)
     })
+
+    def prepayOrder = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import bmpattern.LogMessage.common_log
+        import bmpattern.ResultMessage.common_result
+        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as)))
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("prepay order"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_OrderPrepay(jv) :: msg_OrderUpdate(jv)
+            :: msg_CommonResultMessage() :: Nil, None)
+    })
 }

@@ -10,6 +10,7 @@ import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.common.sercurity.Sercurity
 import bmlogic.order.OrderData._
 import bmlogic.order.OrderMessage._
+import bmlogic.webpay.WechatPayModule
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
@@ -33,6 +34,8 @@ object OrderModule extends ModuleTrait {
         case msg_OrderAccomplish(data) => updateOrder(data)
 
         case msg_OrderChangedNotify(data) => orderStatusChangeNotify(data)(pr)
+
+        case msg_OrderPrepay(data) => orderPrepay(data)
 
 //            case class msg_OrderSplit(data : JsValue) extends msg_OrderCommand
 //
@@ -151,20 +154,21 @@ object OrderModule extends ModuleTrait {
     }
 
     def updateOrder(data : JsValue)
+                   (pr : Option[Map[String, JsValue]])
                    (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             import inner_trait.dc
-            val o : DBObject = data
+            val o : DBObject = MergeStepResult(data, pr)
             val reVal = db.queryObject(o, "orders") { obj =>
 
-                println(data)
                 (data \ "order" \ "order_title").asOpt[String].map (x => obj += "order_title" -> x).getOrElse(Unit)
                 (data \ "order" \ "order_thumbs").asOpt[String].map (x => obj += "order_thumbs" -> x).getOrElse(Unit)
                 (data \ "order" \ "further_message").asOpt[String].map (x => obj += "further_message" -> x).getOrElse(Unit)
                 (data \ "order" \ "status").asOpt[Int].map (x => obj += "status" -> x.asInstanceOf[Number]).getOrElse(Unit)
+                (data \ "order" \ "prepay_id").asOpt[String].map (x => obj += "prepay_id" -> x).getOrElse(Unit)
 
                 db.updateObject(obj, "orders", "order_id")
 
@@ -173,6 +177,45 @@ object OrderModule extends ModuleTrait {
             }
 
             (Some(Map("order" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def orderPrepay(data : JsValue)
+                   (pr : Option[Map[String, JsValue]])
+                   (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val condition = (data \ "condition").asOpt[JsValue].map (x => x).getOrElse(throw new Exception("input error"))
+
+            val order_id = (condition \ "order_id").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
+            val pay_method = (condition \ "pay_method").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
+
+            pay_method match {
+                case "wechat" => {
+                    val js = WechatPayModule.prepayid(data, order_id)
+//                    println(s"get wechat pay prepayid : $js")
+                    val prepay_id = (js \ "result" \ "prepay_id").asOpt[String].map (x => x).getOrElse(throw new Exception("prepay id error"))
+//                    updateOrder(toJson(Map("order_id" -> toJson(order_id), "prepay_id" -> toJson(prepay_id))))
+
+                    (Some(Map(
+                        "order" -> toJson(Map(
+                            "prepay_id" -> toJson(prepay_id)
+                        ))
+                    )), None)
+                }
+                case "alipay" => {
+//                    updateOrder(toJson(Map("order_id" -> toJson(order_id), "prepay_id" -> toJson(""))))
+
+                    (Some(Map(
+                        "order" -> toJson(Map(
+                            "prepay_id" -> toJson("")
+                        ))
+                    )), None)
+                }
+            }
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
