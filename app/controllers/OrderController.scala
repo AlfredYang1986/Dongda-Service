@@ -7,11 +7,14 @@ import bminjection.db.DBTrait
 import bminjection.notification.DDNTrait
 import bminjection.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
+import bmlogic.common.placeholder.PlaceHolderMessages.msg_PlaceHold
 import bmlogic.common.requestArgsQuery
 import bmlogic.order.OrderMessage._
 import bmlogic.kidnap.KidnapMessage.msg_KidnapDetail
+import bmlogic.profile.ProfileMessage.msg_ProfileMultiQuery
 import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
+import bmpattern.ParallelMessage
 import bmpattern.ResultMessage.msg_CommonResultMessage
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
@@ -43,19 +46,31 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
     def detailOrder = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
+        import bmlogic.order.OrderModule.detailOrderResultMerge
+        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("detail order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderDetail(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            ::
+            ParallelMessage(
+                MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
+                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, detailOrderResultMerge)
+            :: msg_CommonResultMessage() :: Nil, None)
     })
 
     def searchOrders = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
+        import bmlogic.order.OrderModule.searchOrderResultMerge
+        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search orders"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderSearch(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            ::
+            ParallelMessage(
+                MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
+                    MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, searchOrderResultMerge)
+            :: msg_CommonResultMessage() :: Nil, None)
     })
 
     def queryMultiOrders = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>

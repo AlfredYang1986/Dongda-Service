@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import bminjection.db.DBTrait
 import bminjection.notification.DDNTrait
 import bmlogic.ActionTypeDefines
-import bmlogic.common.mergestepresult.MergeStepResult
+import bmlogic.common.mergestepresult.{MergeParallelResult, MergeStepResult}
 import bmlogic.common.sercurity.Sercurity
 import bmlogic.order.OrderData._
 import bmlogic.order.OrderMessage._
@@ -15,7 +15,7 @@ import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
 import com.mongodb.casbah.Imports._
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
 object OrderModule extends ModuleTrait {
@@ -26,16 +26,16 @@ object OrderModule extends ModuleTrait {
         case msg_OrderSearch(data) => searchOrder(data)
         case msg_OrderQueryMulti(data) => queryMultiOrders(data)
         case msg_OrderDetail(data) => detailOrder(data)
-        case msg_OrderUpdate(data) => updateOrder(data)
+        case msg_OrderUpdate(data) => updateOrder(data)(pr)
 
-        case msg_OrderAccept(data) => updateOrder(data)
-        case msg_OrderReject(data) => updateOrder(data)
-        case msg_OrderCancel(data) => updateOrder(data)
-        case msg_OrderAccomplish(data) => updateOrder(data)
+        case msg_OrderAccept(data) => updateOrder(data)(pr)
+        case msg_OrderReject(data) => updateOrder(data)(pr)
+        case msg_OrderCancel(data) => updateOrder(data)(pr)
+        case msg_OrderAccomplish(data) => updateOrder(data)(pr)
 
         case msg_OrderChangedNotify(data) => orderStatusChangeNotify(data)(pr)
 
-        case msg_OrderPrepay(data) => orderPrepay(data)
+        case msg_OrderPrepay(data) => orderPrepay(data)(pr)
 
 //            case class msg_OrderSplit(data : JsValue) extends msg_OrderCommand
 //
@@ -105,7 +105,17 @@ object OrderModule extends ModuleTrait {
             val reVal = db.queryObject(o, "orders")
 
             if (reVal.isEmpty) throw new Exception("order not exist")
-            else (Some(Map("order" -> toJson(reVal.get - "date" - "pay_date"))), None)
+            else {
+                val user_id = reVal.get.get("user_id").get.asOpt[String].get
+                val owner_id = reVal.get.get("owner_id").get.asOpt[String].get
+
+                (Some(Map(
+                        "order" -> toJson(reVal.get - "date" - "pay_date"),
+                        "condition" -> toJson(Map(
+                            "lst" -> toJson(user_id :: owner_id :: Nil)
+                        ))
+                )), None)
+            }
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -125,7 +135,15 @@ object OrderModule extends ModuleTrait {
             val o : DBObject = data
             val reVal = db.queryMultipleObject(o, "orders", skip = skip, take = take)
 
-            (Some(Map("orders" -> toJson(reVal))), None)
+            val lst = reVal.map (x => x.get("user_id").get.asOpt[String].get) :::
+                      reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+
+            (Some(Map(
+                "orders" -> toJson(reVal),
+                "condition" -> toJson(Map(
+                    "lst" -> toJson(lst)
+                ))
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -273,5 +291,74 @@ object OrderModule extends ModuleTrait {
         ddn.notifyAsync("target_type" -> toJson("users"), "target" -> toJson(List(receiver_id).distinct),
             "msg" -> toJson(Map("type" -> toJson("txt"), "msg"-> toJson(toJson(content).toString))),
             "from" -> toJson("dongda_master"))
+    }
+
+    def detailOrderResultMerge(lst : List[Map[String, JsValue]])
+                              (pr : Option[Map[String, JsValue]]) : Map[String, JsValue] = {
+
+        val para = MergeParallelResult(lst)
+
+        val order = pr.get.get("order").get.asOpt[JsValue].get
+        val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
+
+        val user_id = (order \ "user_id").asOpt[String].get
+        val user = profiles.find(p => (p \ "user_id").asOpt[String].get == user_id).map (x => x).getOrElse {
+            toJson(Map(
+                "screen_name" -> toJson("Gost"),
+                "screen_photo" -> toJson("")
+            ))
+        }
+
+        val owner_id = (order \ "owner_id").asOpt[String].get
+        val owner = profiles.find(p => (p \ "user_id").asOpt[String].get == user_id).map (x => x).getOrElse {
+            toJson(Map(
+                "screen_name" -> toJson("Gost"),
+                "screen_photo" -> toJson("")
+            ))
+        }
+
+        val result = order.as[JsObject].value.toMap -
+                     "user_id" -
+                     "owner_id" +
+                     ("owner" -> owner) +
+                     ("user" -> user)
+
+        Map("order" -> toJson(result))
+    }
+
+    def searchOrderResultMerge(lst : List[Map[String, JsValue]])
+                              (pr : Option[Map[String, JsValue]]) : Map[String, JsValue] = {
+
+        val para = MergeParallelResult(lst)
+
+        val orders = pr.get.get("orders").get.asOpt[List[JsValue]].get
+        val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
+
+        val result =
+            orders.map { iter =>
+                val owner_id = (iter \ "owner_id").asOpt[String].get
+                val owner = profiles.find(p => (p \ "user_id").asOpt[String].get == owner_id).map (x => x).getOrElse {
+                    toJson(Map(
+                        "screen_name" -> toJson("Gost"),
+                        "screen_photo" -> toJson("")
+                    ))
+                }
+
+                val user_id= (iter \ "user_id").asOpt[String].get
+                val user = profiles.find(p => (p \ "user_id").asOpt[String].get == user_id).map (x => x).getOrElse {
+                    toJson(Map(
+                        "screen_name" -> toJson("Gost"),
+                        "screen_photo" -> toJson("")
+                    ))
+                }
+
+                iter.as[JsObject].value.toMap -
+                    "user_id" -
+                    "owner_id" +
+                    ("owner" -> owner) +
+                    ("user" -> user)
+            }
+
+        Map("orders" -> toJson(result))
     }
 }

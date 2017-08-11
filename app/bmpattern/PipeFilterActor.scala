@@ -18,6 +18,7 @@ import bmlogic.timemanager.{TimemanagerModule, msg_TMCommand}
 import bmlogic.collections.{CollectionsModule, msg_CollectionsCommand}
 import bmlogic.emxmpp.{EMModule, msg_EMMessageCommand}
 import bmlogic.dongdaselectedservice.{msg_SelectedServiceCommand, SelectedServiceModule}
+import bmlogic.common.placeholder.{msg_PlaceHoldCommand, PlaceHolderModule}
 
 object PipeFilterActor {
 	def prop(originSender : ActorRef, msr : MessageRoutes) : Props = {
@@ -58,6 +59,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		case cmd : msg_CollectionsCommand => dispatchImpl(cmd, CollectionsModule)
 		case cmd : msg_SelectedServiceCommand => dispatchImpl(cmd, SelectedServiceModule)
 		case cmd : msg_EMMessageCommand => dispatchImpl(cmd, EMModule)
+        case cmd : msg_PlaceHoldCommand => dispatchImpl(cmd, PlaceHolderModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
 		case cmd : ParallelMessage => {
