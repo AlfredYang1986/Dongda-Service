@@ -11,6 +11,7 @@ import bmlogic.common.placeholder.PlaceHolderMessages.msg_PlaceHold
 import bmlogic.common.requestArgsQuery
 import bmlogic.order.OrderMessage._
 import bmlogic.kidnap.KidnapMessage.msg_KidnapDetail
+import bmlogic.orderDate.OrderDateMessages._
 import bmlogic.profile.ProfileMessage.msg_ProfileMultiQuery
 import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
@@ -29,7 +30,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_posted)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_KidnapDetail(jv) :: msg_OrderPush(jv)
+            :: msg_KidnapDetail(jv) :: msg_OrderPush(jv) :: msg_OrderDateLstPush(jv)
             :: msg_OrderChangedNotify(jv)
             :: msg_CommonResultMessage() :: Nil, None)
     })
@@ -39,7 +40,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         import bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_OrderPop(jv)
+            :: msg_OrderPop(jv) :: msg_OrderDateLstPop(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 

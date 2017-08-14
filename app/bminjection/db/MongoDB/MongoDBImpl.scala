@@ -2,6 +2,7 @@ package bminjection.db.MongoDB
 
 import bminjection.db.DBTrait
 import bmutil.dao.{_data_connection, from}
+import com.mongodb.casbah.Imports
 import play.api.libs.json.JsValue
 import com.mongodb.casbah.Imports._
 
@@ -42,6 +43,12 @@ trait MongoDBImpl extends DBTrait {
         (from db() in db_name where (primary_key -> primary) select(x =>x)).toList match {
             case head :: Nil => _data_connection.getCollection(db_name) -= head
             case _ => throw new Exception("primary key error")
+        }
+    }
+
+    override def deleteMultiObject(obj: DBObject, db_name: String): Unit = {
+        (from db() in db_name where obj select(x =>x)).toList map { iter =>
+            _data_connection.getCollection(db_name) -= iter
         }
     }
 

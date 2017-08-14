@@ -69,7 +69,17 @@ object OrderModule extends ModuleTrait {
             db.insertObject(o, "orders", "order_id")
             val reVal = toJson(o - "date" - "pay_date")
 
-            (Some(Map("order" -> reVal)), None)
+            val order_id = (reVal \ "order_id").asOpt[String].get
+            val lst = (data \ "order" \ "order_date").asOpt[JsValue].map (x => x).getOrElse(throw new Exception("push Order input error"))
+
+            (Some(Map(
+                "order" -> reVal,
+                "condition" -> toJson(Map(
+                    "order_id" -> toJson(order_id),
+                    "owner_id" -> toJson(owner_id),
+                    "tms" -> lst
+                ))
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -181,6 +191,10 @@ object OrderModule extends ModuleTrait {
             import inner_trait.dc
             val o : DBObject = MergeStepResult(data, pr)
             val reVal = db.queryObject(o, "orders") { obj =>
+
+                /**
+                  * P.S. 订单时间绝对禁止修改
+                  */
 
                 (data \ "order" \ "order_title").asOpt[String].map (x => obj += "order_title" -> x).getOrElse(Unit)
                 (data \ "order" \ "order_thumbs").asOpt[String].map (x => obj += "order_thumbs" -> x).getOrElse(Unit)

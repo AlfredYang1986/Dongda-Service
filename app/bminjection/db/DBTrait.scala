@@ -23,6 +23,7 @@ trait DBTrait {
                  (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]]
 
     def deleteObject(obj : DBObject, db_name : String, primary_key : String) : Unit
+    def deleteMultiObject(obj : DBObject, db_name : String) : Unit
 
     def restoreDatabase() = ???
     def dumpDatabase() = ???

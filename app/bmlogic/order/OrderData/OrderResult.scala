@@ -16,8 +16,8 @@ trait OrderResult {
             "total_fee" -> toJson(obj.getAs[Number]("total_fee").map (x => x.intValue).getOrElse(throw new Exception("order output error"))),
             "further_message" -> toJson(obj.getAs[String]("further_message").map (x => x).getOrElse(throw new Exception("order output error"))),
             "prepay_id" -> toJson(obj.getAs[String]("further_message").map (x => x).getOrElse(throw new Exception("order output error"))),
-            "status" -> toJson(obj.getAs[Number]("status").map (x => x.intValue).getOrElse(throw new Exception("order output error"))),
-            "order_date" -> OrderDate2Js(obj)
+            "status" -> toJson(obj.getAs[Number]("status").map (x => x.intValue).getOrElse(throw new Exception("order output error")))//,
+//            "order_date" -> OrderDate2Js(obj)
         )
     }
 
