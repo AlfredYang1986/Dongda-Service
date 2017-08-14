@@ -7,7 +7,6 @@ import bminjection.db.DBTrait
 import bminjection.notification.DDNTrait
 import bminjection.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
-import bmlogic.common.placeholder.PlaceHolderMessages.msg_PlaceHold
 import bmlogic.common.requestArgsQuery
 import bmlogic.order.OrderMessage._
 import bmlogic.kidnap.KidnapMessage.msg_KidnapDetail
@@ -55,7 +54,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
             ::
             ParallelMessage(
                 MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
-                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, detailOrderResultMerge)
+                MessageRoutes(msg_QueryOrderDate(jv) :: Nil, None) :: Nil, detailOrderResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)
     })
 
@@ -70,7 +69,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
             ::
             ParallelMessage(
                 MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
-                    MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, searchOrderResultMerge)
+                MessageRoutes(msg_QueryMultiOrderDate(jv) :: Nil, None) :: Nil, searchOrderResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)
     })
 

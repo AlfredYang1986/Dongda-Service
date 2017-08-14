@@ -36,6 +36,13 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
         )
     )
 
+    val order_date = toJson(
+        Map(
+            "start" -> toJson(12345),
+            "end" -> toJson(67890)
+           )
+        ) :: Nil
+
     def service_info(owner_id : String) = toJson(
         Map(
             "owner_id" -> toJson(owner_id),
@@ -133,15 +140,15 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
                 push order test                                               $pushOrderTest
                 query detial order test                                       $detailOrderTest
                 search order test                                             $searchOrdersTest
-                update order test                                             $updateOrderTest
                                                                               """
+//        update order test                                             $updateOrderTest
 //    pop order test                                                $popOrderTest
 
 
     def pushOrderTest =
         WsTestClient.withClient { client =>
             val reVal = Await.result(
-                new DongdaClient(client, "http://127.0.0.1:9999").pushOrder(token_1, user_id_1, service_id), time_out)
+                new DongdaClient(client, "http://127.0.0.1:9999").pushOrder(token_1, user_id_1, service_id, toJson(order_date)), time_out)
 
             val result = (reVal \ "result").asOpt[JsValue].get
             order_id  = (result \ "order" \ "order_id").asOpt[String].get
@@ -163,6 +170,8 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
                 new DongdaClient(client, "http://127.0.0.1:9999").detailOrder(token_1, user_id_1, order_id), time_out)
 
 //            val result = (reVal \ "result").asOpt[JsValue].get
+
+//            println(s"detail is $reVal")
             (reVal \ "status").asOpt[String].get must_== "ok"
         }
 
@@ -172,6 +181,7 @@ class OrderTestSpecs extends Specification with BeforeAll with AfterAll {
                 new DongdaClient(client, "http://127.0.0.1:9999").searchOrders(token_1, user_id_1, user_id_2), time_out)
 
 //            val result = (reVal \ "result").asOpt[JsValue].get
+            println(s"search are $reVal")
             (reVal \ "status").asOpt[String].get must_== "ok"
         }
 

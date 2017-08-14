@@ -139,7 +139,7 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             }
     }
 
-    def pushOrder(token : String, user_id : String, service_id : String) : Future[JsValue] = {
+    def pushOrder(token : String, user_id : String, service_id : String, tms : JsValue) : Future[JsValue] = {
         ws.url(baseUrl + "/al/order/push")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map("token" -> toJson(token),
@@ -150,6 +150,7 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                              "order" -> toJson(Map(
                                  "user_id" -> toJson(user_id),
                                  "service_id" -> toJson(service_id),
+                                 "order_date" -> tms,
                                  "total_fee" -> toJson(1)
                              )))))
             .map { response =>
@@ -190,8 +191,9 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
         ws.url(baseUrl + "/al/order/search")
             .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
             .post(toJson(Map("token" -> toJson(token),
+                "skip" -> toJson(10),
                 "condition" -> toJson(Map(
-                    "owner_id" -> owner_id
+                    "owner_id" -> "76155e804458a307d6bd6e711982ce46" //owner_id
                 )))))
             .map { response =>
 //                println(response.json)

@@ -8,6 +8,7 @@ import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
 import com.mongodb.DBObject
+import com.mongodb.casbah.commons.MongoDBObject
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
@@ -16,6 +17,8 @@ object OrderDateModule extends ModuleTrait {
 
         case msg_OrderDateLstPush(data) => orderDateLstPush(data)(pr)
         case msg_OrderDateLstPop(data) => orderDateLstPop(data)(pr)
+        case msg_QueryOrderDate(data) => orderDateDetailQuery(data)(pr)
+        case msg_QueryMultiOrderDate(data) => orderMultiDateQuery(data)(pr)
 
         case _ => ???
     }
@@ -79,7 +82,54 @@ object OrderDateModule extends ModuleTrait {
                             (pr : Option[Map[String, JsValue]])
                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            null
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val para = MergeStepResult(data, pr)
+
+            import inner_trait.dc
+            import inner_trait.sr
+            val o : DBObject = para
+
+            val tms = db.queryMultipleObject(o, "order_time") map { x =>
+                            toJson(Map(
+                                "start" -> (x.get("start").get),
+                                "end" -> (x.get("end").get)
+                            ))
+                        }
+
+            (Some(Map(
+                "order_date" -> toJson(tms)
+            )), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def orderMultiDateQuery(data : JsValue)
+                           (pr : Option[Map[String, JsValue]])
+                           (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val para = MergeStepResult(data, pr)
+
+            import inner_trait.mc
+            import inner_trait.dr
+            val o : DBObject = para
+
+            val tms = db.queryMultipleObject(o, "order_time") map { x =>
+                toJson(Map(
+                    "order_id" -> (x.get("order_id").get),
+                    "start" -> (x.get("start").get),
+                    "end" -> (x.get("end").get)
+                ))
+            }
+
+            (Some(Map(
+                "order_date" -> toJson(tms)
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

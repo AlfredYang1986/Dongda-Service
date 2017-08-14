@@ -122,7 +122,8 @@ object OrderModule extends ModuleTrait {
                 (Some(Map(
                         "order" -> toJson(reVal.get - "date" - "pay_date"),
                         "condition" -> toJson(Map(
-                            "lst" -> toJson(user_id :: owner_id :: Nil)
+                            "lst" -> toJson(user_id :: owner_id :: Nil),
+                            "order_id" -> (reVal.get.get("order_id").get)
                         ))
                 )), None)
             }
@@ -148,10 +149,13 @@ object OrderModule extends ModuleTrait {
             val lst = reVal.map (x => x.get("user_id").get.asOpt[String].get) :::
                       reVal.map (x => x.get("owner_id").get.asOpt[String].get)
 
+            val order_lst = reVal.map (x => x.get("order_id").get.asOpt[String].get)
+
             (Some(Map(
                 "orders" -> toJson(reVal),
                 "condition" -> toJson(Map(
-                    "lst" -> toJson(lst)
+                    "lst" -> toJson(lst),
+                    "order_lst" -> toJson(order_lst)
                 ))
             )), None)
 
@@ -314,6 +318,7 @@ object OrderModule extends ModuleTrait {
 
         val order = pr.get.get("order").get.asOpt[JsValue].get
         val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
+        val tms = para.get("order_date").get.asOpt[JsValue].get
 
         val user_id = (order \ "user_id").asOpt[String].get
         val user = profiles.find(p => (p \ "user_id").asOpt[String].get == user_id).map (x => x).getOrElse {
@@ -334,6 +339,7 @@ object OrderModule extends ModuleTrait {
         val result = order.as[JsObject].value.toMap -
                      "user_id" -
                      "owner_id" +
+                     ("order_date" -> tms) +
                      ("owner" -> owner) +
                      ("user" -> user)
 
@@ -347,6 +353,7 @@ object OrderModule extends ModuleTrait {
 
         val orders = pr.get.get("orders").get.asOpt[List[JsValue]].get
         val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
+        val tms_g = para.get("order_date").get.asOpt[List[JsValue]].get.groupBy(x => (x \ "order_id").asOpt[String].get)
 
         val result =
             orders.map { iter =>
@@ -366,9 +373,20 @@ object OrderModule extends ModuleTrait {
                     ))
                 }
 
+                val order_id = (iter \ "order_id").asOpt[String].get
+                val order_date = tms_g.find(p => p._1 == order_id).map { one =>
+                    one._2.map { iter =>
+                        toJson(Map(
+                            "start" -> toJson((iter \ "start").asOpt[JsValue].get),
+                            "end" -> toJson((iter \ "start").asOpt[JsValue].get)
+                        ))
+                    }
+                }.getOrElse(Nil)
+
                 iter.as[JsObject].value.toMap -
                     "user_id" -
                     "owner_id" +
+                    ("order_date" -> toJson(order_date)) +
                     ("owner" -> owner) +
                     ("user" -> user)
             }

@@ -2,7 +2,6 @@ package bminjection.db.MongoDB
 
 import bminjection.db.DBTrait
 import bmutil.dao.{_data_connection, from}
-import com.mongodb.casbah.Imports
 import play.api.libs.json.JsValue
 import com.mongodb.casbah.Imports._
 
