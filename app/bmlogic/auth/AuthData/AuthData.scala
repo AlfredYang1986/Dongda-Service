@@ -45,7 +45,9 @@ trait AuthData {
     }
 
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
-        val spm = obj.getAs[MongoDBObject]("service_provider").map (x => 1).getOrElse(0)
+        val spm = obj.getAs[MongoDBObject]("service_provider").map { x =>
+            x.getAs[String]("social_id").map (y => 1).getOrElse(0)
+        }.getOrElse(0)
         val has_auth_phone = obj.getAs[String]("auth_phone").map (x => 1).getOrElse(0)
 
         Map(
