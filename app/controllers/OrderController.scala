@@ -7,6 +7,7 @@ import bminjection.db.DBTrait
 import bminjection.notification.DDNTrait
 import bminjection.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
+import bmlogic.common.placeholder.PlaceHolderMessages.msg_PlaceHold
 import bmlogic.common.requestArgsQuery
 import bmlogic.order.OrderMessage._
 import bmlogic.kidnap.KidnapMessage.msg_KidnapDetail
@@ -142,6 +143,30 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("prepay order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderPrepay(jv) :: msg_OrderUpdate(jv)
+            :: msg_CommonResultMessage() :: Nil, None)
+    })
+
+    def lstOrdersDateSorted = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import bmpattern.LogMessage.common_log
+        import bmpattern.ResultMessage.common_result
+        import bmlogic.order.OrderModule.searchOrderResultMerge
+        import bmlogic.orderDate.OrderDateModule.orderDateResultMerge
+        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
+
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("lst orders date"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_LstOrdersDateSorted(jv)
+            ::
+            ParallelMessage(
+                MessageRoutes(
+                    msg_OrderQueryMulti(jv)
+                    ::
+                    ParallelMessage(
+                        MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
+                        MessageRoutes(msg_QueryMultiOrderDate(jv) :: Nil, None) :: Nil, searchOrderResultMerge)
+                    :: Nil, None)
+                ::
+                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, orderDateResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)
     })
 }

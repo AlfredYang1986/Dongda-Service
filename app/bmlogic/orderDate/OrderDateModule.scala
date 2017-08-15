@@ -1,14 +1,13 @@
 package bmlogic.orderDate
 
 import bminjection.db.DBTrait
-import bmlogic.common.mergestepresult.MergeStepResult
-import bmlogic.orderDate.OrderDateData.{OrderDateCondition, OrderDateDate, OrderDateMultiCondition, OrderDateResult}
+import bmlogic.common.mergestepresult.{MergeParallelResult, MergeStepResult}
+import bmlogic.orderDate.OrderDateData._
 import bmlogic.orderDate.OrderDateMessages._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
 import com.mongodb.DBObject
-import com.mongodb.casbah.commons.MongoDBObject
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
@@ -20,6 +19,8 @@ object OrderDateModule extends ModuleTrait {
         case msg_QueryOrderDate(data) => orderDateDetailQuery(data)(pr)
         case msg_QueryMultiOrderDate(data) => orderMultiDateQuery(data)(pr)
 
+        case msg_LstOrdersDateSorted(data) => lstOrdersDateSorted(data)
+
         case _ => ???
     }
 
@@ -27,6 +28,7 @@ object OrderDateModule extends ModuleTrait {
                           with OrderDateCondition
                           with OrderDateMultiCondition
                           with OrderDateResult
+                          with OrderDateSearchCondition
 
     def orderDateLstPush(data : JsValue)
                         (pr : Option[Map[String, JsValue]])
@@ -134,5 +136,57 @@ object OrderDateModule extends ModuleTrait {
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
+    }
+
+    def lstOrdersDateSorted(data : JsValue)
+                           (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_trait.sc
+            val o : DBObject = data
+
+            val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(10)
+            val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
+
+            import inner_trait.dr
+            val reVal = db.queryMultipleObject(o, "order_time", "start", skip, take)
+
+            val lst = reVal.map (x => x.get("order_id").get.asOpt[String].get)
+
+            (Some(Map(
+                "order_date" -> toJson(reVal),
+                "condition" -> toJson(Map(
+                    "lst" -> toJson(lst)
+                ))
+            )), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def orderDateResultMerge(lst : List[Map[String, JsValue]])
+                            (pr : Option[Map[String, JsValue]]) : Map[String, JsValue] = {
+
+        val para = MergeParallelResult(lst)
+
+        val order_date = pr.get.get("order_date").get.asOpt[List[JsValue]].get
+        val orders = para.get("orders").get.asOpt[List[JsValue]].get
+
+        val result = order_date map { iter =>
+            val order_id = (iter \ "order_id").asOpt[String].get
+
+            val order = orders.find(p => (p \ "order_id").asOpt[String].get == order_id).get
+
+            iter.as[JsObject].value.toMap - "order_id" +
+                ("order" -> order)
+        }
+
+        Map(
+            "sortBy" -> toJson("start"),
+            "lst" -> toJson(result)
+        )
     }
 }

@@ -24,7 +24,7 @@ object OrderModule extends ModuleTrait {
         case msg_OrderPush(data) => pushOrder(data)(pr)
         case msg_OrderPop(data) => popOrder(data)
         case msg_OrderSearch(data) => searchOrder(data)
-        case msg_OrderQueryMulti(data) => queryMultiOrders(data)
+        case msg_OrderQueryMulti(data) => queryMultiOrders(data)(pr)
         case msg_OrderDetail(data) => detailOrder(data)
         case msg_OrderUpdate(data) => updateOrder(data)(pr)
 
@@ -165,6 +165,7 @@ object OrderModule extends ModuleTrait {
     }
 
     def queryMultiOrders(data : JsValue)
+                        (pr : Option[Map[String, JsValue]])
                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
@@ -175,10 +176,21 @@ object OrderModule extends ModuleTrait {
 
             import inner_trait.mc
             import inner_trait.dr
-            val o : DBObject = data
+            val o : DBObject = MergeStepResult(data, pr)
             val reVal = db.queryMultipleObject(o, "orders", skip = skip, take = take)
 
-            (Some(Map("orders" -> toJson(reVal))), None)
+            val lst = reVal.map (x => x.get("user_id").get.asOpt[String].get) :::
+                        reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+
+            val order_lst = reVal.map (x => x.get("order_id").get.asOpt[String].get)
+
+            (Some(Map(
+                "orders" -> toJson(reVal),
+                "condition" -> toJson(Map(
+                    "lst" -> toJson(lst),
+                    "order_lst" -> toJson(order_lst)
+                ))
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

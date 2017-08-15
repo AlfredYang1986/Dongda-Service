@@ -34,6 +34,8 @@ POST    /al/order/accomplish                    controllers.OrderController.acco
 
 POST    /al/order/prepay                        controllers.OrderController.prepayOrder
 
+POST    /al/order/date/lst                      controllers.OrderController.lstOrdersDateSorted
+
 # auth 用户授权 End Point (详情参考概要设计，@Alfred)
 # 这个是直接登陆，后面去掉不要直接调用
 POST    /al/auth                                controllers.AuthController.authLogin
