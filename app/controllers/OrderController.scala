@@ -154,7 +154,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("lst orders date"))), jv)
-            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_LstOrdersDateSorted(jv)
             ::
             ParallelMessage(

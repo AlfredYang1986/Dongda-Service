@@ -16,12 +16,12 @@ trait OrderDateSearchCondition {
 
         val today_conditon = (js \ "condition" \ "only_today").asOpt[Int].map { t =>
             val (s, e) = TimespanOpt.todayRange
-            Some($and("order_date.start" $gte s, "order_date.start" $lte e))
+            Some($and("start" $gte s, "start" $lte e))
         }.getOrElse(None)
 
         val history_condition = (js \ "condition" \ "only_history").asOpt[Int].map { t =>
             val (_, e) = TimespanOpt.todayRange
-            Some("order_date.start" $lte e)
+            Some("start" $lte e)
         }.getOrElse(None)
 
 

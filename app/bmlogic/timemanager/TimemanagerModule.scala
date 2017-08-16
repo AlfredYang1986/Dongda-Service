@@ -148,6 +148,8 @@ object TimemanagerModule extends ModuleTrait {
 
                 obj += "tms" -> tms.result
 
+                db.updateObject(obj, "service_time", "service_id")
+
                 import inner_traits.dr
                 obj - "date"
             }

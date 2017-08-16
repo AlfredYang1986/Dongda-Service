@@ -177,20 +177,32 @@ object OrderModule extends ModuleTrait {
             import inner_trait.mc
             import inner_trait.dr
             val o : DBObject = MergeStepResult(data, pr)
-            val reVal = db.queryMultipleObject(o, "orders", skip = skip, take = take)
 
-            val lst = reVal.map (x => x.get("user_id").get.asOpt[String].get) :::
-                        reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+            if (o == null) {
+                (Some(Map(
+                    "orders" -> toJson(List[JsValue]()),
+                    "condition" -> toJson(Map(
+                        "lst" -> toJson(List[String]()),
+                        "order_lst" -> toJson(List[String]())
+                    ))
+                )), None)
 
-            val order_lst = reVal.map (x => x.get("order_id").get.asOpt[String].get)
+            } else {
+                val reVal = db.queryMultipleObject(o, "orders", skip = skip, take = take)
 
-            (Some(Map(
-                "orders" -> toJson(reVal),
-                "condition" -> toJson(Map(
-                    "lst" -> toJson(lst),
-                    "order_lst" -> toJson(order_lst)
-                ))
-            )), None)
+                val lst = reVal.map (x => x.get("user_id").get.asOpt[String].get) :::
+                            reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+
+                val order_lst = reVal.map (x => x.get("order_id").get.asOpt[String].get)
+
+                (Some(Map(
+                    "orders" -> toJson(reVal),
+                    "condition" -> toJson(Map(
+                        "lst" -> toJson(lst),
+                        "order_lst" -> toJson(order_lst)
+                    ))
+                )), None)
+            }
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -390,7 +402,7 @@ object OrderModule extends ModuleTrait {
                     one._2.map { iter =>
                         toJson(Map(
                             "start" -> toJson((iter \ "start").asOpt[JsValue].get),
-                            "end" -> toJson((iter \ "start").asOpt[JsValue].get)
+                            "end" -> toJson((iter \ "end").asOpt[JsValue].get)
                         ))
                     }
                 }.getOrElse(Nil)
