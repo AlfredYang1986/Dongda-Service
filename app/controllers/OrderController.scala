@@ -50,13 +50,14 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         import bmlogic.order.OrderModule.detailOrderResultMerge
         implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("detail order"))), jv)
-            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderDetail(jv)
             ::
             ParallelMessage(
                 MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
-//                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, detailOrderResultMerge)
+                MessageRoutes(msg_KidnapDetail(jv) :: Nil, None) ::
                 MessageRoutes(msg_QueryOrderDate(jv) :: Nil, None) :: Nil, detailOrderResultMerge)
+//                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, detailOrderResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)
     })
 
@@ -71,8 +72,8 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
             ::
             ParallelMessage(
                 MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
-//                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, searchOrderResultMerge)
                 MessageRoutes(msg_QueryMultiOrderDate(jv) :: Nil, None) :: Nil, searchOrderResultMerge)
+//                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, searchOrderResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)
     })
 

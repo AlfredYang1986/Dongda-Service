@@ -123,7 +123,8 @@ object OrderModule extends ModuleTrait {
                         "order" -> toJson(reVal.get - "date" - "pay_date"),
                         "condition" -> toJson(Map(
                             "lst" -> toJson(user_id :: owner_id :: Nil),
-                            "order_id" -> (reVal.get.get("order_id").get)
+                            "order_id" -> (reVal.get.get("order_id").get),
+                            "service_id" -> (reVal.get.get("service_id").get)
                         ))
                 )), None)
             }
@@ -343,6 +344,7 @@ object OrderModule extends ModuleTrait {
         val order = pr.get.get("order").get.asOpt[JsValue].get
         val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
         val tms = para.get("order_date").get.asOpt[JsValue].get
+        val service = para.get("service").get.asOpt[JsValue].get
 
         val user_id = (order \ "user_id").asOpt[String].get
         val user = profiles.find(p => (p \ "user_id").asOpt[String].get == user_id).map (x => x).getOrElse {
@@ -365,7 +367,8 @@ object OrderModule extends ModuleTrait {
                      "owner_id" +
                      ("order_date" -> tms) +
                      ("owner" -> owner) +
-                     ("user" -> user)
+                     ("user" -> user) +
+                     ("service" -> service)
 
         Map("order" -> toJson(result))
     }

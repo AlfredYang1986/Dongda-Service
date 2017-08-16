@@ -3,7 +3,7 @@ package bmlogic.kidnap
 import java.util.Date
 
 import bminjection.db.DBTrait
-import bmlogic.common.mergestepresult.MergeParallelResult
+import bmlogic.common.mergestepresult.{MergeParallelResult, MergeStepResult}
 import bmlogic.kidnap.KidnapData._
 import bmlogic.kidnap.KidnapMessage._
 import bmmessages.{CommonModules, MessageDefines}
@@ -19,7 +19,7 @@ object KidnapModule extends ModuleTrait {
         case msg_KidnapPush(data) => pushService(data)
         case msg_KidnapCanPop(data) => canPopService(data)(pr)
         case msg_KidnapPop(data) => popService(data)
-        case msg_KidnapDetail(data) => detailService(data)
+        case msg_KidnapDetail(data) => detailService(data)(pr)
         case msg_KidnapMultiQuery(data) => multiQueryService(data)(pr)
         case msg_KidnapSearch(data) => searchService(data)
         case msg_KidnapUpdate(data) => updateService(data)
@@ -256,6 +256,7 @@ object KidnapModule extends ModuleTrait {
     }
 
     def detailService(data : JsValue)
+                     (pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
@@ -263,7 +264,7 @@ object KidnapModule extends ModuleTrait {
 
             import inner_traits.dc
             import inner_traits.dr
-            val o : DBObject = data
+            val o : DBObject = MergeStepResult(data, pr)
             val reVal = db.queryObject(o, "kidnap").map (x => x).getOrElse(throw new Exception("service not exist"))
             val owner_id = reVal.get("owner_id").get.asOpt[String].get
             val service_id = reVal.get("service_id").get.asOpt[String].get
