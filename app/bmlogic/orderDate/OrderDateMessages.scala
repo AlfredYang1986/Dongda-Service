@@ -11,4 +11,6 @@ object OrderDateMessages {
     case class msg_QueryOrderDate(data : JsValue) extends msg_OrderDateCommand
     case class msg_QueryMultiOrderDate(data : JsValue) extends msg_OrderDateCommand
     case class msg_LstOrdersDateSorted(data : JsValue) extends msg_OrderDateCommand
+
+    case class msg_OrderSearchPrefix(data : JsValue) extends msg_OrderDateCommand
 }

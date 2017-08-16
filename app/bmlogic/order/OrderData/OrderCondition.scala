@@ -7,6 +7,7 @@ import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 
 object orderStatus {
+    case object cancelled extends orderStatusDefines(-2, "cancelled")
     case object expired extends orderStatusDefines(-1, "expired")
 
     case object ready extends orderStatusDefines(0, "ready")
@@ -15,8 +16,6 @@ object orderStatus {
     case object rejected extends orderStatusDefines(2, "rejected")
     case object accepted extends orderStatusDefines(3, "accecpted")
     case object paid extends orderStatusDefines(4, "paid")
-    case object cancelled extends orderStatusDefines(5, "cancelled")
-
     case object done extends orderStatusDefines(9, "done")
 }
 
@@ -39,7 +38,7 @@ trait OrderCondition {
         builder += "order_thumbs" -> (js \ "order_thumbs").asOpt[String].map (x => x).getOrElse("")
         builder += "order_title" -> (js \ "order_title").asOpt[String].map (x => x).getOrElse("")
 
-//        builder += "order_date" -> JsOrderDate(js)
+        builder += "order_date" -> JsOrderDate(js)
         builder += "order_id" -> order_id
         builder += "total_fee" -> (js \ "total_fee").asOpt[Int].map (x => x).getOrElse(throw new Exception("push Order input error"))
         builder += "further_message" -> (js \ "further_message").asOpt[String].map (x => x).getOrElse("")

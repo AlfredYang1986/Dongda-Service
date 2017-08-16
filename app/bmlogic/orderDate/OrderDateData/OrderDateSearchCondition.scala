@@ -5,6 +5,18 @@ import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 
 trait OrderDateSearchCondition {
+    implicit val spc : JsValue => DBObject = { js =>
+        val builder = MongoDBObject.newBuilder
+
+        val status_condition =
+            (js \ "condition" \ "status").asOpt[List[Int]].map { lst =>
+                if (lst.isEmpty) None
+                else Some($or(lst.map (x => DBObject("status" -> x.asInstanceOf[Number]))))
+            }.getOrElse(None)
+
+        $and((Some(builder.result) :: status_condition :: Nil).filterNot(_ == None).map (_.get))
+    }
+
     implicit val sc : JsValue => DBObject = { js =>
         val builder = MongoDBObject.newBuilder
 
@@ -24,8 +36,12 @@ trait OrderDateSearchCondition {
             Some("start" $lte e)
         }.getOrElse(None)
 
+        val inner_condition = (js \ "condition" \ "inner_lst").asOpt[List[String]].map { inner =>
+            Some("orders" $in inner)
+        }.getOrElse(None)
+
 
         if (!today_conditon.isEmpty && !history_condition.isEmpty) throw new Exception("order detail condition error")
-        else $and((nor_conditon :: today_conditon :: history_condition :: Nil).filterNot(_ == None).map (_.get))
+        else $and((nor_conditon :: today_conditon :: history_condition :: inner_condition :: Nil).filterNot(_ == None).map (_.get))
     }
 }

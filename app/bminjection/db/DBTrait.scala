@@ -27,4 +27,6 @@ trait DBTrait {
 
     def restoreDatabase() = ???
     def dumpDatabase() = ???
+
+    def mapReduceJob(c : String, m : String, r : String, q : Option[DBObject], out : String) : Boolean = false
 }

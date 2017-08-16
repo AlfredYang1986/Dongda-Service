@@ -55,6 +55,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
             ::
             ParallelMessage(
                 MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
+//                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, detailOrderResultMerge)
                 MessageRoutes(msg_QueryOrderDate(jv) :: Nil, None) :: Nil, detailOrderResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)
     })
@@ -70,6 +71,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
             ::
             ParallelMessage(
                 MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
+//                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, searchOrderResultMerge)
                 MessageRoutes(msg_QueryMultiOrderDate(jv) :: Nil, None) :: Nil, searchOrderResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)
     })
@@ -155,6 +157,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("lst orders date"))), jv)
 //            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_OrderSearchPrefix(jv)
             :: msg_LstOrdersDateSorted(jv)
             ::
             ParallelMessage(

@@ -73,6 +73,26 @@ class ALINQ[T] {
 object from {
 	def apply[T]() : ALINQ[T] = new ALINQ[T]
 	def db() : AMongoDBLINQ = new AMongoDBLINQ
+
+    /**
+      * Map reduce
+      */
+    def mapReduce(coll : String, m : String, r : String, q : Option[DBObject], out : String) : Boolean = {
+
+        val cmd =
+        MapReduceCommand(
+            coll,
+            m,
+            r,
+            out,
+            q,
+            finalizeFunction = None,
+            verbose = true
+        )
+
+        val a = _data_connection.getCollection(coll).mapReduce(cmd)
+        true
+    }
 }
 
 class AMongoDBLINQ extends IDatabaseContext {

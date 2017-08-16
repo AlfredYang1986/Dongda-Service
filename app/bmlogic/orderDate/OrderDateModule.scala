@@ -7,7 +7,7 @@ import bmlogic.orderDate.OrderDateMessages._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
-import com.mongodb.DBObject
+import com.mongodb.casbah.Imports._
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
@@ -19,7 +19,9 @@ object OrderDateModule extends ModuleTrait {
         case msg_QueryOrderDate(data) => orderDateDetailQuery(data)(pr)
         case msg_QueryMultiOrderDate(data) => orderMultiDateQuery(data)(pr)
 
-        case msg_LstOrdersDateSorted(data) => lstOrdersDateSorted(data)
+        case msg_LstOrdersDateSorted(data) => lstOrdersDateSorted(data)(pr)
+
+        case msg_OrderSearchPrefix(data) => orderDateSearchPrefix(data)
 
         case _ => ???
     }
@@ -29,6 +31,36 @@ object OrderDateModule extends ModuleTrait {
                           with OrderDateMultiCondition
                           with OrderDateResult
                           with OrderDateSearchCondition
+
+    def orderDateSearchPrefix(data : JsValue)
+                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_trait.spc
+            val o : DBObject = data
+
+            import inner_trait.psr
+            val reVal = db.queryMultipleObject(o, "orders")
+
+            val lst = reVal.map (x => x.get("order_id").get)
+
+            val ori_con = (data \ "condition").asOpt[JsValue].get
+
+            val result = toJson(
+                ori_con.as[JsObject].value.toMap +
+                ("inner_lst" -> toJson(lst))
+            )
+
+            (Some(Map(
+                "condition" -> toJson(result)
+            )), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
 
     def orderDateLstPush(data : JsValue)
                         (pr : Option[Map[String, JsValue]])
@@ -66,7 +98,6 @@ object OrderDateModule extends ModuleTrait {
 
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-
 
             import inner_trait.dc
             val o : DBObject = data
@@ -139,13 +170,15 @@ object OrderDateModule extends ModuleTrait {
     }
 
     def lstOrdersDateSorted(data : JsValue)
+                           (pr : Option[Map[String, JsValue]])
                            (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             import inner_trait.sc
-            val o : DBObject = data
+            val o : DBObject = MergeStepResult(data, pr)
+            println(o)
 
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(10)
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)

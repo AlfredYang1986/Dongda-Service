@@ -69,4 +69,8 @@ trait MongoDBImpl extends DBTrait {
     override def aggregate(condition : DBObject, db_name : String, group : DBObject)
                  (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]] =
         Some(t((from db() in db_name where condition).aggregate(group)))
+
+    override def mapReduceJob(c : String, m : String, r : String, q : Option[DBObject], out : String) : Boolean =
+        from.mapReduce(c, m, r, q, out)
+
 }

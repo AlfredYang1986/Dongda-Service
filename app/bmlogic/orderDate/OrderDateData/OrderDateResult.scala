@@ -19,4 +19,10 @@ trait OrderDateResult {
             "end" -> toJson(obj.getAs[Number]("end").map (x => x.floatValue).getOrElse(throw new Exception("push order input error")))
         )
     }
+
+    implicit val psr : DBObject => Map[String, JsValue] = { obj =>
+        Map(
+            "order_id" -> toJson(obj.getAs[String]("order_id").map (x => x).getOrElse(throw new Exception("push order input error")))
+        )
+    }
 }
