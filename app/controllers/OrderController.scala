@@ -30,7 +30,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_posted)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_KidnapDetail(jv) :: msg_OrderPush(jv) :: msg_OrderDateLstPush(jv)
+            :: msg_KidnapDetail(jv) :: msg_OrderPush(jv) // :: msg_OrderDateLstPush(jv)
             :: msg_OrderChangedNotify(jv)
             :: msg_CommonResultMessage() :: Nil, None)
     })
@@ -156,7 +156,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("lst orders date"))), jv)
-//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderSearchPrefix(jv)
             :: msg_LstOrdersDateSorted(jv)
             ::
