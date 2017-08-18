@@ -13,10 +13,10 @@ trait OrderDateDate {
 
         val lst = (js \ "condition" \ "tms").asOpt[List[JsValue]].map (x => x).getOrElse(throw new Exception("push Order input error"))
 
-        lst.map { x =>
+        lst.zipWithIndex.map { case(x, i) =>
             val tmp = MongoDBObject.newBuilder
 
-            tmp += "order_time_id" -> Sercurity.md5Hash(order_id + owner_id + user_id + Sercurity.getTimeSpanWithMillSeconds)
+            tmp += "order_time_id" -> Sercurity.md5Hash(order_id + owner_id + user_id + i + Sercurity.getTimeSpanWithMillSeconds)
 
             tmp += "order_id" -> order_id
             tmp += "owner_id" -> owner_id

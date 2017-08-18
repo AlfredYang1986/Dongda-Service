@@ -37,7 +37,7 @@ trait OrderDateSearchCondition {
         }.getOrElse(None)
 
         val inner_condition = (js \ "condition" \ "inner_lst").asOpt[List[String]].map { inner =>
-            Some("orders" $in inner)
+            Some("order_id" $in inner)
         }.getOrElse(None)
 
 

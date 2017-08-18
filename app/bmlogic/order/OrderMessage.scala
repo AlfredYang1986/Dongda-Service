@@ -19,9 +19,9 @@ object OrderMessage {
     case class msg_OrderReject(data : JsValue) extends msg_OrderCommand
     case class msg_OrderCancel(data : JsValue) extends msg_OrderCommand
     case class msg_OrderAccomplish(data : JsValue) extends msg_OrderCommand
+    case class msg_OrderPay(data : JsValue) extends msg_OrderCommand
 
     case class msg_OrderPrepay(data : JsValue) extends msg_OrderCommand
-    case class msg_OrderPay(data : JsValue) extends msg_OrderCommand
     case class msg_OrderPostpay(data : JsValue) extends msg_OrderCommand
 
     case class msg_OrderChangedNotify(data : JsValue) extends msg_OrderCommand

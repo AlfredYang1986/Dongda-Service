@@ -10,9 +10,9 @@ import com.mongodb.casbah.Imports._
 object _data_connection {
 	def conn_name : String = "baby_time_test"
 
-//	val addr = new com.mongodb.casbah.Imports.ServerAddress("localhost", 2017)
+	val addr = new com.mongodb.casbah.Imports.ServerAddress("localhost", 2017)
 //	val credentialsList = MongoCredential.createPlainCredential("dongdamaster", conn_name, "dongda@master".toCharArray)
-//    val _conn = MongoClient(addr, List(credentialsList))
+//    val _conn = MongoClient(addr) //, List(credentialsList))
 	val _conn = MongoClient()
 
 	var _conntion : Map[String, MongoCollection] = Map.empty

@@ -89,7 +89,8 @@ object EmailModule {
 	  val user_email = (data \ "email").asOpt[String].get
 	  
 //	  this.send(new EmailMessage("Dongda Privacy", "", "yangyuanpig@163.com", "resource/email_content", "", null, 60.second, 1))
-    emailServiceActor ! user_email
+//    emailServiceActor ! user_email
+      sendEmailToSync(user_email)
 	  Json.toJson(Map("status" -> toJson("ok"), "result" -> toJson("send email success")))
   }
   

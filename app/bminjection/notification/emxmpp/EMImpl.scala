@@ -21,7 +21,7 @@ trait EMImpl extends DDNTrait {
     def notifyAsync(parameters : (String, JsValue)*)(implicit as : ActorSystem) = {
         val a = as.actorOf(Props[EMActor])
         a ! DDNNotifyUsers(parameters.toList)
-        as.stop(a)
+//        as.stop(a)
     }
 
     def registerForDDN(user_id : String)(implicit as : ActorSystem) : JsValue = {

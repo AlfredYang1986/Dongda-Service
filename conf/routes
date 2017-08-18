@@ -31,6 +31,7 @@ POST    /al/order/accept                        controllers.OrderController.acce
 POST    /al/order/reject                        controllers.OrderController.rejectOrder
 POST    /al/order/cancel                        controllers.OrderController.cancelOrder
 POST    /al/order/accomplish                    controllers.OrderController.accomplishOrder
+POST    /al/order/paid                          controllers.OrderController.paidOrder
 
 POST    /al/order/prepay                        controllers.OrderController.prepayOrder
 

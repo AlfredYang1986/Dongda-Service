@@ -32,6 +32,7 @@ object OrderModule extends ModuleTrait {
         case msg_OrderReject(data) => updateOrder(data)(pr)
         case msg_OrderCancel(data) => updateOrder(data)(pr)
         case msg_OrderAccomplish(data) => updateOrder(data)(pr)
+        case msg_OrderPay(data) => updateOrder(data)(pr)
 
         case msg_OrderChangedNotify(data) => orderStatusChangeNotify(data)(pr)
 
@@ -218,18 +219,20 @@ object OrderModule extends ModuleTrait {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             import inner_trait.dc
-            val o : DBObject = MergeStepResult(data, pr)
+            val para = MergeStepResult(data, pr)
+            val o : DBObject = para
+
             val reVal = db.queryObject(o, "orders") { obj =>
 
                 /**
                   * P.S. 订单时间绝对禁止修改
                   */
 
-                (data \ "order" \ "order_title").asOpt[String].map (x => obj += "order_title" -> x).getOrElse(Unit)
-                (data \ "order" \ "order_thumbs").asOpt[String].map (x => obj += "order_thumbs" -> x).getOrElse(Unit)
-                (data \ "order" \ "further_message").asOpt[String].map (x => obj += "further_message" -> x).getOrElse(Unit)
-                (data \ "order" \ "status").asOpt[Int].map (x => obj += "status" -> x.asInstanceOf[Number]).getOrElse(Unit)
-                (data \ "order" \ "prepay_id").asOpt[String].map (x => obj += "prepay_id" -> x).getOrElse(Unit)
+                (para \ "order" \ "order_title").asOpt[String].map (x => obj += "order_title" -> x).getOrElse(Unit)
+                (para \ "order" \ "order_thumbs").asOpt[String].map (x => obj += "order_thumbs" -> x).getOrElse(Unit)
+                (para \ "order" \ "further_message").asOpt[String].map (x => obj += "further_message" -> x).getOrElse(Unit)
+                (para \ "order" \ "status").asOpt[Int].map (x => obj += "status" -> x.asInstanceOf[Number]).getOrElse(Unit)
+                (para \ "order" \ "prepay_id").asOpt[String].map (x => obj += "prepay_id" -> x).getOrElse(Unit)
 
                 db.updateObject(obj, "orders", "order_id")
 
@@ -256,7 +259,7 @@ object OrderModule extends ModuleTrait {
 
             pay_method match {
                 case "wechat" => {
-                    val js = WechatPayModule.prepayid(data, order_id)
+                    val js = WechatPayModule.prepayid(condition, order_id)
 //                    println(s"get wechat pay prepayid : $js")
                     val prepay_id = (js \ "result" \ "prepay_id").asOpt[String].map (x => x).getOrElse(throw new Exception("prepay id error"))
 //                    updateOrder(toJson(Map("order_id" -> toJson(order_id), "prepay_id" -> toJson(prepay_id))))
@@ -355,7 +358,7 @@ object OrderModule extends ModuleTrait {
         }
 
         val owner_id = (order \ "owner_id").asOpt[String].get
-        val owner = profiles.find(p => (p \ "user_id").asOpt[String].get == user_id).map (x => x).getOrElse {
+        val owner = profiles.find(p => (p \ "user_id").asOpt[String].get == owner_id).map (x => x).getOrElse {
             toJson(Map(
                 "screen_name" -> toJson("Gost"),
                 "screen_photo" -> toJson("")

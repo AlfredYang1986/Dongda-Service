@@ -30,7 +30,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_posted)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_KidnapDetail(jv) :: msg_OrderPush(jv) // :: msg_OrderDateLstPush(jv)
+            :: msg_KidnapDetail(jv) :: msg_OrderPush(jv) :: msg_OrderDateLstPush(jv)
             :: msg_OrderChangedNotify(jv)
             :: msg_CommonResultMessage() :: Nil, None)
     })
@@ -50,7 +50,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         import bmlogic.order.OrderModule.detailOrderResultMerge
         implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("detail order"))), jv)
-//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderDetail(jv)
             ::
             ParallelMessage(
@@ -146,6 +146,17 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("prepay order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderPrepay(jv) :: msg_OrderUpdate(jv)
+            :: msg_CommonResultMessage() :: Nil, None)
+    })
+
+    def paidOrder = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import bmpattern.LogMessage.common_log
+        import bmpattern.ResultMessage.common_result
+        import bmlogic.AcitionType._
+        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_paid)))
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("pay order"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_OrderPay(jv) :: msg_OrderChangedNotify(jv)
             :: msg_CommonResultMessage() :: Nil, None)
     })
 

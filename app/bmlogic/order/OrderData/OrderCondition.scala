@@ -38,7 +38,7 @@ trait OrderCondition {
         builder += "order_thumbs" -> (js \ "order_thumbs").asOpt[String].map (x => x).getOrElse("")
         builder += "order_title" -> (js \ "order_title").asOpt[String].map (x => x).getOrElse("")
 
-        builder += "order_date" -> JsOrderDate(js)
+//        builder += "order_date" -> JsOrderDate(js)
         builder += "order_id" -> order_id
         builder += "total_fee" -> (js \ "total_fee").asOpt[Int].map (x => x).getOrElse(throw new Exception("push Order input error"))
         builder += "further_message" -> (js \ "further_message").asOpt[String].map (x => x).getOrElse("")

@@ -48,7 +48,7 @@ object WechatPayModule {
         	
         		val order_url = "https://api.mch.weixin.qq.com/pay/unifiedorder"
         		val result = ((HTTP(order_url)).post(valxml.toString))
-        	
+
         		val tag_return_code = "return_code"
         		var return_code = result.substring(result.indexOf(tag_return_code) + tag_return_code.length + 1, result.indexOf("</" + tag_return_code)) 
         		if (return_code.startsWith("<![CDATA[") && return_code.endsWith("]]>")) 
