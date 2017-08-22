@@ -39,9 +39,10 @@ trait KidnapSearchConditions {
         /**
           * 分类相关
           */
-        {
-            // TODO : 根据中间分类层次表搜索
-        }
+        val category_condition =
+            (js \ "condition" \ "category").asOpt[String].map { cat =>
+                Some($or(("category.cans_cat" $eq cat) :: ("category.cans" $eq cat) :: Nil))
+            }.getOrElse(None)
 
         /**
           * 服务详情信息
@@ -50,7 +51,10 @@ trait KidnapSearchConditions {
             // TODO: 应该有价格区间和年龄区间
         }
 
-        (Some(builder.result) :: date_condition :: loction_condition :: Nil).filterNot(_ == None).map (_.get) match {
+        (Some(builder.result) ::
+            date_condition ::
+            loction_condition ::
+            category_condition :: Nil).filterNot(_ == None).map (_.get) match {
             case Nil => DBObject()
             case head :: Nil => head
             case lst : List[DBObject] => $and(lst)
