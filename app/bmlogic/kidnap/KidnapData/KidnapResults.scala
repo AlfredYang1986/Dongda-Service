@@ -9,8 +9,8 @@ trait KidnapResults {
         val loc_map = obj.getAs[MongoDBObject]("location").map { loc =>
             val pin = loc.getAs[MongoDBObject]("pin").get
             val cor = pin.getAs[MongoDBList]("coordinates").get
-            val latitude = toJson(cor.head.asInstanceOf[Number].floatValue)
-            val longitude = toJson(cor.tail.head.asInstanceOf[Number].floatValue)
+            val longitude = toJson(cor.head.asInstanceOf[Number].floatValue)
+            val latitude = toJson(cor.tail.head.asInstanceOf[Number].floatValue)
 
             Map(
                 "address" -> loc.getAs[String]("address").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
@@ -58,8 +58,8 @@ trait KidnapResults {
         val loc_map = obj.getAs[MongoDBObject]("location").map { loc =>
             val pin = loc.getAs[MongoDBObject]("pin").get
             val cor = pin.getAs[MongoDBList]("coordinates").get
-            val latitude = toJson(cor.head.asInstanceOf[Number].floatValue)
-            val longitude = toJson(cor.tail.head.asInstanceOf[Number].floatValue)
+            val longitude = toJson(cor.head.asInstanceOf[Number].floatValue)
+            val latitude = toJson(cor.tail.head.asInstanceOf[Number].floatValue)
 
             Map(
                 "province" -> loc.getAs[String]("province").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),

@@ -150,30 +150,39 @@ object SelectedServiceModule extends ModuleTrait {
 
             val o : DBObject = MergeStepResult(data, pr)
 
-            val reVal = db.queryMultipleObject(o, "dongda_selected")
+            if (o != null) {
+                val reVal = db.queryMultipleObject(o, "dongda_selected")
 
-            val result = reVal.groupBy(_.get("service_id").get.asOpt[String].get).map { x => x._2 match {
-                case Nil => {
-                    toJson(Map(
-                        "service_id" -> toJson(x._1),
-                        "selected" -> toJson(List[String]()),
-                        "hotcate" -> toJson(List[String]())
-                    ))
-                }
-                case lst : List[Map[String, JsValue]] => {
-                    toJson(Map(
-                        "service_id" -> toJson(x._1),
-                        "selected" -> toJson(lst.filter(p => p.get("group").get.asOpt[String].get.
-                                                equals("严选")).map (x => x.get("category").get.asOpt[String].get)),
-                        "hotcate" -> toJson(lst.filter(p => p.get("group").get.asOpt[String].get.
-                                                equals("热门")).map (x => x.get("category").get.asOpt[String].get))
-                    ))
-                }
-            }}.toList
+                val result = reVal.groupBy(_.get("service_id").get.asOpt[String].get).map { x => x._2 match {
+                    case Nil => {
+                        toJson(Map(
+                            "service_id" -> toJson(x._1),
+                            "selected" -> toJson(List[String]()),
+                            "hotcate" -> toJson(List[String]())
+                        ))
+                    }
+                    case lst : List[Map[String, JsValue]] => {
+                        toJson(Map(
+                            "service_id" -> toJson(x._1),
+                            "selected" -> toJson(lst.filter(p => p.get("group").get.asOpt[String].get.
+                                                    equals("严选")).map (x => x.get("category").get.asOpt[String].get)),
+                            "hotcate" -> toJson(lst.filter(p => p.get("group").get.asOpt[String].get.
+                                                    equals("热门")).map (x => x.get("category").get.asOpt[String].get))
+                        ))
+                    }
+                }}.toList
 
-            (Some(Map(
-                "selected" -> toJson(result)
-            )), None)
+                (Some(Map(
+                    "selected" -> toJson(result)
+                )), None)
+
+            } else {
+                (Some(Map(
+                    "selected" -> toJson(List[String]())
+                )), None)
+
+            }
+
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
