@@ -48,7 +48,7 @@ trait AuthData {
         val spm = obj.getAs[MongoDBObject]("service_provider").map { x =>
             x.getAs[String]("social_id").map (y => 1).getOrElse(0)
         }.getOrElse(0)
-        val has_auth_phone = obj.getAs[String]("auth_phone").map (x => 1).getOrElse(0)
+        val has_auth_phone = obj.getAs[String]("auth_phone").map (x => !x.isEmpty).getOrElse(0)
 
         Map(
             "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
