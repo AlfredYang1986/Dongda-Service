@@ -48,7 +48,7 @@ object AuthModule extends ModuleTrait with AuthData {
             o += "user_id" -> Sercurity.md5Hash(seed)
             o += "date" -> date.asInstanceOf[Number]
 
-            val only_condition =    if (third_uid.isEmpty) DBObject("auth_wechat.uid" -> third_uid)
+            val only_condition =    if (!third_uid.isEmpty) DBObject("auth_wechat.uid" -> third_uid)
                                     else DBObject("auth_phone" -> auth_phone)
 
             db.queryObject(only_condition, "users") match {
