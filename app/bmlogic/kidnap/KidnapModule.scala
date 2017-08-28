@@ -295,20 +295,34 @@ object KidnapModule extends ModuleTrait {
             import bmlogic.common.mergestepresult.MergeStepResult
             val o : DBObject = MergeStepResult(data, pr)
 
-            val reVal = db.queryMultipleObject(o, "kidnap")
+            if (o == null) {
+                val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
 
-            val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
-            val lst = reVal.map (x => x.get("owner_id").get.asOpt[String].get)
-            val slst = reVal.map (x => x.get("service_id").get.asOpt[String].get)
+                (Some(Map("date" -> toJson(date),
+                    "services" -> toJson(List[JsValue]()),
+                    "condition" -> toJson(Map(
+                        "slst" -> toJson(List[String]()),
+                        "lst" -> toJson(List[String]()),
+                        "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
+                    ))
+                )), None)
 
-            (Some(Map("date" -> toJson(date),
-                        "services" -> toJson(reVal),
-                        "condition" -> toJson(Map(
-                            "slst" -> toJson(slst),
-                            "lst" -> toJson(lst),
-                            "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
-                        ))
-            )), None)
+            } else {
+                val reVal = db.queryMultipleObject(o, "kidnap")
+
+                val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
+                val lst = reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+                val slst = reVal.map (x => x.get("service_id").get.asOpt[String].get)
+
+                (Some(Map("date" -> toJson(date),
+                    "services" -> toJson(reVal),
+                    "condition" -> toJson(Map(
+                        "slst" -> toJson(slst),
+                        "lst" -> toJson(lst),
+                        "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
+                    ))
+                )), None)
+            }
 
 //            (Some(Map("services" -> toJson(reVal))), None)
 
@@ -382,7 +396,7 @@ object KidnapModule extends ModuleTrait {
                         "owner_id" +
                         ("owner" -> profile) +
                         ("tms" -> timemanager) +
-                        ("isColllections" -> toJson(isCollections)) +
+                        ("isCollections" -> toJson(isCollections)) +
                         ("selected" -> toJson(selected_lst)) +
                         ("hotcate" -> toJson(hotcate_lst))
 

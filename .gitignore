@@ -17,3 +17,4 @@ test/UserTest.scala
 project/project/
 public/video/
 *.log
+*.DS_Store
