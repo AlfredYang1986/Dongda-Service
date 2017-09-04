@@ -13,4 +13,5 @@ object ProfileMessage {
     case class msg_ProfileSearch(data : JsValue) extends msg_ProfileCommand
     case class msg_ProfileMultiQuery(data : JsValue) extends msg_ProfileCommand
     case class msg_ProfileCanUpdate(data : JsValue) extends msg_ProfileCommand
+    case class msg_ProfileLst(data : JsValue) extends msg_ProfileCommand
 }

@@ -21,6 +21,7 @@ object ProfileModule extends ModuleTrait {
         case msg_ProfileCanUpdate(data) => canUpdate(data)(pr)
         case msg_ProfileWithToken(_) => profileWithToken(pr)
         case msg_ProfileOwnerQuery(data) => queryOwnerProfile(data)(pr)
+        case msg_ProfileLst(data) => lstProfiles(data)
         case _ => ???
     }
 
@@ -170,6 +171,28 @@ object ProfileModule extends ModuleTrait {
 
             if (id == user_id) (pr, None)
             else throw new Exception("profile update no right")
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+
+    def lstProfiles(data : JsValue)
+                   (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val o : DBObject = DBObject()
+
+            val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
+            val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
+
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_conditions.sr
+            val reVal = db.queryMultipleObject(o, "users", take = take, skip = skip)
+
+            (Some(Map("profiles" -> toJson(reVal))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

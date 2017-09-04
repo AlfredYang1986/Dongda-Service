@@ -192,7 +192,7 @@ object KidnapModule extends ModuleTrait {
                   */
                 (data \ "service" \ "detail").asOpt[JsValue].map { det =>
 
-                    val det_obj = obj.getAs[MongoDBObject]("category").map (x => x).getOrElse(throw new Exception("service result error"))
+                    val det_obj = obj.getAs[MongoDBObject]("detail").map (x => x).getOrElse(throw new Exception("service result error"))
 
                     (det \ "capacity").asOpt[Int].map (x => det_obj += "capacity" -> x.asInstanceOf[Number]).getOrElse(Unit)
                     (det \ "least_hours").asOpt[Int].map (x => det_obj += "least_hours" -> x.asInstanceOf[Number]).getOrElse(Unit)
