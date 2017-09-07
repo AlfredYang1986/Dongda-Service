@@ -11,7 +11,7 @@ POST    /al/profile/query                       controllers.ProfileController.qu
 POST    /al/profile/search                      controllers.ProfileController.searchProfile
 POST    /al/profile/multi                       controllers.ProfileController.queryMultiProfile
 POST    /al/profile/update                      controllers.ProfileController.updateProfile
-POST    /al/profile/lst
+POST    /al/profile/lst                         controllers.ProfileController.lstProfile
 
 # kidnap 用户服务向光功能
 POST    /al/kidnap/push                         controllers.KidnapController.pushService
