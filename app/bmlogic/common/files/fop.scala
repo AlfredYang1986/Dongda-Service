@@ -5,7 +5,7 @@ import java.io.File
 import play.api.libs.Files
 import java.io.FileInputStream
 
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 import play.api.mvc.MultipartFormData
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.json.Json

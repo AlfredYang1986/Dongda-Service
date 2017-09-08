@@ -5,7 +5,7 @@ import bmlogic.dongdaselectedservice.SelectedServiceData._
 import bmlogic.dongdaselectedservice.SelectedServiceMessages._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 import com.mongodb.DBObject
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson

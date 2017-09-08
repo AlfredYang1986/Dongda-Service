@@ -13,7 +13,7 @@ import bmlogic.order.OrderMessage._
 import bmlogic.webpay.WechatPayModule
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson

@@ -9,7 +9,7 @@ import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.phonecode.PhoneCodeData.PhoneCodeData
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 
 object PhoneCodeModule extends ModuleTrait with PhoneCodeData {

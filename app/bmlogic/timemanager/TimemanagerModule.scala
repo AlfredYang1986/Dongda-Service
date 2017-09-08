@@ -6,7 +6,7 @@ import bmlogic.timemanager.TMMessages._
 import bmlogic.timemanager.TimemanagerData._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 import com.mongodb.DBObject
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue

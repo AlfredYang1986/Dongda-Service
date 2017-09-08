@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import bmlogic.emxmpp.EMMessages.msg_RegisterEMUser
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 import play.api.libs.json.JsValue
 import com.mongodb.casbah.Imports._
 import com.pharbers.mongodbDriver.DBTrait

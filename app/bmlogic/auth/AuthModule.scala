@@ -12,7 +12,7 @@ import bmlogic.common.sercurity.Sercurity
 import bmmessages.MessageDefines
 import bmmessages.CommonModules
 import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 
 import scala.collection.immutable.Map
 import com.mongodb.casbah.Imports._

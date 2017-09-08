@@ -6,7 +6,7 @@ import bmlogic.orderDate.OrderDateData._
 import bmlogic.orderDate.OrderDateMessages._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson

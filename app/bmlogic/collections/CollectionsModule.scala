@@ -1,13 +1,12 @@
 package bmlogic.collections
 
-//import bminjection.db.DBTrait
 import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.collections.CollectionData.{CollectionCondition, CollectionResult, CollectionsDetailCondition}
 import bmlogic.collections.CollectionsMessage._
 import bmlogic.common.mergestepresult.MergeStepResult
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
