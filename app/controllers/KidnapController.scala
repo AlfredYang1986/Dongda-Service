@@ -4,8 +4,8 @@ import javax.inject.Inject
 
 import play.api.mvc._
 import akka.actor.ActorSystem
-import bminjection.db.DBTrait
-import bminjection.token.AuthTokenTrait
+import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.collections.CollectionsMessage.msg_QueryUserCollections
 import bmlogic.common.requestArgsQuery

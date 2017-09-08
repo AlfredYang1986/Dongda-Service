@@ -1,6 +1,6 @@
 package bmlogic.searchingIndex
 
-import bminjection.db.DBTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.searchingIndex.SearchIndexMessages._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait

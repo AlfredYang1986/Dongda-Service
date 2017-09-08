@@ -3,7 +3,6 @@ package controllers
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import bminjection.db.DBTrait
 import bmlogic.auth.AuthMessage.msg_AuthQuery
 import play.api.mvc._
 import bmlogic.common.requestArgsQuery
@@ -11,6 +10,7 @@ import bmlogic.phonecode.PhoneCodeMessages.{msg_CheckSMSCode, msg_SendSMSCode}
 import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
 import bmpattern.ResultMessage.msg_CommonResultMessage
+import com.pharbers.mongodbDriver.DBTrait
 import play.api.libs.json.Json.toJson
 
 class PhoneSMSController @Inject () (as_inject : ActorSystem, dbt : DBTrait) extends Controller {

@@ -3,9 +3,9 @@ package controllers
 import javax.inject._
 
 import akka.actor.ActorSystem
-import bminjection.db.DBTrait
-import bminjection.notification.DDNTrait
-import bminjection.token.AuthTokenTrait
+import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.xmpp.DDNTrait
+import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage._
 import bmlogic.common.requestArgsQuery
 import bmlogic.phonecode.PhoneCodeMessages.msg_CheckSMSCode

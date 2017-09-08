@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
     jdbc,
     cache,
     ws,
+    "com.pharbers" % "pharbers-modules" % "0.1",
     "com.pharbers" % "encrypt" % "0.1",
     "com.pharbers" % "mongodb-connect" % "0.1",
     "com.pharbers" % "mongodb-driver" % "0.1",

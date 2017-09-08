@@ -1,6 +1,6 @@
 package bmlogic.orderDate
 
-import bminjection.db.DBTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.common.mergestepresult.{MergeParallelResult, MergeStepResult}
 import bmlogic.orderDate.OrderDateData._
 import bmlogic.orderDate.OrderDateMessages._

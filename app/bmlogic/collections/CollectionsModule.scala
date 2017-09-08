@@ -1,6 +1,7 @@
 package bmlogic.collections
 
-import bminjection.db.DBTrait
+//import bminjection.db.DBTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.collections.CollectionData.{CollectionCondition, CollectionResult, CollectionsDetailCondition}
 import bmlogic.collections.CollectionsMessage._
 import bmlogic.common.mergestepresult.MergeStepResult

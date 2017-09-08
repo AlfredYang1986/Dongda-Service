@@ -5,8 +5,8 @@ import java.util.Date
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 import AuthMessage._
-import bminjection.db.DBTrait
-import bminjection.token.AuthTokenTrait
+import com.pharbers.token.AuthTokenTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.auth.AuthData.AuthData
 import bmlogic.common.sercurity.Sercurity
 import bmmessages.MessageDefines

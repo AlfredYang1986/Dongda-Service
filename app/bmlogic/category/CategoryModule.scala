@@ -1,6 +1,6 @@
 package bmlogic.category
 
-import bminjection.db.DBTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.category.CategoryData._
 import bmlogic.category.CategoryMessages._
 import bmmessages.{CommonModules, MessageDefines}

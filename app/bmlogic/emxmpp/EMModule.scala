@@ -1,15 +1,14 @@
 package bmlogic.emxmpp
 
 import akka.actor.ActorSystem
-import bminjection.db.DBTrait
-import bminjection.notification.DDNTrait
 import bmlogic.emxmpp.EMMessages.msg_RegisterEMUser
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
-import bmutil.dao._data_connection
 import bmutil.errorcode.ErrorCode
 import play.api.libs.json.JsValue
 import com.mongodb.casbah.Imports._
+import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.xmpp.DDNTrait
 
 object EMModule extends ModuleTrait {
 	def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {

@@ -1,6 +1,6 @@
 package bmlogic.profile
 
-import bminjection.db.DBTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.profile.ProfileConditions._
 import bmlogic.profile.ProfileMessage.{msg_ProfileCanUpdate, _}

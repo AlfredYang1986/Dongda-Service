@@ -2,7 +2,7 @@ package bmlogic.kidnap
 
 import java.util.Date
 
-import bminjection.db.DBTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.common.mergestepresult.{MergeParallelResult, MergeStepResult}
 import bmlogic.kidnap.KidnapData._
 import bmlogic.kidnap.KidnapMessage._

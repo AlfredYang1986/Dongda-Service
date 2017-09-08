@@ -3,8 +3,6 @@ package controllers
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import bminjection.db.DBTrait
-import bminjection.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.collections.CollectionsMessage.msg_QueryUserCollections
 import bmlogic.common.requestArgsQuery
@@ -15,6 +13,8 @@ import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
 import bmpattern.ParallelMessage
 import bmpattern.ResultMessage.msg_CommonResultMessage
+import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.token.AuthTokenTrait
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, Controller}
 
