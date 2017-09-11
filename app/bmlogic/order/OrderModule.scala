@@ -11,8 +11,8 @@ import bmlogic.common.sercurity.Sercurity
 import bmlogic.order.OrderData._
 import bmlogic.order.OrderMessage._
 import bmlogic.webpay.WechatPayModule
-import bmmessages.{CommonModules, MessageDefines}
-import bmpattern.ModuleTrait
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.{JsObject, JsValue}

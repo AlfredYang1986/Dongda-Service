@@ -20,6 +20,7 @@ libraryDependencies ++= Seq(
     "com.pharbers" % "xmpp-em" % "0.1",
     "com.pharbers" % "http" % "0.1",
     "com.pharbers" % "auth-token" % "0.1",
+    "com.pharbers" % "pharbers-pattern" % "0.1",
     "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
     "org.mongodb.scala" %% "mongo-scala-driver" % "1.2.1",
     "org.mongodb.spark" %% "mongo-spark-connector" % "2.0.0",

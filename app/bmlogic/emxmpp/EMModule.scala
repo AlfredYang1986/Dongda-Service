@@ -2,8 +2,8 @@ package bmlogic.emxmpp
 
 import akka.actor.ActorSystem
 import bmlogic.emxmpp.EMMessages.msg_RegisterEMUser
-import bmmessages.{CommonModules, MessageDefines}
-import bmpattern.ModuleTrait
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.ErrorCode
 import play.api.libs.json.JsValue
 import com.mongodb.casbah.Imports._
@@ -29,6 +29,7 @@ object EMModule extends ModuleTrait {
             val user_id = (user \ "user_id").asOpt[String].map (x => x).getOrElse(throw new Exception("user not exist"))
 
             val result = ddn.registerForDDN(user_id)(as)
+            println(s"result is $result")
 
             (result \ "error").asOpt[String] match {
                 case None => {

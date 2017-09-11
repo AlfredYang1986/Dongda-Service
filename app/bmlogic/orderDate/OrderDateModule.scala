@@ -4,8 +4,8 @@ import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.common.mergestepresult.{MergeParallelResult, MergeStepResult}
 import bmlogic.orderDate.OrderDateData._
 import bmlogic.orderDate.OrderDateMessages._
-import bmmessages.{CommonModules, MessageDefines}
-import bmpattern.ModuleTrait
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.{JsObject, JsValue}

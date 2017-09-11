@@ -4,8 +4,8 @@ import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.collections.CollectionData.{CollectionCondition, CollectionResult, CollectionsDetailCondition}
 import bmlogic.collections.CollectionsMessage._
 import bmlogic.common.mergestepresult.MergeStepResult
-import bmmessages.{CommonModules, MessageDefines}
-import bmpattern.ModuleTrait
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue

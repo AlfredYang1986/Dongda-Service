@@ -7,8 +7,8 @@ import bmlogic.common.sms.smsModule
 import PhoneCodeMessages._
 import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.phonecode.PhoneCodeData.PhoneCodeData
-import bmmessages.{CommonModules, MessageDefines}
-import bmpattern.ModuleTrait
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 

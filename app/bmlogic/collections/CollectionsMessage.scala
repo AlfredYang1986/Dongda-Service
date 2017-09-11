@@ -1,9 +1,9 @@
 package bmlogic.collections
 
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 import play.api.libs.json.JsValue
 
-abstract class msg_CollectionsCommand extends CommonMessage
+abstract class msg_CollectionsCommand extends CommonMessage(cat = "collections", mt = CollectionsModule)
 
 object CollectionsMessage {
     case class msg_CollectionPush(data : JsValue) extends msg_CollectionsCommand

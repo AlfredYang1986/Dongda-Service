@@ -1,9 +1,9 @@
 package bmlogic.order
 
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 import play.api.libs.json.JsValue
 
-abstract class msg_OrderCommand extends CommonMessage
+abstract class msg_OrderCommand extends CommonMessage(cat = "order", mt = OrderModule)
 
 object OrderMessage {
     case class msg_OrderPush(data : JsValue) extends msg_OrderCommand

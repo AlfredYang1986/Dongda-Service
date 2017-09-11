@@ -1,9 +1,9 @@
 package bmlogic.profile
 
 import play.api.libs.json.JsValue
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 
-abstract class msg_ProfileCommand extends CommonMessage
+abstract class msg_ProfileCommand extends CommonMessage(cat = "profile", mt = ProfileModule)
 
 object ProfileMessage {
     case class msg_ProfileWithToken(data : JsValue) extends msg_ProfileCommand

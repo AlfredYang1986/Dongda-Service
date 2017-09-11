@@ -1,9 +1,9 @@
 package bmlogic.timemanager
 
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 import play.api.libs.json.JsValue
 
-abstract class msg_TMCommand extends CommonMessage
+abstract class msg_TMCommand extends CommonMessage(cat = "timemanagement", mt = TimemanagerModule)
 
 object TMMessages {
     case class msg_pushTMCommand(data : JsValue) extends msg_TMCommand
