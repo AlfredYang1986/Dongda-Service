@@ -21,6 +21,8 @@ libraryDependencies ++= Seq(
     "com.pharbers" % "http" % "0.1",
     "com.pharbers" % "auth-token" % "0.1",
     "com.pharbers" % "pharbers-pattern" % "0.1",
+    "org.mongodb" % "casbah_2.11" % "2.8.2" pomOnly(),
+    "org.apache.commons" % "commons-email" % "1.4",
     "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
     "org.mongodb.scala" %% "mongo-scala-driver" % "1.2.1",
     "org.mongodb.spark" %% "mongo-spark-connector" % "2.0.0",
