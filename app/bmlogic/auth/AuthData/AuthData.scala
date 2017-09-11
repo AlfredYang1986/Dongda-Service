@@ -37,8 +37,8 @@ trait AuthData {
             third_builder += "token" -> (x \ "provide_token").asOpt[String].map (x => x).getOrElse(throw new Exception("user push error"))
 
             builder += "screen_name" -> (x \ "provide_screen_name").asOpt[String].map (x => x).getOrElse(throw new Exception("user push error"))
-            builder += "screen_photo" -> (x \ "provide_screen_photo").asOpt[String].map (x => x).getOrElse(throw new Exception("user push error"))
-            builder += name -> third_builder.result
+//            builder += "screen_photo" -> (x \ "provide_screen_photo").asOpt[String].map (x => x).getOrElse(throw new Exception("user push error"))
+            builder += ("auth_" + name) -> third_builder.result
         }
 
         builder.result
