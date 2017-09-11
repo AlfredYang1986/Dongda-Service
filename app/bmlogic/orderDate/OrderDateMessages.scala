@@ -1,9 +1,9 @@
 package bmlogic.orderDate
 
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 import play.api.libs.json.JsValue
 
-abstract class msg_OrderDateCommand extends CommonMessage
+abstract class msg_OrderDateCommand extends CommonMessage(cat = "orderData", mt = OrderDateModule)
 
 object OrderDateMessages {
     case class msg_OrderDateLstPush(data : JsValue) extends msg_OrderDateCommand

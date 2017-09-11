@@ -4,8 +4,8 @@ import javax.inject.Inject
 
 import play.api.mvc._
 import akka.actor.ActorSystem
-import bminjection.db.DBTrait
-import bminjection.token.AuthTokenTrait
+import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.collections.CollectionsMessage.msg_QueryUserCollections
 import bmlogic.common.requestArgsQuery
@@ -13,18 +13,18 @@ import bmlogic.dongdaselectedservice.SelectedServiceMessages.{msg_IsServiceSelec
 import bmlogic.kidnap.KidnapMessage._
 import bmlogic.profile.ProfileMessage.{msg_ProfileMultiQuery, msg_ProfileOwnerQuery, msg_ProfileWithToken}
 import bmlogic.timemanager.TMMessages.{msg_pushTMCommand, msg_queryTMCommand}
-import bmmessages.{CommonModules, MessageRoutes}
-import bmpattern.LogMessage.msg_log
-import bmpattern.ParallelMessage
-import bmpattern.ResultMessage.msg_CommonResultMessage
+import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
+import com.pharbers.bmpattern.LogMessage.msg_log
+import com.pharbers.bmpattern.ParallelMessage
+import com.pharbers.bmpattern.ResultMessage.msg_CommonResultMessage
 import play.api.libs.json.Json.toJson
 
 class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait) extends Controller {
     implicit val as = as_inject
 
     def pushService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-        import bmpattern.LogMessage.common_log
-        import bmpattern.ResultMessage.common_result
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_ProfileWithToken(jv)
@@ -34,8 +34,8 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
     })
 
     def popService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-        import bmpattern.LogMessage.common_log
-        import bmpattern.ResultMessage.common_result
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_ProfileWithToken(jv)
@@ -44,8 +44,8 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
     })
 
     def detailService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-        import bmpattern.LogMessage.common_log
-        import bmpattern.ResultMessage.common_result
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.kidnap.KidnapModule.detailResultMerge
         implicit val cm = (CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("detail service"))), jv)
@@ -61,8 +61,8 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
     })
 
     def searchService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-        import bmpattern.LogMessage.common_log
-        import bmpattern.ResultMessage.common_result
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.kidnap.KidnapModule.serviceResultMerge
         implicit val cm = (CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search service"))), jv)
@@ -77,8 +77,8 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
     })
 
     def multiQueryService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-        import bmpattern.LogMessage.common_log
-        import bmpattern.ResultMessage.common_result
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("multiple service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_KidnapMultiQuery(jv)
@@ -86,8 +86,8 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
     })
 
     def updateService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-        import bmpattern.LogMessage.common_log
-        import bmpattern.ResultMessage.common_result
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("multiple service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
 //            :: msg_KidnapCanUpdate(jv)

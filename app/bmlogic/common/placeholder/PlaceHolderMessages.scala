@@ -1,9 +1,8 @@
 package bmlogic.common.placeholder
 
-import bmmessages.CommonMessage
-import play.api.libs.json.JsValue
+import com.pharbers.bmmessages.CommonMessage
 
-abstract class msg_PlaceHoldCommand extends CommonMessage
+abstract class msg_PlaceHoldCommand extends CommonMessage(cat = "plackhold", mt = PlaceHolderModule)
 
 object PlaceHolderMessages {
     case class msg_PlaceHold() extends msg_PlaceHoldCommand

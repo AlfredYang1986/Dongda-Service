@@ -1,9 +1,9 @@
 package bmlogic.kidnap
 
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 import play.api.libs.json.JsValue
 
-abstract class msg_KidnapCommand extends CommonMessage
+abstract class msg_KidnapCommand extends CommonMessage(cat = "kidnap", mt = KidnapModule)
 
 object KidnapMessage {
     case class msg_KidnapCanPush(data : JsValue) extends msg_KidnapCommand

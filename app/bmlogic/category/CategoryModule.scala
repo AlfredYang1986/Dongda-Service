@@ -1,11 +1,11 @@
 package bmlogic.category
 
-import bminjection.db.DBTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.category.CategoryData._
 import bmlogic.category.CategoryMessages._
-import bmmessages.{CommonModules, MessageDefines}
-import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
+import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson

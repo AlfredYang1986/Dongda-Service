@@ -1,8 +1,8 @@
 package bmlogic.common.placeholder
 
 import bmlogic.common.placeholder.PlaceHolderMessages.msg_PlaceHold
-import bmmessages.{CommonModules, MessageDefines}
-import bmpattern.ModuleTrait
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 

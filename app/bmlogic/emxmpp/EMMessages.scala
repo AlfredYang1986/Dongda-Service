@@ -1,9 +1,9 @@
 package bmlogic.emxmpp
 
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 import play.api.libs.json.JsValue
 
-abstract class msg_EMMessageCommand extends CommonMessage
+abstract class msg_EMMessageCommand extends CommonMessage(cat = "em-xmpp", mt = EMModule)
 
 object EMMessages {
 	case class msg_EMToken(data : JsValue) extends msg_EMMessageCommand

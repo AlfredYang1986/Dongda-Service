@@ -5,14 +5,14 @@ import java.util.Date
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 import AuthMessage._
-import bminjection.db.DBTrait
-import bminjection.token.AuthTokenTrait
+import com.pharbers.token.AuthTokenTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.auth.AuthData.AuthData
 import bmlogic.common.sercurity.Sercurity
-import bmmessages.MessageDefines
-import bmmessages.CommonModules
-import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.bmmessages.MessageDefines
+import com.pharbers.bmmessages.CommonModules
+import com.pharbers.bmpattern.ModuleTrait
+import com.pharbers.ErrorCode
 
 import scala.collection.immutable.Map
 import com.mongodb.casbah.Imports._
@@ -123,7 +123,7 @@ object AuthModule extends ModuleTrait with AuthData {
             val date = new Date().getTime
             val result = toJson(user.as[JsObject].value.toMap + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
             val auth_token = att.encrypt2Token(result)
-            val tt = att.decrypt2JsValue(auth_token)
+//            val tt = att.decrypt2JsValue(auth_token)
 
             (Some(Map("user" -> user, "auth_token" -> toJson(auth_token))), None)
 

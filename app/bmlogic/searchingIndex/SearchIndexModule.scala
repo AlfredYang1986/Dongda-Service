@@ -1,10 +1,10 @@
 package bmlogic.searchingIndex
 
-import bminjection.db.DBTrait
+import com.pharbers.mongodbDriver.DBTrait
 import bmlogic.searchingIndex.SearchIndexMessages._
-import bmmessages.{CommonModules, MessageDefines}
-import bmpattern.ModuleTrait
-import bmutil.errorcode.ErrorCode
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
+import com.pharbers.ErrorCode
 import play.api.libs.json.JsValue
 
 object SearchIndexModule extends ModuleTrait {

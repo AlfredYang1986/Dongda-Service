@@ -1,9 +1,9 @@
 package bmlogic.phonecode
 
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 import play.api.libs.json.JsValue
 
-abstract class msg_PhoneCodeCommand extends CommonMessage
+abstract class msg_PhoneCodeCommand extends CommonMessage(cat = "phoneCode", mt = PhoneCodeModule)
 
 object PhoneCodeMessages {
 	case class msg_SendSMSCode(data : JsValue) extends msg_PhoneCodeCommand

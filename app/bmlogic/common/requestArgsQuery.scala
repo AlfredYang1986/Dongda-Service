@@ -12,9 +12,9 @@ import akka.pattern.ask
 import scala.concurrent.duration._
 import scala.concurrent.Await
 
-import bmmessages.MessageRoutes
-import bmmessages.excute
-import bmpattern.RoutesActor
+import com.pharbers.bmmessages.MessageRoutes
+import com.pharbers.bmmessages.excute
+import com.pharbers.bmpattern.RoutesActor
 
 import javax.inject._
 

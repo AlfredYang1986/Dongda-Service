@@ -1,15 +1,14 @@
 package bmlogic.emxmpp
 
 import akka.actor.ActorSystem
-import bminjection.db.DBTrait
-import bminjection.notification.DDNTrait
 import bmlogic.emxmpp.EMMessages.msg_RegisterEMUser
-import bmmessages.{CommonModules, MessageDefines}
-import bmpattern.ModuleTrait
-import bmutil.dao._data_connection
-import bmutil.errorcode.ErrorCode
+import com.pharbers.bmmessages.{CommonModules, MessageDefines}
+import com.pharbers.bmpattern.ModuleTrait
+import com.pharbers.ErrorCode
 import play.api.libs.json.JsValue
 import com.mongodb.casbah.Imports._
+import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.xmpp.DDNTrait
 
 object EMModule extends ModuleTrait {
 	def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
@@ -30,6 +29,7 @@ object EMModule extends ModuleTrait {
             val user_id = (user \ "user_id").asOpt[String].map (x => x).getOrElse(throw new Exception("user not exist"))
 
             val result = ddn.registerForDDN(user_id)(as)
+            println(s"result is $result")
 
             (result \ "error").asOpt[String] match {
                 case None => {

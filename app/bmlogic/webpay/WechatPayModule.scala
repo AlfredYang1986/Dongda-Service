@@ -2,7 +2,7 @@ package bmlogic.webpay
 
 import play.api.libs.json.Json.{toJson}
 import play.api.libs.json.JsValue
-import bmutil.errorcode.ErrorCode
+import com.pharbers.ErrorCode
 
 import bmlogic.common.http.HTTP
 

@@ -1,9 +1,9 @@
 package bmlogic.category
 
 import play.api.libs.json.JsValue
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 
-abstract class msg_CategoryCommand extends CommonMessage
+abstract class msg_CategoryCommand extends CommonMessage(cat = "category", mt = CategoryModule)
 
 object CategoryMessages {
     case class msg_PushCategory(data : JsValue) extends msg_CategoryCommand

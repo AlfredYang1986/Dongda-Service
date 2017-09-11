@@ -1,9 +1,9 @@
 package bmlogic.searchingIndex
 
-import bmmessages.CommonMessage
+import com.pharbers.bmmessages.CommonMessage
 import play.api.libs.json.JsValue
 
-abstract class msg_SearchIndexCommand extends CommonMessage
+abstract class msg_SearchIndexCommand extends CommonMessage(cat = "searchIndex", mt = SearchIndexModule)
 
 object SearchIndexMessages {
     case class msg_CategoryIndexingCommand(data : JsValue) extends msg_SearchIndexCommand
