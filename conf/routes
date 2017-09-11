@@ -11,9 +11,13 @@ POST    /al/profile/query                       controllers.ProfileController.qu
 POST    /al/profile/search                      controllers.ProfileController.searchProfile
 POST    /al/profile/multi                       controllers.ProfileController.queryMultiProfile
 POST    /al/profile/update                      controllers.ProfileController.updateProfile
+<<<<<<< HEAD
 POST    /al/profile/lst                         controllers.ProfileController.lstProfile
+=======
+# POST    /al/profile/lst
+>>>>>>> master
 
-# kidnap 用户服务向光功能
+# kidnap 用户服务相关功能
 POST    /al/kidnap/push                         controllers.KidnapController.pushService
 POST    /al/kidnap/pop                          controllers.KidnapController.popService
 POST    /al/kidnap/detail                       controllers.KidnapController.detailService
