@@ -1,12 +1,13 @@
+import play.routes.compiler.InjectedRoutesGenerator
 import play.sbt.PlayScala
-
-resolvers += Resolver.mavenLocal
 
 lazy val commonSettings = Seq(
     organization := "com.blackmirror",
     version := "2.0",
     scalaVersion := "2.11.8"
 )
+
+resolvers += Resolver.mavenLocal
 
 libraryDependencies ++= Seq(
     jdbc,

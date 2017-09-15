@@ -29,7 +29,6 @@ object EMModule extends ModuleTrait {
             val user_id = (user \ "user_id").asOpt[String].map (x => x).getOrElse(throw new Exception("user not exist"))
 
             val result = ddn.registerForDDN(user_id)(as)
-            println(s"result is $result")
 
             (result \ "error").asOpt[String] match {
                 case None => {
@@ -44,7 +43,7 @@ object EMModule extends ModuleTrait {
             }
 
 		} catch {
-			case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+			case ex : Exception => ex.printStackTrace(); (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
 

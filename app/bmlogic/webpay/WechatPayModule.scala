@@ -4,7 +4,7 @@ import play.api.libs.json.Json.{toJson}
 import play.api.libs.json.JsValue
 import com.pharbers.ErrorCode
 
-import bmlogic.common.http.HTTP
+import com.pharbers.http.HTTP
 
 object WechatPayModule {
     def prepayid(data : JsValue, order_id : String) : JsValue = 
