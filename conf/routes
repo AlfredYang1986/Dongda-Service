@@ -21,6 +21,9 @@ POST    /al/kidnap/search                       controllers.KidnapController.sea
 POST    /al/kidnap/multi                        controllers.KidnapController.multiQueryService
 POST    /al/kidnap/update                       controllers.KidnapController.updateService
 
+# 拆分kidnap数据库抽去location独立为address数据表
+POST    /al/kidnap/refactor/split               controllers.KidnapController.refactorSplit
+
 # order 相关功能
 POST    /al/order/push                          controllers.OrderController.pushOrder
 POST    /al/order/pop                           controllers.OrderController.popOrder

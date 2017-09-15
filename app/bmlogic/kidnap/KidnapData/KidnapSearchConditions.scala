@@ -31,7 +31,7 @@ trait KidnapSearchConditions {
                             "type" -> "Point",
                             "coordinates" -> MongoDBList(log, lat)
                         ),
-                        "$maxDistance" -> 5 ))
+                        "$maxDistance" -> 5000 ))
 
                 Some(tmp)
             }.getOrElse (None)
