@@ -317,10 +317,12 @@ object KidnapModule extends ModuleTrait {
                 obj - "date" - "update_date"
             }
 
+            import inner_traits.dr
             val finalReVal = reVal.get + ("location" -> address.get.get("location"))
 
             if (reVal.isEmpty) throw new Exception("service not exist")
-            else (Some(Map("service" -> toJson(finalReVal))), None)
+            else (Some(Map("service" -> toJson(reVal),
+                           "address" -> toJson(address))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
