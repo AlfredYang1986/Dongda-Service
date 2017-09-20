@@ -7,7 +7,7 @@ import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.ErrorCode
 import play.api.libs.json.JsValue
 import com.mongodb.casbah.Imports._
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import com.pharbers.xmpp.DDNTrait
 
 object EMModule extends ModuleTrait {

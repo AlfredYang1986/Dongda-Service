@@ -1,6 +1,6 @@
 package bmlogic.timemanager
 
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.timemanager.TMMessages._
 import bmlogic.timemanager.TimemanagerData._

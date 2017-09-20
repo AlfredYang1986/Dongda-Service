@@ -5,7 +5,7 @@ import play.api.libs.json.Json.toJson
 import bmlogic.common.sercurity.Sercurity
 import bmlogic.common.sms.smsModule
 import PhoneCodeMessages._
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import bmlogic.phonecode.PhoneCodeData.PhoneCodeData
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait

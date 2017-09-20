@@ -9,7 +9,7 @@ import bmlogic.timemanager.TMMessages._
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
 import com.pharbers.bmpattern.ResultMessage.msg_CommonResultMessage
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import com.pharbers.token.AuthTokenTrait
 import play.api.mvc._
 import play.api.libs.json.Json.toJson

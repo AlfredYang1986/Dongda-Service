@@ -13,7 +13,7 @@ import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
 import com.pharbers.bmpattern.ParallelMessage
 import com.pharbers.bmpattern.ResultMessage.msg_CommonResultMessage
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import com.pharbers.token.AuthTokenTrait
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, Controller}

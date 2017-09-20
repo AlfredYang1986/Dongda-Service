@@ -3,7 +3,7 @@ package bmlogic.order
 import java.util.Date
 
 import akka.actor.ActorSystem
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import com.pharbers.xmpp.DDNTrait
 import bmlogic.ActionTypeDefines
 import bmlogic.common.mergestepresult.{MergeParallelResult, MergeStepResult}

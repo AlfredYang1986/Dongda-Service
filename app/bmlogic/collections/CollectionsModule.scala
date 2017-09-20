@@ -1,6 +1,6 @@
 package bmlogic.collections
 
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import bmlogic.collections.CollectionData.{CollectionCondition, CollectionResult, CollectionsDetailCondition}
 import bmlogic.collections.CollectionsMessage._
 import bmlogic.common.mergestepresult.MergeStepResult

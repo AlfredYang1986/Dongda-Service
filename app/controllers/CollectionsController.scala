@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.collections.CollectionsMessage._

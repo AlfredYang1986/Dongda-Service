@@ -6,7 +6,7 @@ import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 import AuthMessage._
 import com.pharbers.token.AuthTokenTrait
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import bmlogic.auth.AuthData.AuthData
 import bmlogic.common.sercurity.Sercurity
 import com.pharbers.bmmessages.MessageDefines

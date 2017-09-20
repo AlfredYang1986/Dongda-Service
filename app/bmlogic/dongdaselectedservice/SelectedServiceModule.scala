@@ -1,6 +1,6 @@
 package bmlogic.dongdaselectedservice
 
-import com.pharbers.mongodbDriver.DBTrait
+import com.pharbers.cliTraits.DBTrait
 import bmlogic.dongdaselectedservice.SelectedServiceData._
 import bmlogic.dongdaselectedservice.SelectedServiceMessages._
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
