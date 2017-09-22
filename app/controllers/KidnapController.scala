@@ -4,6 +4,7 @@ import javax.inject.Inject
 
 import play.api.mvc._
 import akka.actor.ActorSystem
+import bmlogic.address.AddressMessage._
 import com.pharbers.cliTraits.DBTrait
 import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
@@ -28,7 +29,7 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_ProfileWithToken(jv)
-            :: msg_KidnapCanPush(jv) :: msg_KidnapPush(jv) :: msg_KidnapPushAddress(jv)
+            :: msg_KidnapCanPush(jv) :: msg_KidnapPush(jv) :: msg_PushAddress(jv)
             :: msg_pushTMCommand(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
@@ -67,7 +68,7 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
         implicit val cm = (CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_KidnapSearchAddress(jv):: msg_KidnapSearch(jv)
+            :: msg_KidnapSearch(jv):: msg_SearchAddress(jv)
             ::
             ParallelMessage(
                 MessageRoutes(msg_LstServiceSelected(jv) :: Nil, None) ::
@@ -91,7 +92,7 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("multiple service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
 //            :: msg_KidnapCanUpdate(jv)
-            :: msg_KidnapUpdate(jv)
+            :: msg_KidnapUpdate(jv) :: msg_UpdateAddress(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
     def refactorSplit = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
@@ -99,7 +100,6 @@ class KidnapController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
         import com.pharbers.bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("refactor split"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_ProfileWithToken(jv)
             :: msg_KidnapRefactorSplit(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })

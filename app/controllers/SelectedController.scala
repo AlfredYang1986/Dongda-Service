@@ -3,11 +3,12 @@ package controllers
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
+import bmlogic.address.AddressMessage.msg_SearchAddress
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.collections.CollectionsMessage.msg_QueryUserCollections
 import bmlogic.common.requestArgsQuery
 import bmlogic.dongdaselectedservice.SelectedServiceMessages.{msg_LstServiceSelected, msg_PopSelectedService, msg_PushSelectedService, msg_QuerySelectedService}
-import bmlogic.kidnap.KidnapMessage.{msg_KidnapDetail, msg_KidnapMultiQuery}
+import bmlogic.kidnap.KidnapMessage.{msg_KidnapDetail, msg_KidnapFinalDetail, msg_KidnapMultiQuery}
 import bmlogic.profile.ProfileMessage.msg_ProfileMultiQuery
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -26,7 +27,7 @@ class SelectedController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att
         import com.pharbers.bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push selected service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_KidnapDetail(jv)
+            :: msg_KidnapDetail(jv):: msg_KidnapFinalDetail(jv)
             :: msg_PushSelectedService(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
@@ -48,7 +49,7 @@ class SelectedController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search selected service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_QuerySelectedService(jv)
-            :: msg_KidnapMultiQuery(jv)
+            :: msg_KidnapMultiQuery(jv):: msg_SearchAddress(jv)
             ::
             ParallelMessage(
                 MessageRoutes(msg_LstServiceSelected(jv) :: Nil, None) ::

@@ -12,7 +12,7 @@ trait KidnapDetailConditions {
     implicit val ac : JsValue => DBObject = { js =>
         val builder = MongoDBObject.newBuilder
 
-        (js \ "condition" \ "service_id").asOpt[String].map (x => builder += "service_id" -> x).getOrElse(Unit)
+        (js \ "condition" \ "service_id").asOpt[String].map (x => builder += "service_id" -> (x :: Nil)).getOrElse(Nil)
         (js \ "condition" \ "address_id").asOpt[String].map (x => builder += "address_id" -> x).getOrElse(Unit)
         (js \ "condition" \ "owner_id").asOpt[String].map (x => builder += "owner_id" -> x).getOrElse(Unit)
 

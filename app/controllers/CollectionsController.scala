@@ -3,6 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
+import bmlogic.address.AddressMessage.msg_SearchAddress
 import com.pharbers.cliTraits.DBTrait
 import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
@@ -66,7 +67,7 @@ class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, 
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_QueryUserCollections(jv)
             :: msg_UserCollectionsServices(jv)
-            :: msg_KidnapMultiQuery(jv)
+            :: msg_KidnapMultiQuery(jv) :: msg_SearchAddress(jv)
             ::
             ParallelMessage(
                 MessageRoutes(msg_LstServiceSelected(jv) :: Nil, None) ::

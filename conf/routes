@@ -62,6 +62,12 @@ POST    /al/tm/query                            controllers.TimemanagerControlle
 POST    /al/tm/pop                              controllers.TimemanagerController.popTM
 POST    /al/tm/update                           controllers.TimemanagerController.updateTM
 
+# address manage 相关
+POST    /al/address/push                        controllers.AddressController.pushAddress
+POST    /al/address/pop                         controllers.AddressController.popAddress
+POST    /al/address/update                      controllers.AddressController.updateAddress
+POST    /al/address/detail                      controllers.AddressController.detailAddress
+
 # collection 用户收藏相关
 POST    /al/collections/push                    controllers.CollectionsController.pushCollection
 POST    /al/collections/pop                     controllers.CollectionsController.popCollection

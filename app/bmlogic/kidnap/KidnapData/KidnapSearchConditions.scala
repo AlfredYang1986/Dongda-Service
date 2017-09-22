@@ -11,6 +11,7 @@ trait KidnapSearchConditions {
 
         (js \ "condition" \ "owner_id").asOpt[String].map (x => builder += "owner_id" -> x).getOrElse(Unit)
         (js \ "condition" \ "service_id").asOpt[String].map (x => builder += "service_id" -> x).getOrElse(Unit)
+        (js \ "condition" \ "address_id").asOpt[String].map (x => builder += "address_id" -> x).getOrElse(Unit)
 
         /**
           * 时间相关
@@ -20,7 +21,7 @@ trait KidnapSearchConditions {
         /**
           * 地址相关
           */
-        val loction_condition =
+        val location_condition =
             (js \ "condition" \ "location" \ "pin").asOpt[JsValue].map { loc =>
                 val lat = (loc \ "latitude").asOpt[Float].map (x => x).getOrElse(throw new Exception("search service input error"))
                 val log = (loc \ "longitude").asOpt[Float].map (x => x).getOrElse(throw new Exception("search service input error"))
@@ -53,7 +54,7 @@ trait KidnapSearchConditions {
 
         (Some(builder.result) ::
             date_condition ::
-            loction_condition ::
+            location_condition ::
             category_condition :: Nil).filterNot(_ == None).map (_.get) match {
             case Nil => DBObject()
             case head :: Nil => head
