@@ -31,28 +31,26 @@ trait AddressConditions {
 
         val address_id = (js \ "address_id").asOpt[String].map (x => x).getOrElse(Sercurity.md5Hash(owner_id + address + log + lat + Sercurity.getTimeSpanWithMillSeconds + math.random))
 
-    {
-        val lb = MongoDBObject.newBuilder
+        {
+            val lb = MongoDBObject.newBuilder
 
+            val pin_obj = MongoDBObject(
+                "type" -> "Point",
+                "coordinates" -> MongoDBList(log, lat)
+            )
 
+            lb += "pin" -> pin_obj
 
-        val pin_obj = MongoDBObject(
-            "type" -> "Point",
-            "coordinates" -> MongoDBList(log, lat)
-        )
+            lb += "province" -> (js \ "location" \ "province").asOpt[String].map (x => x).getOrElse("")
+            lb += "city" -> (js \ "location" \ "city").asOpt[String].map (x => x).getOrElse("")
+            lb += "district" -> (js \ "location" \ "district").asOpt[String].map (x => x).getOrElse("")
+            lb += "address" -> (js \ "location" \ "address").asOpt[String].map (x => x).getOrElse("")
+            lb += "adjust" -> (js \ "location" \ "adjust").asOpt[String].map (x => x).getOrElse("")
+            lb += "location_type" -> (js \ "location" \ "location_type").asOpt[String].map (x => x).getOrElse("")
+            lb += "loc_images" -> (js \ "location" \ "loc_images").asOpt[List[Map[String,String]]].map (lst => lst).getOrElse(List(Map("pic" -> "","tag" -> "")))
 
-        lb += "pin" -> pin_obj
-
-        lb += "province" -> (js \ "location" \ "province").asOpt[String].map (x => x).getOrElse("")
-        lb += "city" -> (js \ "location" \ "city").asOpt[String].map (x => x).getOrElse("")
-        lb += "district" -> (js \ "location" \ "district").asOpt[String].map (x => x).getOrElse("")
-        lb += "address" -> (js \ "location" \ "address").asOpt[String].map (x => x).getOrElse("")
-        lb += "adjust" -> (js \ "location" \ "adjust").asOpt[String].map (x => x).getOrElse("")
-        lb += "location_type" -> (js \ "location" \ "location_type").asOpt[String].map (x => x).getOrElse("")
-        lb += "loc_images" -> (js \ "location" \ "loc_images").asOpt[List[Map[String,String]]].map (lst => lst).getOrElse(List(Map("pic" -> "","tag" -> "")))
-
-        builder += "location" -> lb.result
-    }
+            builder += "location" -> lb.result
+        }
 
         val date = new Date().getTime
         builder += "date" -> (js \ "date").asOpt[Long].map (x => x).getOrElse(date)
