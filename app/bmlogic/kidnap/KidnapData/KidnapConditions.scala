@@ -72,7 +72,8 @@ trait KidnapConditions {
         {
             val detail = MongoDBObject.newBuilder
 
-            detail += "price" -> (js \ "detail" \ "price").asOpt[Int].map (tmp => tmp).getOrElse(throw new Exception("push service input error")) // 单位为分
+            detail += "price" -> (js \ "detail" \ "price").asOpt[Int].map (tmp => tmp).getOrElse(throw new Exception("push service input error"))   // 单位为分
+            detail += "price_type" -> (js \ "detail" \ "price_type").asOpt[Int].map (tmp => tmp).getOrElse(0)                                       // 单位价格类型，默认小时
             detail += "facility" -> (js \ "detail" \ "facility").asOpt[List[String]].map (x => x).getOrElse(MongoDBList.newBuilder.result)
 
             val age_boundary = MongoDBObject.newBuilder

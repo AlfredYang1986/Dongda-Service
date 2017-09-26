@@ -11,7 +11,7 @@ import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.cliTraits.DBTrait
 import com.pharbers.ErrorCode
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
 /**
@@ -168,8 +168,14 @@ object AddressModule extends ModuleTrait {
                 import inner_traits.dr
                 obj - "date" - "update_date"
             }
+
+            val result = pr.get.get("service").map{ service =>
+                service.as[JsObject].value.toMap + ("location" -> address.get.get("location").get)
+            }
+
             if (address.isEmpty) throw new Exception("service not exist")
-            else (Some(Map("address" -> toJson(address))), None)
+            else (Some(Map("address" -> toJson(address),
+                            "service" -> toJson(result))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

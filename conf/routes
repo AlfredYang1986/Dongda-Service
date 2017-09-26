@@ -24,6 +24,9 @@ POST    /al/kidnap/update                       controllers.KidnapController.upd
 # 拆分kidnap数据库抽去location独立为address数据表
 POST    /al/kidnap/refactor/split               controllers.KidnapController.refactorSplit
 
+# 在order表中添加【单位时间价格（看顾-小时/日/月；课程-单次/学期）】
+POST    /al/order/refactor/split                controllers.OrderController.refactorSplit
+
 # order 相关功能
 POST    /al/order/push                          controllers.OrderController.pushOrder
 POST    /al/order/pop                           controllers.OrderController.popOrder

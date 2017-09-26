@@ -7,7 +7,7 @@ import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.common.placeholder.PlaceHolderMessages.msg_PlaceHold
 import bmlogic.common.requestArgsQuery
 import bmlogic.order.OrderMessage._
-import bmlogic.kidnap.KidnapMessage.msg_KidnapDetail
+import bmlogic.kidnap.KidnapMessage.{msg_KidnapDetail, msg_KidnapFinalDetail}
 import bmlogic.orderDate.OrderDateMessages._
 import bmlogic.profile.ProfileMessage.msg_ProfileMultiQuery
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
@@ -55,7 +55,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
             ::
             ParallelMessage(
                 MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
-                MessageRoutes(msg_KidnapDetail(jv) :: Nil, None) ::
+                MessageRoutes(msg_KidnapDetail(jv) :: msg_KidnapFinalDetail(jv) :: Nil, None) ::
                 MessageRoutes(msg_QueryOrderDate(jv) :: Nil, None) :: Nil, detailOrderResultMerge)
 //                MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, detailOrderResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)
@@ -183,5 +183,14 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
                 ::
                 MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, orderDateResultMerge)
             :: msg_CommonResultMessage() :: Nil, None)
+    })
+
+    def refactorSplit = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("refactor split"))), jv)
+          :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+          :: msg_OrderRefactorSplit(jv)
+          :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 }

@@ -143,7 +143,6 @@ object KidnapModule extends ModuleTrait {
 
             import inner_traits.dc
             val o : DBObject = data
-
             val reVal = db.queryObject(o, "kidnap") { obj =>
 
                 /**
@@ -178,10 +177,14 @@ object KidnapModule extends ModuleTrait {
 
                     (det \ "capacity").asOpt[Int].map (x => det_obj += "capacity" -> x.asInstanceOf[Number]).getOrElse(Unit)
                     (det \ "least_hours").asOpt[Int].map (x => det_obj += "least_hours" -> x.asInstanceOf[Number]).getOrElse(Unit)
-                    (det \ "allow_leaves").asOpt[Int].map (x => det_obj += "allow_leaves" -> x.asInstanceOf[Number]).getOrElse(Unit)
+                    (det \ "allow_leaves").asOpt[Boolean].map (x =>
+                        if(x) det_obj += "allow_leaves" -> 1.asInstanceOf[Number]
+                        else det_obj += "allow_leaves" -> 0.asInstanceOf[Number]
+                    ).getOrElse(Unit)
                     (det \ "least_times").asOpt[Int].map (x => det_obj += "least_times" -> x.asInstanceOf[Number]).getOrElse(Unit)
                     (det \ "lecture_length").asOpt[Int].map (x => det_obj += "lecture_length" -> x.asInstanceOf[Number]).getOrElse(Unit)
                     (det \ "servant_no").asOpt[Int].map (x => det_obj += "servant_no" -> x.asInstanceOf[Number]).getOrElse(Unit)
+                    (det \ "facility").asOpt[List[String]].map (x => det_obj += "facility" -> x).getOrElse(Unit)
 
                     obj += "detail" -> det_obj
 
@@ -213,7 +216,7 @@ object KidnapModule extends ModuleTrait {
 
             validation match {
                 case 1 => {
-                    import inner_traits.dr
+                    import inner_traits.rdr
 
                     count = db.queryCount(DBObject(),"kidnap").getOrElse(throw new Exception("data not exist"))
 
@@ -271,10 +274,45 @@ object KidnapModule extends ModuleTrait {
                 obj += "location" -> loc_obj
 
                 val detail_obj = obj.getAs[MongoDBObject]("detail").map (x => x).getOrElse(throw new Exception("service result error"))
+
                 detail_obj += "health" -> 0.asInstanceOf[Number]
                 detail_obj += "characteristics" -> (""::Nil)
-                obj += "detail" -> detail_obj
+
                 (data \ "address_id").asOpt[String].map (x => obj += "address_id" -> x).getOrElse(Unit)
+
+                val category_obj = obj.getAs[MongoDBObject]("category").map (x => x).getOrElse(throw new Exception("service_obj result error"))
+                val service_cat = category_obj.getAs[String]("service_cat").get
+
+                if(service_cat == "看护") category_obj += "service_cat" -> "看顾"
+                else category_obj += "service_cat" -> "课程"
+
+                /**
+                  * //0---------------00/01/10
+                  * //看顾-price_type：小时/日/月  000/001/010 对应十进制0/1/2
+                  * //011 即十进制的3作为之后【看顾类】的需求填补位
+                  *
+                  * //1---------------00/01
+                  * //课程-price_type：课次/学期   100/101     对应十进制4/5
+                  * //110/111 即十进制的6/7作为之后【课程类】的需求填补位
+                  */
+
+                service_cat match {
+                    case "看顾" => detail_obj += "price_type" -> 0.asInstanceOf[Number]       //0---------------00/01/10
+                    case "看护" => {                                                          //看顾-price_type：小时/日/月  000/001/010 对应十进制0/1/2
+                        category_obj += "service_cat" -> "看顾"                               //011 即十进制的3作为之后看顾类的需求填补位
+                        detail_obj += "price_type" -> 0.asInstanceOf[Number]
+                    }
+                    case "课程" => detail_obj += "price_type" -> 4.asInstanceOf[Number]       //1---------------00/01
+                    case "" => {                                                             //课程-price_type：课次/学期   100/101     对应十进制4/5
+                        category_obj += "service_cat" -> "课程"                               //110/111 即十进制的6/7作为之后课程类的需求填补位
+                        detail_obj += "price_type" -> 4.asInstanceOf[Number]
+                    }
+                    case _ => throw new Exception("service_cat result error")
+                }
+
+                obj += "detail" -> detail_obj
+                obj += "category" -> category_obj
+
                 db.updateObject(obj, "kidnap", "service_id")
                 import inner_traits.dr
                 obj - "date" - "update_date"

@@ -44,6 +44,7 @@ object OrderModule extends ModuleTrait {
 //            case class msg_OrderPay(data : JsValue) extends msg_OrderCommand
 //            case class msg_OrderPostpay(data : JsValue) extends msg_OrderCommand
 //
+        case msg_OrderRefactorSplit(data) => orderRefactor(data)
         case _ => ???
     }
 
@@ -51,6 +52,7 @@ object OrderModule extends ModuleTrait {
                             with OrderDetailCondition
                             with OrderSearchCondition
                             with OrderQueryMultiCondition
+                            with OrderRefactorConditions
                             with OrderResult
 
     def pushOrder(data : JsValue)
@@ -422,5 +424,107 @@ object OrderModule extends ModuleTrait {
             }
 
         Map("orders" -> toJson(result))
+    }
+
+    def orderRefactor(data : JsValue)
+                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val validation = (data \ "doRefactorSplit").asOpt[Int].map(x => x).getOrElse(throw new Exception("input error"))
+
+            var count = 0
+
+            validation match {
+                case 1 => {
+
+                    import inner_trait.dr
+                    count = db.queryCount(DBObject(),"orders").getOrElse(throw new Exception("data not exist"))
+
+                    val take = 20
+                    for(i <- 0 to count/20){
+
+                        val skip = 20 * i
+                        val reVal = db.queryMultipleObject(DBObject(), "orders", skip = skip, take = take)
+
+                        reVal.foreach(x => {
+
+                            import inner_trait.orc
+                            val o : DBObject = toJson(Map("condition" -> toJson(x)))
+                            val hasService = db.queryCount(o,"kidnap").getOrElse(throw new Exception("data not exist"))
+                            hasService match {
+                                case 0 => db.deleteObject(o, "orders", "service_id")
+                                case 1 => {
+                                    db.queryObject(o, "kidnap"){ service_obj =>
+                                        val detail_obj = service_obj.getAs[MongoDBObject]("detail").map (x => x).getOrElse(throw new Exception("service_obj result error"))
+                                        val price = detail_obj.getAs[Number]("price").get
+                                        val category_obj = service_obj.getAs[MongoDBObject]("category").map (x => x).getOrElse(throw new Exception("service_obj result error"))
+                                        val service_cat = category_obj.getAs[String]("service_cat").get
+                                        orderUpdateRefactor(toJson(Map("condition" -> toJson(x))), price, service_cat)
+                                        x
+                                    }
+                                }
+                                case _ => throw new Exception("orderRefactor error")
+                            }
+
+                        })
+
+                    }
+                }
+                case _ => throw new Exception("input error")
+            }
+
+            (Some(Map("count" -> toJson(count)
+            )), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    /**
+      * 0---------------00/01/10
+      * 看顾-price_type：小时/日/月  000/001/010 对应十进制0/1/2
+      * 011 即十进制的3作为之后【看顾类】的需求填补位
+      *
+      * 1---------------00/01
+      * 课程-price_type：课次/学期   100/101     对应十进制4/5
+      * 110/111 即十进制的6/7作为之后【课程类】的需求填补位
+      */
+
+    def orderUpdateRefactor(data : JsValue, price : Number, service_cat : String)(implicit cm : CommonModules) : Unit = {
+        try {
+
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_trait.sc
+            import inner_trait.dr
+            val o : DBObject = data
+
+            service_cat match {
+
+                case "看顾" => {
+                    db.queryObject(o, "orders") { obj =>                //0---------------00/01/10
+                        obj += "price_type" -> 0.asInstanceOf[Number]   //看顾-price_type：小时/日/月  000/001/010 对应十进制0/1/2
+                        obj += "price" -> price                         //011 即十进制的3作为之后看顾类的需求填补位
+                        db.updateObject(obj, "orders", "order_id")
+                        obj
+                    }
+                }
+
+                case "课程" => {
+                    db.queryObject(o, "orders") { obj =>                //1---------------00/01
+                        obj += "price_type" -> 4.asInstanceOf[Number]   //课程-price_type：课次/学期   100/101     对应十进制4/5
+                        obj += "price" -> price                         //110/111 即十进制的6/7作为之后课程类的需求填补位
+                        db.updateObject(obj, "orders", "order_id")
+                        obj
+                    }
+                }
+
+            }
+
+        } catch {
+            case ex : Exception => throw new Exception("orderUpdateRefactor error")
+        }
     }
 }

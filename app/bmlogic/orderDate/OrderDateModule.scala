@@ -179,8 +179,6 @@ object OrderDateModule extends ModuleTrait {
             import inner_trait.sc
             val o : DBObject = MergeStepResult(data, pr)
 
-            println(o)
-
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(10)
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
 

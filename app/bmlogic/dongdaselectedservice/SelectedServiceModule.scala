@@ -78,9 +78,9 @@ object SelectedServiceModule extends ModuleTrait {
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
 
             import inner_trait.dc
-            val o : DBObject = data
-
             import inner_trait.sr
+
+            val o : DBObject = data
             val reVal = db.queryMultipleObject(o, "dongda_selected", skip = skip, take = take)
             val services =
                 reVal.map (x => x.get("service_id").

@@ -54,6 +54,7 @@ trait AddressResults {
                 "city" -> loc.getAs[String]("city").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "district" -> loc.getAs[String]("district").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "address" -> loc.getAs[String]("address").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
+                "adjust" -> loc.getAs[String]("adjust").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "location_type" -> loc.getAs[String]("location_type").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "loc_images" -> toJson(loc_images.map{ one =>
                     toJson(Map(
