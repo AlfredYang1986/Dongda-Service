@@ -10,5 +10,6 @@ object AuthMessage {
 	case class msg_AuthQuery(data : JsValue) extends msg_AuthCommand
 	case class msg_AuthTokenParser(data : JsValue) extends msg_AuthCommand
 	case class msg_CheckTokenExpire(data : JsValue) extends msg_AuthCommand
+	case class msg_AuthTokenIsExpired(data : JsValue) extends msg_AuthCommand
 	case class msg_GenerateToken() extends msg_AuthCommand
 }

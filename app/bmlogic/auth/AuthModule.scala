@@ -25,6 +25,7 @@ object AuthModule extends ModuleTrait with AuthData {
         case msg_AuthTokenParser(data) => authTokenParser(data)
 
         case msg_CheckTokenExpire(data) => checkAuthTokenExpire(data)(pr)
+        case msg_AuthTokenIsExpired(data) => AuthTokenIsExpired(data)(pr)
         case msg_GenerateToken() => generateToken(pr)
 
 		case _ => ???
@@ -108,6 +109,22 @@ object AuthModule extends ModuleTrait with AuthData {
 
             if (new Date().getTime > expire_in) throw new Exception("token expired")
             else (pr, None)
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def AuthTokenIsExpired(data : JsValue)
+                            (pr : Option[Map[String, JsValue]])
+                            (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
+            val expire_in = (auth \ "expire_in").asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
+
+            if (new Date().getTime > expire_in) {
+                (Some(Map("isExpired" -> toJson(1))), None)
+            } else (Some(Map("isExpired" -> toJson(0))), None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }

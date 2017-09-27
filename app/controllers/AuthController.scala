@@ -52,4 +52,12 @@ class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : A
                     "db" -> dbt, "att" -> att,
                     "ddn" -> ddn, "as" -> as))))
         })
+
+    def authTokenIsExpired = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("auth token is expire"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_AuthTokenIsExpired(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
 }
