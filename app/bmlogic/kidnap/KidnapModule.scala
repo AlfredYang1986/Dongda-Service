@@ -150,7 +150,7 @@ object KidnapModule extends ModuleTrait {
                   */
                 (data \ "service" \ "title").asOpt[String].map (x => obj += "title" -> x).getOrElse(Unit)
                 (data \ "service" \ "description").asOpt[String].map (x => obj += "description" -> x).getOrElse(Unit)
-                (data \ "service" \ "images").asOpt[String].map (x => obj += "images" -> x).getOrElse(Unit)
+                (data \ "service" \ "images").asOpt[List[String]].map (x => obj += "images" -> x).getOrElse(Unit)
 
                 /**
                   * category
@@ -282,9 +282,6 @@ object KidnapModule extends ModuleTrait {
 
                 val category_obj = obj.getAs[MongoDBObject]("category").map (x => x).getOrElse(throw new Exception("service_obj result error"))
                 val service_cat = category_obj.getAs[String]("service_cat").get
-
-                if(service_cat == "看护") category_obj += "service_cat" -> "看顾"
-                else category_obj += "service_cat" -> "课程"
 
                 /**
                   * //0---------------00/01/10
