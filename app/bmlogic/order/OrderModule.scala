@@ -69,6 +69,7 @@ object OrderModule extends ModuleTrait {
             import inner_trait.dr
             val o : DBObject = data
             o += "owner_id" -> owner_id
+
             db.insertObject(o, "orders", "order_id")
             val reVal = toJson(o - "date" - "pay_date")
 
@@ -198,11 +199,13 @@ object OrderModule extends ModuleTrait {
                             reVal.map (x => x.get("owner_id").get.asOpt[String].get)
 
                 val order_lst = reVal.map (x => x.get("order_id").get.asOpt[String].get)
+                val service_lst = reVal.map (x => x.get("service_id").get.asOpt[String].get)
 
                 (Some(Map(
                     "orders" -> toJson(reVal),
                     "condition" -> toJson(Map(
                         "lst" -> toJson(lst),
+                        "list" -> toJson(service_lst),
                         "order_lst" -> toJson(order_lst)
                     ))
                 )), None)
@@ -385,6 +388,7 @@ object OrderModule extends ModuleTrait {
 
         val orders = pr.get.get("orders").get.asOpt[List[JsValue]].get
         val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
+        val services = para.get("services").get.asOpt[List[JsValue]].get
         val tms_g = para.get("order_date").get.asOpt[List[JsValue]].get.groupBy(x => (x \ "order_id").asOpt[String].get)
 
         val result =
@@ -405,6 +409,13 @@ object OrderModule extends ModuleTrait {
                     ))
                 }
 
+                val location = services.find(p => (p \ "owner_id").asOpt[String].get == owner_id).map(x => (x \ "location").get).getOrElse{
+                    toJson(Map(
+                        "address" -> toJson("Ghost Address"),
+                        "adjust" -> toJson("0.0")
+                    ))
+                }
+
                 val order_id = (iter \ "order_id").asOpt[String].get
                 val order_date = tms_g.find(p => p._1 == order_id).map { one =>
                     one._2.map { iter =>
@@ -420,7 +431,8 @@ object OrderModule extends ModuleTrait {
                     "owner_id" +
                     ("order_date" -> toJson(order_date)) +
                     ("owner" -> owner) +
-                    ("user" -> user)
+                    ("user" -> user) +
+                    ("location" -> location)
             }
 
         Map("orders" -> toJson(result))

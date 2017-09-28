@@ -3,11 +3,12 @@ package controllers
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
+import bmlogic.address.AddressMessage.msg_SearchAddress
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.common.placeholder.PlaceHolderMessages.msg_PlaceHold
 import bmlogic.common.requestArgsQuery
 import bmlogic.order.OrderMessage._
-import bmlogic.kidnap.KidnapMessage.{msg_KidnapDetail, msg_KidnapFinalDetail}
+import bmlogic.kidnap.KidnapMessage.{msg_KidnapDetail, msg_KidnapFinalDetail, msg_KidnapMultiOrderQuery}
 import bmlogic.orderDate.OrderDateMessages._
 import bmlogic.profile.ProfileMessage.msg_ProfileMultiQuery
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
@@ -178,6 +179,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
                     ::
                     ParallelMessage(
                         MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
+                        MessageRoutes(msg_KidnapMultiOrderQuery(jv) :: msg_SearchAddress(jv) :: Nil, None) ::
                         MessageRoutes(msg_QueryMultiOrderDate(jv) :: Nil, None) :: Nil, searchOrderResultMerge)
                     :: Nil, None)
                 ::

@@ -13,6 +13,7 @@ object KidnapMessage {
     case class msg_KidnapDetail(data : JsValue) extends msg_KidnapCommand
     case class msg_KidnapFinalDetail(data : JsValue) extends msg_KidnapCommand
     case class msg_KidnapMultiQuery(data : JsValue) extends msg_KidnapCommand
+    case class msg_KidnapMultiOrderQuery(data : JsValue) extends msg_KidnapCommand
     case class msg_KidnapSearch(data : JsValue) extends msg_KidnapCommand
     case class msg_KidnapUpdate(data : JsValue) extends msg_KidnapCommand
     case class msg_KidnapCanUpdate(data : JsValue) extends msg_KidnapCommand

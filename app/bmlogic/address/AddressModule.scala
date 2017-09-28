@@ -90,7 +90,7 @@ object AddressModule extends ModuleTrait {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             import inner_traits.asc
-            import inner_traits.ar
+            import inner_traits.dr
 
             val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)

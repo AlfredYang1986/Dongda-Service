@@ -11,4 +11,12 @@ trait KidnapMultiConditions {
         if (lst.isEmpty) null
         else $or(lst.map (x => DBObject("service_id" -> x)))
     }
+
+    implicit val moc : JsValue => DBObject = { js =>
+        val lst = (js \ "condition" \ "list").asOpt[List[String]].map (x => x)
+            .getOrElse(throw new Exception("search service input error")).distinct
+
+        if (lst.isEmpty) null
+        else $or(lst.map (x => DBObject("service_id" -> x)))
+    }
 }

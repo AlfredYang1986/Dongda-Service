@@ -22,6 +22,7 @@ object KidnapModule extends ModuleTrait {
         case msg_KidnapDetail(data) => detailService(data)(pr)
         case msg_KidnapFinalDetail(data) => finalDetailService(data)(pr)
         case msg_KidnapMultiQuery(data) => multiQueryService(data)(pr)
+        case msg_KidnapMultiOrderQuery(data) => multiOrderQueryService(data)(pr)
         case msg_KidnapSearch(data) => searchService(data)
         case msg_KidnapUpdate(data) => updateService(data)
         case msg_KidnapCanUpdate(data) => canUpdateService(data)(pr)
@@ -405,6 +406,55 @@ object KidnapModule extends ModuleTrait {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             import inner_traits.mc
+            import inner_traits.sr
+
+            import bmlogic.common.mergestepresult.MergeStepResult
+            val o : DBObject = MergeStepResult(data, pr)
+
+            if (o == null) {
+                val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
+
+                (Some(Map("date" -> toJson(date),
+                    "services" -> toJson(List[JsValue]()),
+                    "condition" -> toJson(Map(
+                        "slst" -> toJson(List[String]()),
+                        "lst" -> toJson(List[String]()),
+                        "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
+                    ))
+                )), None)
+
+            } else {
+                val reVal = db.queryMultipleObject(o, "kidnap")
+
+                val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
+                val lst = reVal.map (x => x.get("owner_id").get.asOpt[String].get)
+                val slst = reVal.map (x => x.get("service_id").get.asOpt[String].get)
+
+                (Some(Map("date" -> toJson(date),
+                    "services" -> toJson(reVal),
+                    "condition" -> toJson(Map(
+                        "slst" -> toJson(slst),
+                        "lst" -> toJson(lst),
+                        "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
+                    ))
+                )), None)
+            }
+
+//            (Some(Map("services" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def multiOrderQueryService(data: JsValue)
+                         (pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.moc
             import inner_traits.sr
 
             import bmlogic.common.mergestepresult.MergeStepResult
