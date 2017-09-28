@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import bmlogic.address.AddressMessage.msg_SearchAddress
+import bmlogic.address.AddressMessage.msg_SearchOrderAddress
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.common.placeholder.PlaceHolderMessages.msg_PlaceHold
 import bmlogic.common.requestArgsQuery
@@ -164,7 +164,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
     def lstOrdersDateSorted = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
-        import bmlogic.order.OrderModule.searchOrderResultMerge
+        import bmlogic.order.OrderModule.multiOrderResultMerge
         import bmlogic.orderDate.OrderDateModule.orderDateResultMerge
         implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
 
@@ -179,8 +179,8 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
                     ::
                     ParallelMessage(
                         MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) ::
-                        MessageRoutes(msg_KidnapMultiOrderQuery(jv) :: msg_SearchAddress(jv) :: Nil, None) ::
-                        MessageRoutes(msg_QueryMultiOrderDate(jv) :: Nil, None) :: Nil, searchOrderResultMerge)
+                        MessageRoutes(msg_KidnapMultiOrderQuery(jv) :: msg_SearchOrderAddress(jv) :: Nil, None) ::
+                        MessageRoutes(msg_QueryMultiOrderDate(jv) :: Nil, None) :: Nil, multiOrderResultMerge)
                     :: Nil, None)
                 ::
                 MessageRoutes(msg_PlaceHold() :: Nil, None) :: Nil, orderDateResultMerge)

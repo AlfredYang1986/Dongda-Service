@@ -467,8 +467,7 @@ object KidnapModule extends ModuleTrait {
                     "services" -> toJson(List[JsValue]()),
                     "condition" -> toJson(Map(
                         "slst" -> toJson(List[String]()),
-                        "lst" -> toJson(List[String]()),
-                        "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
+                        "lst" -> toJson(List[String]())
                     ))
                 )), None)
 
@@ -483,8 +482,7 @@ object KidnapModule extends ModuleTrait {
                     "services" -> toJson(reVal),
                     "condition" -> toJson(Map(
                         "slst" -> toJson(slst),
-                        "lst" -> toJson(lst),
-                        "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
+                        "lst" -> toJson(lst)
                     ))
                 )), None)
             }

@@ -188,6 +188,7 @@ object OrderModule extends ModuleTrait {
                     "orders" -> toJson(List[JsValue]()),
                     "condition" -> toJson(Map(
                         "lst" -> toJson(List[String]()),
+                        "list" -> toJson(List[String]()),
                         "order_lst" -> toJson(List[String]())
                     ))
                 )), None)
@@ -388,7 +389,6 @@ object OrderModule extends ModuleTrait {
 
         val orders = pr.get.get("orders").get.asOpt[List[JsValue]].get
         val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
-        val services = para.get("services").get.asOpt[List[JsValue]].get
         val tms_g = para.get("order_date").get.asOpt[List[JsValue]].get.groupBy(x => (x \ "order_id").asOpt[String].get)
 
         val result =
@@ -409,11 +409,67 @@ object OrderModule extends ModuleTrait {
                     ))
                 }
 
-                val location = services.find(p => (p \ "owner_id").asOpt[String].get == owner_id).map(x => (x \ "location").get).getOrElse{
+                val order_id = (iter \ "order_id").asOpt[String].get
+                val order_date = tms_g.find(p => p._1 == order_id).map { one =>
+                    one._2.map { iter =>
+                        toJson(Map(
+                            "start" -> toJson((iter \ "start").asOpt[JsValue].get),
+                            "end" -> toJson((iter \ "end").asOpt[JsValue].get)
+                        ))
+                    }
+                }.getOrElse(Nil)
+
+                iter.as[JsObject].value.toMap -
+                    "user_id" -
+                    "owner_id" +
+                    ("order_date" -> toJson(order_date)) +
+                    ("owner" -> owner) +
+                    ("user" -> user)
+            }
+
+        Map("orders" -> toJson(result))
+    }
+
+    def multiOrderResultMerge(lst : List[Map[String, JsValue]])
+                              (pr : Option[Map[String, JsValue]]) : Map[String, JsValue] = {
+
+        val para = MergeParallelResult(lst)
+
+        val orders = pr.get.get("orders").get.asOpt[List[JsValue]].get
+        val profiles = para.get("profiles").get.asOpt[List[JsValue]].get
+        val services = para.get("services").get.asOpt[List[JsValue]].getOrElse(List(toJson("")))
+        val tms_g = para.get("order_date").get.asOpt[List[JsValue]].get.groupBy(x => (x \ "order_id").asOpt[String].get)
+
+        val result =
+            orders.map { iter =>
+                val owner_id = (iter \ "owner_id").asOpt[String].get
+                val owner = profiles.find(p => (p \ "user_id").asOpt[String].get == owner_id).map (x => x).getOrElse {
+                    toJson(Map(
+                        "screen_name" -> toJson("Gost"),
+                        "screen_photo" -> toJson("")
+                    ))
+                }
+
+                val user_id= (iter \ "user_id").asOpt[String].get
+                val user = profiles.find(p => (p \ "user_id").asOpt[String].get == user_id).map (x => x).getOrElse {
+                    toJson(Map(
+                        "screen_name" -> toJson("Gost"),
+                        "screen_photo" -> toJson("")
+                    ))
+                }
+
+                val location = if ((services.head \ "service_id").asOpt[String].getOrElse("").isEmpty) {
                     toJson(Map(
                         "address" -> toJson("Ghost Address"),
                         "adjust" -> toJson("0.0")
                     ))
+                } else {
+                    services.find(p => (p \ "owner_id").asOpt[String].get == owner_id).map(x => (x \ "location").get).getOrElse{
+                        toJson(Map(
+                            "address" -> toJson("Ghost Address"),
+                            "adjust" -> toJson("0.0")
+                        ))
+                    }
                 }
 
                 val order_id = (iter \ "order_id").asOpt[String].get

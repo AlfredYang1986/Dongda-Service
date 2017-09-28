@@ -15,6 +15,7 @@ object AddressMessage {
     case class msg_PopAddress(data : JsValue) extends msg_AddressCommand
     case class msg_UpdateAddress(data : JsValue) extends msg_AddressCommand
     case class msg_SearchAddress(data : JsValue) extends msg_AddressCommand
+    case class msg_SearchOrderAddress(data : JsValue) extends msg_AddressCommand
     case class msg_MultiAddress(data : JsValue) extends msg_AddressCommand
 
 }

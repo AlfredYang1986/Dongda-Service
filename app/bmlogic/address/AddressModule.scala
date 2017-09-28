@@ -23,6 +23,7 @@ object AddressModule extends ModuleTrait {
         case msg_PushAddress(data) => pushAddress(data)(pr)
         case msg_PopAddress(data) => popAddress(data)
         case msg_SearchAddress(data) => searchServiceAddress(data)(pr)
+        case msg_SearchOrderAddress(data) => searchServiceInOrderAddress(data)(pr)
         case msg_UpdateAddress(data) => updateAddress(data)(pr)
         case msg_MultiAddress(data) => queryMultipleAddress(data)
 
@@ -115,6 +116,55 @@ object AddressModule extends ModuleTrait {
                     "user_id" -> toJson((data \ "condition" \ "user_id").asOpt[String].get)
                 ))
             )), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def searchServiceInOrderAddress(data : JsValue)
+                     (pr : Option[Map[String, JsValue]])
+                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.asc
+            import inner_traits.dr
+
+            val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
+            val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
+            val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
+
+            val services = pr.get.get("services").get.asOpt[List[JsValue]].getOrElse(throw new Exception("search service input error"))
+
+            if (services.isEmpty){
+                val date = (data \ "condition" \ "date").asOpt[Long].map (x => x).getOrElse(new Date().getTime)
+
+                (Some(Map("date" -> toJson(date),
+                    "services" -> toJson(List[JsValue]()),
+                    "condition" -> toJson(Map(
+                        "slst" -> toJson(List[String]()),
+                        "lst" -> toJson(List[String]())
+                    ))
+                )), None)
+            } else {
+                val result = services.map{ x =>
+                    val o : DBObject = x
+                    val reVal = db.queryObject(o, "address")
+                    x.asOpt[Map[String,JsValue]].get + ("location" -> reVal.get.get("location").get)
+                }
+                val slst = result.map (x => x.get("service_id").get.asOpt[String].get)
+                val lst = result.map (x => x.get("owner_id").get.asOpt[String].get)
+
+                (Some(Map("date" -> toJson(date),
+                    "count" -> toJson(skip + take),
+                    "services" -> toJson(result),
+                    "condition" -> toJson(Map(
+                        "slst" -> toJson(slst),
+                        "lst" -> toJson(lst)
+                    ))
+                )), None)
+            }
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
