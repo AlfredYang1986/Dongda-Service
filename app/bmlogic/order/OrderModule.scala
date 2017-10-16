@@ -69,8 +69,7 @@ object OrderModule extends ModuleTrait {
             import inner_trait.dr
             val o : DBObject = data
             o += "owner_id" -> owner_id
-            (service \ "detail" \ "price").asOpt[Int].map (x => o += "price" -> x.asInstanceOf[Number]).getOrElse(Unit)
-            (service \ "detail" \ "price_type").asOpt[Int].map (x => o += "price_type" -> x.asInstanceOf[Number]).getOrElse(Unit)
+            (service \ "detail" \ "price_arr").asOpt[List[Map[String, Int]]].map (list => o += "price_arr" -> list).getOrElse(Unit)
 
             db.insertObject(o, "orders", "order_id")
             val reVal = toJson(o - "date" - "pay_date")
@@ -508,7 +507,7 @@ object OrderModule extends ModuleTrait {
             validation match {
                 case 1 => {
 
-                    import inner_trait.dr
+                    import inner_trait.rdr
                     count = db.queryCount(DBObject(),"orders").getOrElse(throw new Exception("data not exist"))
 
                     val take = 20
@@ -553,6 +552,7 @@ object OrderModule extends ModuleTrait {
     }
 
     /**
+      * price_arr : List[Map[String, Int]]
       * 0---------------00/01/10
       * 看顾-price_type：小时/日/月  000/001/010 对应十进制0/1/2
       * 011 即十进制的3作为之后【看顾类】的需求填补位
@@ -568,24 +568,22 @@ object OrderModule extends ModuleTrait {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             import inner_trait.sc
-            import inner_trait.dr
+            import inner_trait.rdr
             val o : DBObject = data
 
             service_cat match {
 
                 case "看顾" => {
-                    db.queryObject(o, "orders") { obj =>                //0---------------00/01/10
-                        obj += "price_type" -> 0.asInstanceOf[Number]   //看顾-price_type：小时/日/月  000/001/010 对应十进制0/1/2
-                        obj += "price" -> price                         //011 即十进制的3作为之后看顾类的需求填补位
+                    db.queryObject(o, "orders") { obj =>
+                        obj += "price_arr" -> (Map("price_type" -> 0.asInstanceOf[Number], "price" -> price)::Nil)
                         db.updateObject(obj, "orders", "order_id")
                         obj
                     }
                 }
 
                 case "课程" => {
-                    db.queryObject(o, "orders") { obj =>                //1---------------00/01
-                        obj += "price_type" -> 4.asInstanceOf[Number]   //课程-price_type：课次/学期   100/101     对应十进制4/5
-                        obj += "price" -> price                         //110/111 即十进制的6/7作为之后课程类的需求填补位
+                    db.queryObject(o, "orders") { obj =>
+                        obj += "price_arr" -> (Map("price_type" -> 4.asInstanceOf[Number], "price" -> price)::Nil)
                         db.updateObject(obj, "orders", "order_id")
                         obj
                     }

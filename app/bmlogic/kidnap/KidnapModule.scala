@@ -283,8 +283,10 @@ object KidnapModule extends ModuleTrait {
 
                 val category_obj = obj.getAs[MongoDBObject]("category").map (x => x).getOrElse(throw new Exception("service_obj result error"))
                 val service_cat = category_obj.getAs[String]("service_cat").get
+                val price = detail_obj.getAs[Number]("price").get
 
                 /**
+                  * price_arr : List[Map[String, Int]]
                   * //0---------------00/01/10
                   * //看顾-price_type：小时/日/月  000/001/010 对应十进制0/1/2
                   * //011 即十进制的3作为之后【看顾类】的需求填补位
@@ -295,15 +297,15 @@ object KidnapModule extends ModuleTrait {
                   */
 
                 service_cat match {
-                    case "看顾" => detail_obj += "price_type" -> 0.asInstanceOf[Number]       //0---------------00/01/10
-                    case "看护" => {                                                          //看顾-price_type：小时/日/月  000/001/010 对应十进制0/1/2
-                        category_obj += "service_cat" -> "看顾"                               //011 即十进制的3作为之后看顾类的需求填补位
-                        detail_obj += "price_type" -> 0.asInstanceOf[Number]
+                    case "看顾" => detail_obj += "price_arr" -> (Map("price_type" -> 0.asInstanceOf[Number], "price" -> price)::Nil)
+                    case "看护" => {
+                        category_obj += "service_cat" -> "看顾"
+                        detail_obj += "price_arr" -> (Map("price_type" -> 0.asInstanceOf[Number], "price" -> price)::Nil)
                     }
-                    case "课程" => detail_obj += "price_type" -> 4.asInstanceOf[Number]       //1---------------00/01
-                    case "" => {                                                             //课程-price_type：课次/学期   100/101     对应十进制4/5
-                        category_obj += "service_cat" -> "课程"                               //110/111 即十进制的6/7作为之后课程类的需求填补位
-                        detail_obj += "price_type" -> 4.asInstanceOf[Number]
+                    case "课程" => detail_obj += "price_arr" -> (Map("price_type" -> 4.asInstanceOf[Number], "price" -> price)::Nil)
+                    case "" => {
+                        category_obj += "service_cat" -> "课程"
+                        detail_obj += "price_arr" -> (Map("price_type" -> 4.asInstanceOf[Number], "price" -> price)::Nil)
                     }
                     case _ => throw new Exception("service_cat result error")
                 }

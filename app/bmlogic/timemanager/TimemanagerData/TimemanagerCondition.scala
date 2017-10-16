@@ -8,6 +8,7 @@ object TMPattern {
     case object weekly extends TMPatternDefines(1, "weekly")
     case object monthly extends TMPatternDefines(2, "monthly")
     case object once extends TMPatternDefines(3, "once")
+    case object openDay extends TMPatternDefines(4, "openDay")
 }
 
 sealed abstract class TMPatternDefines(val t : Int, val des : String)

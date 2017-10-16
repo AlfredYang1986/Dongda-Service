@@ -13,7 +13,7 @@ libraryDependencies ++= Seq(
     jdbc,
     cache,
     ws,
-    "org.mongodb" % "casbah_2.11" % "2.8.2",
+    "org.mongodb" % "casbah_2.11" % "3.1.1",
     "org.apache.commons" % "commons-email" % "1.4",
     "com.pharbers" % "pharbers-modules" % "0.1",
     "com.pharbers" % "pharbers-cli-traits" % "0.1",
