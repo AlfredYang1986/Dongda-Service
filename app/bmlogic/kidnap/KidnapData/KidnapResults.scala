@@ -110,6 +110,7 @@ trait KidnapResults {
         val detail_map = obj.getAs[MongoDBObject]("detail").map { det =>
             Map(
                 "price" -> det.getAs[Number]("price").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),
+                "price_type" -> det.getAs[Number]("price_type").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),
                 "facility" -> det.getAs[List[String]]("facility").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "capacity" -> det.getAs[Number]("capacity").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),
                 "least_hours" -> det.getAs[Number]("least_hours").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),

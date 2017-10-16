@@ -13,6 +13,8 @@ trait OrderResult {
             "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("order output error"))),
             "order_title" -> toJson(obj.getAs[String]("order_title").map (x => x).getOrElse(throw new Exception("order output error"))),
             "order_thumbs" -> toJson(obj.getAs[String]("order_thumbs").map (x => x).getOrElse(throw new Exception("order output error"))),
+            "price" -> toJson(obj.getAs[Number]("price").map (x => x.intValue).getOrElse(throw new Exception("order output error"))),
+            "price_type" -> toJson(obj.getAs[Number]("price_type").map (x => x.intValue).getOrElse(throw new Exception("order output error"))),
             "total_fee" -> toJson(obj.getAs[Number]("total_fee").map (x => x.intValue).getOrElse(throw new Exception("order output error"))),
             "further_message" -> toJson(obj.getAs[String]("further_message").map (x => x).getOrElse(throw new Exception("order output error"))),
             "prepay_id" -> toJson(obj.getAs[String]("prepay_id").map (x => x).getOrElse(throw new Exception("order output error"))),

@@ -69,6 +69,8 @@ object OrderModule extends ModuleTrait {
             import inner_trait.dr
             val o : DBObject = data
             o += "owner_id" -> owner_id
+            (service \ "detail" \ "price").asOpt[Int].map (x => o += "price" -> x.asInstanceOf[Number]).getOrElse(Unit)
+            (service \ "detail" \ "price_type").asOpt[Int].map (x => o += "price_type" -> x.asInstanceOf[Number]).getOrElse(Unit)
 
             db.insertObject(o, "orders", "order_id")
             val reVal = toJson(o - "date" - "pay_date")

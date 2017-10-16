@@ -40,8 +40,8 @@ trait OrderCondition {
 
 //        builder += "order_date" -> JsOrderDate(js)
         builder += "order_id" -> order_id
-        builder += "price" -> (js \ "price").asOpt[Int].map (x => x).getOrElse(0)                           // 单位价格
-        builder += "price_type" -> (js \ "price_type").asOpt[Int].map (x => x).getOrElse(0)                 // 单位价格类型，默认小时
+//        builder += "price" -> (js \ "price").asOpt[Int].map (x => x).getOrElse(0)                           // 单位价格
+//        builder += "price_type" -> (js \ "price_type").asOpt[Int].map (x => x).getOrElse(0)                 // 单位价格类型，默认小时
         builder += "total_fee" -> (js \ "total_fee").asOpt[Int].map (x => x).getOrElse(throw new Exception("push Order input error"))
         builder += "further_message" -> (js \ "further_message").asOpt[String].map (x => x).getOrElse("")
         builder += "prepay_id" -> ""
