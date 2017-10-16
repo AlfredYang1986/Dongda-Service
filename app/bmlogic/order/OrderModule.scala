@@ -69,7 +69,15 @@ object OrderModule extends ModuleTrait {
             import inner_trait.dr
             val o : DBObject = data
             o += "owner_id" -> owner_id
-            (service \ "detail" \ "price_arr").asOpt[List[Map[String, Int]]].map (list => o += "price_arr" -> list).getOrElse(Unit)
+            (service \ "detail" \ "price_arr").asOpt[List[JsValue]].map {list =>
+                val price_arr = list.map{x =>
+                    val price_obj = MongoDBObject.newBuilder
+                    price_obj += "price_type" -> (x \ "price_type").asOpt[Int].getOrElse(0)
+                    price_obj += "price" -> (x \ "price").asOpt[Int].getOrElse(0)
+                    price_obj.result
+                }
+                o += "price_arr" -> price_arr
+            }.getOrElse(MongoDBList.newBuilder.result)
 
             db.insertObject(o, "orders", "order_id")
             val reVal = toJson(o - "date" - "pay_date")

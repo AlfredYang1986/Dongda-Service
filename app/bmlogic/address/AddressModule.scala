@@ -98,7 +98,6 @@ object AddressModule extends ModuleTrait {
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
 
             val services = pr.get.get("services").get.asOpt[List[JsValue]].getOrElse(throw new Exception("search service input error"))
-
             val result = services.map{ x =>
                 val o : DBObject = x
                 val reVal = db.queryObject(o, "address")
@@ -106,7 +105,6 @@ object AddressModule extends ModuleTrait {
             }
             val slst = result.map (x => x.get("service_id").get.asOpt[String].get)
             val lst = result.map (x => x.get("owner_id").get.asOpt[String].get)
-
             (Some(Map("date" -> toJson(date),
                 "count" -> toJson(skip + take),
                 "services" -> toJson(result),

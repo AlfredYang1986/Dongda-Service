@@ -1,8 +1,8 @@
 package bmlogic.kidnap.KidnapData
 
 import com.mongodb.casbah.Imports._
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json.toJson
+import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.Json.{JsValueWrapper, toJson}
 
 trait KidnapResults {
     implicit val sr : DBObject => Map[String, JsValue] = { obj =>
@@ -108,9 +108,15 @@ trait KidnapResults {
         }.getOrElse(throw new Exception("service result error"))
 
         val detail_map = obj.getAs[MongoDBObject]("detail").map { det =>
+
+            val price_arr = det.getAs[MongoDBList]("price_arr").get
+
             Map(
                 "price" -> det.getAs[Number]("price").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),
-                "price_arr" -> det.getAs[List[Map[String, Int]]]("price_arr").map (list => toJson(list.map(x => toJson(x)))).getOrElse(throw new Exception("service result error")),
+                "price_arr" -> toJson(price_arr.toList.map(x =>
+                    Map("price_type" -> toJson(x.asInstanceOf[DBObject].getAs[Int]("price_type").getOrElse(throw new Exception("service result error"))),
+                        "price" -> toJson(x.asInstanceOf[DBObject].getAs[Int]("price").getOrElse(throw new Exception("service result error"))))
+                )),
                 "facility" -> det.getAs[List[String]]("facility").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "capacity" -> det.getAs[Number]("capacity").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),
                 "least_hours" -> det.getAs[Number]("least_hours").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),

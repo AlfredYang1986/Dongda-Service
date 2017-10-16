@@ -22,6 +22,7 @@ trait OrderResult {
     }
 
     implicit val dr : DBObject => Map[String, JsValue] = { obj =>
+        val price_arr = obj.getAs[MongoDBList]("price_arr").get
         Map(
             "order_id" -> toJson(obj.getAs[String]("order_id").map (x => x).getOrElse(throw new Exception("order output error"))),
             "service_id" -> toJson(obj.getAs[String]("service_id").map (x => x).getOrElse(throw new Exception("order output error"))),
@@ -29,7 +30,10 @@ trait OrderResult {
             "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("order output error"))),
             "order_title" -> toJson(obj.getAs[String]("order_title").map (x => x).getOrElse(throw new Exception("order output error"))),
             "order_thumbs" -> toJson(obj.getAs[String]("order_thumbs").map (x => x).getOrElse(throw new Exception("order output error"))),
-            "price_arr" -> obj.getAs[List[Map[String, Int]]]("price_arr").map (list => toJson(list.map(x => toJson(x)))).getOrElse(throw new Exception("order output error")),
+            "price_arr" -> toJson(price_arr.toList.map(x =>
+                Map("price_type" -> toJson(x.asInstanceOf[DBObject].getAs[Int]("price_type").getOrElse(throw new Exception("order output error"))),
+                    "price" -> toJson(x.asInstanceOf[DBObject].getAs[Int]("price").getOrElse(throw new Exception("order output error"))))
+            )),
             "total_fee" -> toJson(obj.getAs[Number]("total_fee").map (x => x.intValue).getOrElse(throw new Exception("order output error"))),
             "further_message" -> toJson(obj.getAs[String]("further_message").map (x => x).getOrElse(throw new Exception("order output error"))),
             "prepay_id" -> toJson(obj.getAs[String]("prepay_id").map (x => x).getOrElse(throw new Exception("order output error"))),
