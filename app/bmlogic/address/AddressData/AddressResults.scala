@@ -18,9 +18,16 @@ trait AddressResults {
             val cor = pin.getAs[MongoDBList]("coordinates").get
             val longitude = toJson(cor.head.asInstanceOf[Number].floatValue)
             val latitude = toJson(cor.tail.head.asInstanceOf[Number].floatValue)
-//            val loc_images = loc.getAs[MongoDBList]("loc_images").get.toList.asInstanceOf[List[BasicDBObject]]
+            val loc_images = loc.getAs[MongoDBList]("loc_images").get.toList.asInstanceOf[List[BasicDBObject]]
             Map(
                 "address" -> loc.getAs[String]("address").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
+                "location_type" -> loc.getAs[String]("location_type").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
+                "loc_images" -> toJson(loc_images.map{ one =>
+                    toJson(Map(
+                        "pic" -> toJson(one.get("pic").asInstanceOf[String]),
+                        "tag" -> toJson(one.get("tag").asInstanceOf[String])
+                    ))
+                }),
                 "pin" -> toJson(
                     Map(
                         "latitude" -> latitude,

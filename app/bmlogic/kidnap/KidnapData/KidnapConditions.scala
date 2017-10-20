@@ -72,7 +72,7 @@ trait KidnapConditions {
         {
             val detail = MongoDBObject.newBuilder
 
-            detail += "price" -> (js \ "detail" \ "price").asOpt[Int].map (tmp => tmp).getOrElse(throw new Exception("push service input error"))   // 单位为分
+            detail += "price" -> (js \ "detail" \ "price").asOpt[Int].map (tmp => tmp).getOrElse(0)   // 单位为分
             detail += "price_arr" -> (js \ "detail" \ "price_arr").asOpt[List[JsValue]].map {tmp => tmp.map { x =>
                 val price_obj = MongoDBObject.newBuilder
                 price_obj += "price_type" -> (x \ "price_type").asOpt[Int].getOrElse(0)
@@ -98,6 +98,7 @@ trait KidnapConditions {
             detail += "lecture_length" -> (js \ "detail" \ "lecture_length").asOpt[Int].map (x => x).getOrElse(0)                       // 单位为分
             detail += "servant_no" -> (js \ "detail" \ "servant_no").asOpt[Int].map (x => x).getOrElse(1)                               // 课程老师人数, 牵强信息
             detail += "health" -> (js \ "detail" \ "health").asOpt[Int].map (x => x).getOrElse(0)                                       // 是否需要健康证明
+            detail += "count_classes" -> (js \ "detail" \ "count_classes").asOpt[Int].map (x => x).getOrElse(0)                                       // 是否需要健康证明
             detail += "characteristics" -> (js \ "detail" \ "characteristics").asOpt[List[String]].map (x => x).getOrElse(""::Nil)      // 是否需要健康证明
 
             detail += "other_words" -> (js \ "detail" \ "other_words").asOpt[String].map (x => x).getOrElse("")

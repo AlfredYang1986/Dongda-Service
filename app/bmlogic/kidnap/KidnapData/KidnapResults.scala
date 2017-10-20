@@ -124,6 +124,8 @@ trait KidnapResults {
                 "least_times" -> det.getAs[Number]("least_times").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),
                 "lecture_length" -> det.getAs[Number]("lecture_length").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),
                 "servant_no" -> det.getAs[Number]("servant_no").map (x => toJson(x.intValue)).getOrElse(throw new Exception("service result error")),
+                "health" -> det.getAs[Number]("health").map (x => toJson(x.intValue)).getOrElse(toJson(1)),
+                "count_classes" -> det.getAs[Number]("count_classes").map (x => toJson(x.intValue)).getOrElse(toJson(0)),
                 "other_words" -> det.getAs[String]("other_words").map (x => toJson(x)).getOrElse(throw new Exception("service result error")),
                 "age_boundary" -> toJson(
                     Map(

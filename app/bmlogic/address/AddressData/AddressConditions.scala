@@ -47,7 +47,12 @@ trait AddressConditions {
             lb += "address" -> (js \ "location" \ "address").asOpt[String].map (x => x).getOrElse("")
             lb += "adjust" -> (js \ "location" \ "adjust").asOpt[String].map (x => x).getOrElse("")
             lb += "location_type" -> (js \ "location" \ "location_type").asOpt[String].map (x => x).getOrElse("")
-            lb += "loc_images" -> (js \ "location" \ "loc_images").asOpt[List[Map[String,String]]].map (lst => lst).getOrElse(List(Map("pic" -> "","tag" -> "")))
+            lb += "loc_images" -> (js \ "location" \ "loc_images").asOpt[List[JsValue]].map {tmp => tmp.map { x =>
+            val loc_images_obj = MongoDBObject.newBuilder
+                loc_images_obj += "pic" -> (x \ "pic").asOpt[String].getOrElse("")
+                loc_images_obj += "tag" -> (x \ "tag").asOpt[String].getOrElse("")
+                loc_images_obj.result
+            }}.getOrElse(MongoDBList.newBuilder.result)
 
             builder += "location" -> lb.result
         }
