@@ -72,11 +72,12 @@ trait KidnapConditions {
         {
             val detail = MongoDBObject.newBuilder
 
-            detail += "price" -> (js \ "detail" \ "price").asOpt[Int].map (tmp => tmp).getOrElse(0)   // 单位为分
+            // detail += "price" -> (js \ "detail" \ "price").asOpt[Int].map (tmp => tmp).getOrElse(0)   // 单位为分
             detail += "price_arr" -> (js \ "detail" \ "price_arr").asOpt[List[JsValue]].map {tmp => tmp.map { x =>
                 val price_obj = MongoDBObject.newBuilder
                 price_obj += "price_type" -> (x \ "price_type").asOpt[Int].getOrElse(0)
                 price_obj += "price" -> (x \ "price").asOpt[Int].getOrElse(0)
+                detail += "price" -> (js \ "detail" \ "price").asOpt[Int].map (tmp => tmp).getOrElse((x \ "price").asOpt[Int].getOrElse(8888))   // 单位为分
                 price_obj.result
             }}.getOrElse(MongoDBList.newBuilder.result)                                       // 单位价格类型，默认小时
             detail += "facility" -> (js \ "detail" \ "facility").asOpt[List[String]].map (x => x).getOrElse(MongoDBList.newBuilder.result)
@@ -92,9 +93,9 @@ trait KidnapConditions {
             detail += "age_boundary" -> age_boundary.result
 
             detail += "capacity" -> (js \ "detail" \ "capacity").asOpt[Int].map (tmp => tmp).getOrElse(0.intValue)                      // 可容纳多少还是，现在没用
-            detail += "least_hours" -> (js \ "detail" \ "least_hours").asOpt[Int].map (x => x).getOrElse(0)                             // 至少预定时长，现阶段和运营跟不上也没用
+            detail += "least_hours" -> (js \ "detail" \ "least_hours").asOpt[Int].map (x => x).getOrElse(1)                             // 至少预定时长，现阶段和运营跟不上也没用
             detail += "allow_leaves" -> (js \ "detail" \ "allow_leaves").asOpt[Int].map (x => x).getOrElse(0)                           // 纯显示，属于后期完善提醒功能
-            detail += "least_times" -> (js \ "detail" \ "least_times").asOpt[Int].map (x => x).getOrElse(0)                             // 至少预定次数
+            detail += "least_times" -> (js \ "detail" \ "least_times").asOpt[Int].map (x => x).getOrElse(1)                             // 至少预定次数
             detail += "lecture_length" -> (js \ "detail" \ "lecture_length").asOpt[Int].map (x => x).getOrElse(0)                       // 单位为分
             detail += "servant_no" -> (js \ "detail" \ "servant_no").asOpt[Int].map (x => x).getOrElse(1)                               // 课程老师人数, 牵强信息
             detail += "health" -> (js \ "detail" \ "health").asOpt[Int].map (x => x).getOrElse(0)                                       // 是否需要健康证明
