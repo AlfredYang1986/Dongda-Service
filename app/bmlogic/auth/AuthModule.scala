@@ -138,7 +138,8 @@ object AuthModule extends ModuleTrait with AuthData {
 
             val user = pr.get.get("user").get
             val date = new Date().getTime
-            val result = toJson(user.as[JsObject].value.toMap + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
+//            val result = toJson(user.as[JsObject].value.toMap + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
+            val result = toJson(user.as[JsObject].value.toMap + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24 * 7))) // token 默认七天过期
             val auth_token = att.encrypt2Token(result)
 //            val tt = att.decrypt2JsValue(auth_token)
 

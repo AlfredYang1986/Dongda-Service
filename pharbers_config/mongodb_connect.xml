@@ -1,9 +1,9 @@
 <pharbers-modules>
     <mongodb-connect>
         <server_host value="localhost" />
-        <server_port value="27017" />
+        <server_port value="2017" />
         <connect_name value="" />
         <connect_pwd value="" />
-        <conn_name value="baby_time_test" />
+        <conn_name value="baby_tt" />
     </mongodb-connect>
 </pharbers-modules>
