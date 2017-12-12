@@ -5,6 +5,7 @@ import java.util.Date
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 import AuthMessage._
+import akka.actor.ActorSystem
 import com.pharbers.token.AuthTokenTrait
 import com.pharbers.cliTraits.DBTrait
 import bmlogic.auth.AuthData.AuthData
@@ -16,8 +17,17 @@ import com.pharbers.ErrorCode
 
 import scala.collection.immutable.Map
 import com.mongodb.casbah.Imports._
+import com.pharbers.baseModules.PharbersInjectModule
+import com.pharbers.driver.redis.phRedisDriver
+import com.pharbers.xmpp.DDNTrait
 
-object AuthModule extends ModuleTrait with AuthData {
+object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
+
+    override val id: String = "token-config"
+    override val configPath: String = "pharbers_config/magic_numbers_config.xml"
+    override val md = "token_expire" :: Nil
+
+    val token_expire = config.mc.find(p => p._1 == "token_expire").get._2.toString.toInt        //Default expired_time in configuration
 
 	def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_AuthLogin(data) => authLogin(data)
@@ -25,8 +35,8 @@ object AuthModule extends ModuleTrait with AuthData {
         case msg_AuthTokenParser(data) => authTokenParser(data)
 
         case msg_CheckTokenExpire(data) => checkAuthTokenExpire(data)(pr)
-        case msg_AuthTokenIsExpired(data) => AuthTokenIsExpired(data)(pr)
-        case msg_GenerateToken() => generateToken(pr)
+        case msg_AuthTokenIsExpired(data) => authTokenIsExpired(data)(pr)
+        case msg_GenerateToken() => setToken2Redis(pr)
 
 		case _ => ???
 	}
@@ -34,8 +44,6 @@ object AuthModule extends ModuleTrait with AuthData {
     def authLogin(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-
             val auth_phone = (data \ "phone").asOpt[String].map (x => x).getOrElse("")
             val third_uid = (data \ "third" \ "provide_uid").asOpt[String].map (x => x).getOrElse("")
 
@@ -43,7 +51,6 @@ object AuthModule extends ModuleTrait with AuthData {
 
             val date = new Date().getTime
             val o : DBObject = data
-
             val seed = auth_phone + third_uid + Sercurity.getTimeSpanWithMillSeconds
 
             o += "user_id" -> Sercurity.md5Hash(seed)
@@ -55,13 +62,10 @@ object AuthModule extends ModuleTrait with AuthData {
             db.queryObject(only_condition, "users") match {
                 case None => {
                     db.insertObject(o, "users", "user_id")
-//                    val result = toJson(o - "date" + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
-//                    val auth_token = att.encrypt2Token(toJson(result))
                     val reVal = toJson(o - "date")
                     (Some(Map("user" -> reVal)), None)
                 }
                 case Some(one) => {
-                    // throw new Exception("user already exist")
                     val reVal = toJson(one - "date")
                     (Some(Map("user" -> reVal)), None)
                 }
@@ -88,10 +92,11 @@ object AuthModule extends ModuleTrait with AuthData {
 
     def authTokenParser(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-
-            val auth_token = (data \ "token").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
-            val auth = att.decrypt2JsValue(auth_token)
+            val redisDriver = phRedisDriver().commonDriver
+            val access_token = (data \ "token").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
+            val redis_map = redisDriver.hgetall1(access_token).getOrElse(Map("expired" -> "1"))
+            val auth_map2 = redis_map.map(x => (x._1 -> toJson(x._2)))
+            val auth = toJson(auth_map2)
             (Some(Map("auth" -> auth)), None)
 
         } catch {
@@ -105,24 +110,24 @@ object AuthModule extends ModuleTrait with AuthData {
 
         try {
             val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
-            val expire_in = (auth \ "expire_in").asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
+            val expired = (auth \ "expired").asOpt[String].map (x => x.toInt).getOrElse(throw new Exception("token parse expired error"))
 
-            if (new Date().getTime > expire_in) throw new Exception("token expired")
+            if (expired == 1) throw new Exception("token expired")
             else (pr, None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
-    def AuthTokenIsExpired(data : JsValue)
-                            (pr : Option[Map[String, JsValue]])
-                            (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+    def authTokenIsExpired(data : JsValue)
+                          (pr : Option[Map[String, JsValue]])
+                          (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
             val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
-            val expire_in = (auth \ "expire_in").asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
+            val expired = (auth \ "expired").asOpt[Int].map (x => x).getOrElse(throw new Exception("token parse error"))
 
-            if (new Date().getTime > expire_in) {
+            if (expired == 1) {
                 (Some(Map("isExpired" -> toJson(1))), None)
             } else (Some(Map("isExpired" -> toJson(0))), None)
         } catch {
@@ -130,22 +135,46 @@ object AuthModule extends ModuleTrait with AuthData {
         }
     }
 
-    def generateToken(pr : Option[Map[String, JsValue]])
+    def setToken2Redis(pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-
             val user = pr.get.get("user").get
             val date = new Date().getTime
-            val result = toJson(user.as[JsObject].value.toMap + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
-            val auth_token = att.encrypt2Token(result)
-//            val tt = att.decrypt2JsValue(auth_token)
+            val user_id = (user \ "user_id").asOpt[String].getOrElse(throw new Exception("no user_id"))
+            val accessToken = s"bearer${user_id}"
 
-            (Some(Map("user" -> user, "auth_token" -> toJson(auth_token))), None)
+            val redisDriver = phRedisDriver().commonDriver
+            val user_map = user.as[JsObject].value.toMap + ("last_update_time" -> toJson(date)) + ("expired" -> toJson(0))
+            val new_cdi = (user \ "current_device_id").asOpt[String].getOrElse("")
+            redisDriver.hget(accessToken, "current_device_id") match {
+                case None => println("This user is generate new token to Redis!")
+                case cdi: Option[String] => {
+                    println(s"This user has old token in Redis! The old cdi is ${cdi.get}")
+                    if (new_cdi != cdi.get) forceOffline(user_id)
+                }
+            }
+
+            m2r(user_map).foreach(x => redisDriver.hset(accessToken, x._1, x._2))
+            redisDriver.expire(accessToken, token_expire)
+            (Some(Map("user" -> user, "auth_token" -> toJson(accessToken))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def forceOffline(user_id: String) (implicit cm : CommonModules) = {
+
+        try {
+            val ddn = cm.modules.get.get("ddn").map (x => x.asInstanceOf[DDNTrait]).getOrElse(throw new Exception("no db connection"))
+            implicit  val as = cm.modules.get.get("as").map (x => x.asInstanceOf[ActorSystem]).getOrElse(throw new Exception("no db connection"))
+            val jsValue = ddn.forceOffline(user_id)(as)
+            val result = (jsValue \ "data" \ "result").asOpt[Boolean].getOrElse(throw new Exception("http get failed"))
+            if (!result) throw new Exception(s"force offline failed!")
+            println("Force offline succeed!")
+        } catch {
+            case ex : Exception => ex.printStackTrace()
         }
     }
 }

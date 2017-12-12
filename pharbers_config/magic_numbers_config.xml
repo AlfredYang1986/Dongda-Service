@@ -1,0 +1,6 @@
+<pharbers-modules>
+    <token-config>
+        <!--Default expire in 24h-->
+        <token_expire value="86400" />
+    </token-config>
+</pharbers-modules>
