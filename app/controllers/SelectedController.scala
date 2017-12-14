@@ -15,11 +15,12 @@ import com.pharbers.bmpattern.LogMessage.msg_log
 import com.pharbers.bmpattern.ParallelMessage
 import com.pharbers.bmpattern.ResultMessage.msg_CommonResultMessage
 import com.pharbers.cliTraits.DBTrait
+import com.pharbers.driver.util.PhRedisTrait
 import com.pharbers.token.AuthTokenTrait
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, Controller}
 
-class SelectedController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait) extends Controller {
+class SelectedController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, prt : PhRedisTrait) extends Controller {
     implicit val as = as_inject
 
     def pushSelectedService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
@@ -29,7 +30,7 @@ class SelectedController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_KidnapDetail(jv):: msg_KidnapFinalDetail(jv)
             :: msg_PushSelectedService(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
     def popSelectedService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
@@ -38,14 +39,14 @@ class SelectedController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop selected service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_PopSelectedService(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
     def searchSelectedService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.kidnap.KidnapModule.serviceResultMerge
-        implicit val cm = (CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+        implicit val cm = (CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search selected service"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_QuerySelectedService(jv)

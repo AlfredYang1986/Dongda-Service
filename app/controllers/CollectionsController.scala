@@ -17,10 +17,11 @@ import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
 import com.pharbers.bmpattern.ParallelMessage
 import com.pharbers.bmpattern.ResultMessage.msg_CommonResultMessage
+import com.pharbers.driver.util.PhRedisTrait
 import play.api.libs.json.Json.toJson
 import play.api.mvc.Action
 
-class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait) {
+class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, prt : PhRedisTrait) {
     implicit val as = as_inject
 
     def pushCollection = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
@@ -29,7 +30,7 @@ class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push collection"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_CollectionPush(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
     def popCollection = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
@@ -38,7 +39,7 @@ class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop collection"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_CollectionPop(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
     def queryUserCollections = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
@@ -47,7 +48,7 @@ class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("user collections"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_QueryUserCollections(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
     def queryCollectedUser = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
@@ -56,13 +57,13 @@ class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("collected users"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_QueryCollectedUsers(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
     def queryUserCollectedServices = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
-        implicit val cm = (CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+        implicit val cm = (CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("user collections"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_QueryUserCollections(jv)

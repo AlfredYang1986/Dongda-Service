@@ -16,19 +16,20 @@ import com.pharbers.bmpattern.LogMessage.msg_log
 import com.pharbers.bmpattern.ParallelMessage
 import com.pharbers.bmpattern.ResultMessage.msg_CommonResultMessage
 import com.pharbers.cliTraits.DBTrait
+import com.pharbers.driver.util.PhRedisTrait
 import com.pharbers.token.AuthTokenTrait
 import com.pharbers.xmpp.DDNTrait
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
 
-class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, ddn : DDNTrait) extends Controller {
+class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, ddn : DDNTrait, prt : PhRedisTrait) extends Controller {
     implicit val as = as_inject
 
     def pushOrder = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.AcitionType._
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_posted)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt, "as" -> as, "ddn" -> ddn, "action" -> al_posted)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("push order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_KidnapDetail(jv) :: msg_OrderPush(jv) :: msg_OrderDateLstPush(jv)
@@ -42,14 +43,14 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderPop(jv) :: msg_OrderDateLstPop(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
     def detailOrder = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.order.OrderModule.detailOrderResultMerge
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("detail order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderDetail(jv)
@@ -66,7 +67,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.order.OrderModule.searchOrderResultMerge
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search orders"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderSearch(jv)
@@ -84,7 +85,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("query multiple orders"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderQueryMulti(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
     def updateOrder = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
@@ -93,14 +94,14 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("update order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderUpdate(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
     def acceptOrder = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.AcitionType._
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_accepted)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt, "as" -> as, "ddn" -> ddn, "action" -> al_accepted)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("accept order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderAccept(jv) :: msg_OrderChangedNotify(jv)
@@ -111,7 +112,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.AcitionType._
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_rejected)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt, "as" -> as, "ddn" -> ddn, "action" -> al_rejected)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("reject order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderReject(jv) :: msg_OrderChangedNotify(jv)
@@ -122,7 +123,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.AcitionType._
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_cancel)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt, "as" -> as, "ddn" -> ddn, "action" -> al_cancel)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("cancel order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderCancel(jv) :: msg_OrderChangedNotify(jv)
@@ -133,7 +134,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.AcitionType._
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_done)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt, "as" -> as, "ddn" -> ddn, "action" -> al_done)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("acomplish order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderAccomplish(jv) :: msg_OrderChangedNotify(jv)
@@ -143,7 +144,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
     def prepayOrder = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt, "as" -> as)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("prepay order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderPrepay(jv) :: msg_OrderUpdate(jv)
@@ -154,7 +155,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.AcitionType._
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att, "as" -> as, "ddn" -> ddn, "action" -> al_paid)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt, "as" -> as, "ddn" -> ddn, "action" -> al_paid)))
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("pay order"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_OrderPay(jv) :: msg_OrderChangedNotify(jv)
@@ -166,7 +167,7 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         import com.pharbers.bmpattern.ResultMessage.common_result
         import bmlogic.order.OrderModule.multiOrderResultMerge
         import bmlogic.orderDate.OrderDateModule.orderDateResultMerge
-        implicit val cm = CommonModules(Some(Map("db" -> dbt, "att" -> att)))
+        implicit val cm = CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt)))
 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("lst orders date"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
@@ -193,6 +194,6 @@ class OrderController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("refactor split"))), jv)
           :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
           :: msg_OrderRefactorSplit(jv)
-          :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+          :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 }
