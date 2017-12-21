@@ -90,3 +90,19 @@ POST    /al/selected/search                     controllers.SelectedController.s
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
+
+# New Dongda database operation below
+# 首页
+POST    /al/homepage/service                        controllers.ServiceController.homePageServices
+
+# brand 品牌相关
+POST    /al/brand/search                        controllers.BrandController.searchBrands
+POST    /al/brand/service                       controllers.BrandController.searchBrandService
+
+# location 场地相关
+POST    /al/location/search                     controllers.LocationController.searchLocations
+POST    /al/location/service                    controllers.LocationController.searchLocationService
+
+# service 服务相关
+POST    /al/service/search                      controllers.ServiceController.searchServices
+
