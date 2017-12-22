@@ -93,16 +93,17 @@ GET     /assets/*file               			controllers.Assets.at(path="/public", fil
 
 # New Dongda database operation below
 # 首页
-POST    /al/homepage/service                        controllers.ServiceController.homePageServices
+POST    /al/homepage/service                    controllers.ServiceController.homePageServices
 
 # brand 品牌相关
 POST    /al/brand/search                        controllers.BrandController.searchBrands
-POST    /al/brand/service                       controllers.BrandController.searchBrandService
+POST    /al/brand/service                       controllers.BrandController.brandServiceBinding
 
 # location 场地相关
 POST    /al/location/search                     controllers.LocationController.searchLocations
-POST    /al/location/service                    controllers.LocationController.searchLocationService
+POST    /al/location/service                    controllers.LocationController.locationServiceBinding
 
 # service 服务相关
 POST    /al/service/search                      controllers.ServiceController.searchServices
+POST    /al/service/detail                      controllers.ServiceController.serviceDetail
 

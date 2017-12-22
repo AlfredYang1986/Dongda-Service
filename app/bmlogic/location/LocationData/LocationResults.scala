@@ -21,7 +21,7 @@ trait LocationResults {
         )
     }
 
-    implicit val slsr : DBObject => Map[String, JsValue] = { obj =>
+    implicit val lsbr : DBObject => Map[String, JsValue] = { obj =>
         Map(
             "location_id" -> toJson(obj.get("location_id").asInstanceOf[ObjectId].toString),
             "service_id" -> toJson(obj.get("service_id").asInstanceOf[ObjectId].toString)

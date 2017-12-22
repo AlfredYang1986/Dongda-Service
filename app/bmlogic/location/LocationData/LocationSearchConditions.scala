@@ -15,9 +15,16 @@ trait LocationSearchConditions {
         builder.result
     }
 
-    implicit val slsc : JsValue => DBObject = { js =>
+    implicit val lsbc : JsValue => DBObject = { js =>
         val builder = MongoDBObject.newBuilder
         (js \ "location_id").asOpt[String].map (x => builder += "location_id" -> new ObjectId(x)).getOrElse(Unit)
+        (js \ "service_id").asOpt[String].map (x => builder += "service_id" -> new ObjectId(x)).getOrElse(Unit)
+        builder.result
+    }
+
+    implicit val sslc : JsValue => DBObject = { js =>
+        val builder = MongoDBObject.newBuilder
+        (js \ "location_id").asOpt[String].map (x => builder += "_id" -> new ObjectId(x)).getOrElse(Unit)
         builder.result
     }
 }

@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import akka.actor.ActorSystem
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
-import bmlogic.brand.BrandMessage.{msg_BrandSearch, msg_BrandSearchService}
+import bmlogic.brand.BrandMessage.{msg_BrandSearch, msg_BrandServiceBinding}
 import bmlogic.common.requestArgsQuery
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
@@ -27,12 +27,12 @@ class BrandController @Inject ()(as_inject : ActorSystem, dbt : DBTrait, att : A
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
-    def searchBrandService = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+    def brandServiceBinding = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search brand"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_BrandSearch(jv) :: msg_BrandSearchService(jv)
+            :: msg_BrandSearch(jv) :: msg_BrandServiceBinding(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 

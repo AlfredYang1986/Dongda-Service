@@ -10,5 +10,6 @@ abstract class msg_ServiceCommand extends CommonMessage(cat = "service", mt = Se
 
 object ServiceMessage {
     case class msg_ServiceSearch(data : JsValue) extends msg_ServiceCommand
-    case class msg_ServiceHome(data : JsValue) extends msg_ServiceCommand
+    case class msg_ServiceDetail(data : JsValue) extends msg_ServiceCommand
+    case class msg_HomeServices(data : JsValue) extends msg_ServiceCommand
 }

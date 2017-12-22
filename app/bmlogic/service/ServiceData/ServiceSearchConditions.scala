@@ -21,7 +21,14 @@ trait ServiceSearchConditions {
         (js \ "condition" \ "service_type").asOpt[String].map (x => builder += "service_type" -> x).getOrElse(Unit)
         (js \ "condition" \ "service_tags").asOpt[String].map (x => builder += "service_tags" -> x).getOrElse(Unit)
         (js \ "condition" \ "service_leaf").asOpt[String].map (x => builder += "service_leaf" -> x).getOrElse(Unit)
+        (js \ "condition" \ "operation").asOpt[String].map (x => builder += "operation" -> x).getOrElse(Unit)
 
+        builder.result
+    }
+
+    implicit val sdc : JsValue => DBObject = { js =>
+        val builder = MongoDBObject.newBuilder
+        (js \ "condition" \ "service_id").asOpt[String].map (x => builder += "_id" -> new ObjectId(x)).getOrElse(throw new Exception("input error"))
         builder.result
     }
 

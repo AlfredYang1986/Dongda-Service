@@ -4,10 +4,10 @@ import javax.inject.Inject
 
 import akka.actor.ActorSystem
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
-import bmlogic.brand.BrandMessage.{msg_BrandSearch, msg_BrandSearchService}
+import bmlogic.brand.BrandMessage._
 import bmlogic.common.requestArgsQuery
-import bmlogic.location.LocationMessage.{msg_LocationSearch, msg_LocationSearchService}
-import bmlogic.service.ServiceMessage.{msg_ServiceHome, msg_ServiceSearch}
+import bmlogic.location.LocationMessage._
+import bmlogic.service.ServiceMessage.{msg_HomeServices, msg_ServiceDetail, msg_ServiceSearch}
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
 import com.pharbers.bmpattern.ParallelMessage
@@ -30,18 +30,33 @@ class ServiceController @Inject ()(as_inject : ActorSystem, dbt : DBTrait, att :
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             ::
             ParallelMessage(
-                MessageRoutes(msg_BrandSearch(jv) :: msg_BrandSearchService(jv) :: Nil, None) ::
-                MessageRoutes(msg_LocationSearch(jv) :: msg_LocationSearchService(jv) :: Nil, None) :: Nil, serviceConditionMerge)
+                MessageRoutes(msg_BrandSearch(jv) :: msg_BrandServiceBinding(jv) :: Nil, None) ::
+                MessageRoutes(msg_LocationSearch(jv) :: msg_LocationServiceBinding(jv) :: Nil, None) :: Nil, serviceConditionMerge)
             :: msg_ServiceSearch(jv)
+            :: msg_LocationServiceBinding(jv) :: msg_SearchServiceLocation(jv)
+            :: msg_BrandServiceBinding(jv) :: msg_SearchServiceBrand(jv)
             :: msg_CommonResultMessage() :: Nil, None)
     })
 
     def homePageServices = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import com.pharbers.bmpattern.LogMessage.common_log
         import com.pharbers.bmpattern.ResultMessage.common_result
-        MessageRoutes(msg_log(toJson(Map("method" -> toJson("search brand"))), jv)
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("search homepage services"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_ServiceHome(jv)
+            :: msg_HomeServices(jv)
+            :: msg_HomeLocationServiceBinding(jv) :: msg_HomeSearchServiceLocation(jv)
+            :: msg_HomeBrandServiceBinding(jv) :: msg_HomeSearchServiceBrand(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
+    })
+
+    def serviceDetail = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("search homepage services"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_ServiceDetail(jv)
+            :: msg_LocationServiceBinding(jv) :: msg_SearchServiceLocation(jv)
+            :: msg_BrandServiceBinding(jv) :: msg_SearchServiceBrand(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 

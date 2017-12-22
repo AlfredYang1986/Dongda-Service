@@ -17,7 +17,7 @@ trait BrandResults {
         )
     }
 
-    implicit val sbsr : DBObject => Map[String, JsValue] = { obj =>
+    implicit val bsbr : DBObject => Map[String, JsValue] = { obj =>
         Map(
             "brand_id" -> toJson(obj.get("brand_id").asInstanceOf[ObjectId].toString),
             "service_id" -> toJson(obj.get("service_id").asInstanceOf[ObjectId].toString)

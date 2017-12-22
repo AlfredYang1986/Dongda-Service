@@ -2,7 +2,7 @@ package bmlogic.service
 
 import bmlogic.common.mergestepresult.{MergeParallelResult, MergeStepResult}
 import bmlogic.service.ServiceData.{ServiceResults, ServiceSearchConditions}
-import bmlogic.service.ServiceMessage.{msg_ServiceHome, msg_ServiceSearch}
+import bmlogic.service.ServiceMessage.{msg_HomeServices, msg_ServiceDetail, msg_ServiceSearch}
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.cliTraits.DBTrait
@@ -17,7 +17,8 @@ import play.api.libs.json.Json.toJson
 object ServiceModule extends ModuleTrait {
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_ServiceSearch(data) => searchService(data)(pr)
-        case msg_ServiceHome(data) => homePageServices(data)
+        case msg_ServiceDetail(data) => serviceDetail(data)(pr)
+        case msg_HomeServices(data) => homePageServices(data)
 
     }
 
@@ -58,25 +59,50 @@ object ServiceModule extends ModuleTrait {
         }
     }
 
+    def serviceDetail(data : JsValue)
+                     (pr : Option[Map[String, JsValue]])
+                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.sdc
+            import inner_traits.sdr
+
+            val o : DBObject = data
+            println(s"serviceDetail.o=${o}")
+            val reVal = db.queryObject(o, "services").get :: Nil
+
+            (Some(Map("services" -> toJson(reVal)
+            )), None)
+        } catch {
+            case ex : Exception => println(s"serviceDetail.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
     def homePageServices(data : JsValue)
                    (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-            val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
-            val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(3) //  首页默认每个类别展示3个服务
-
             import inner_traits.ssr
 
-            var result : Map[String, JsValue] = Map.empty
+            val service_type_lmap = (data \ "condition" \ "service_type_list").asOpt[List[Map[String, JsValue]]].map(x => x).
+                getOrElse(List(
+                    Map("service_type" -> toJson("看顾"), "count" -> toJson(6)),
+                    Map("service_type" -> toJson("科学"), "count" -> toJson(4)),
+                    Map("service_type" -> toJson("运动"), "count" -> toJson(4)),
+                    Map("service_type" -> toJson("艺术"), "count" -> toJson(4))
+                ))   //  首页默认展示此四类服务
 
-            val service_type_lst = (data \ "condition" \ "service_type").asOpt[List[String]].map(x => x).getOrElse(List("看顾","科学","运动","艺术"))   //  首页默认展示此四类服务
-            service_type_lst.foreach { service_type =>
-                val reVal_tmp = db.queryMultipleObject(DBObject("service_type" -> service_type), "services", skip = skip, take = take)
-                result += (service_type -> toJson(reVal_tmp))
+            val reVal = service_type_lmap.map { service_type_map =>
+                val service_type = service_type_map.get("service_type").get.asOpt[String].get
+                val dbo = DBObject("service_type" -> service_type)
+                val reVal_tmp = db.queryMultipleObject(dbo, "services", take = service_type_map.get("count").get.asOpt[Int].get)
+                val count = db.queryCount(dbo, "services").get
+                service_type_map + ("totalCount" -> toJson(count)) + ("services" -> toJson(reVal_tmp))
             }
 
-            (Some(result), None)
+            (Some(Map("homepage_services" -> toJson(reVal))), None)
         } catch {
             case ex : Exception => println(s"homePageServices.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }

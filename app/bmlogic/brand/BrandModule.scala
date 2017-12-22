@@ -1,7 +1,7 @@
 package bmlogic.brand
 
 import bmlogic.brand.BrandData.{BrandResults, BrandSearchConditions}
-import bmlogic.brand.BrandMessage.{msg_BrandSearch, msg_BrandSearchService}
+import bmlogic.brand.BrandMessage._
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.cliTraits.DBTrait
@@ -18,7 +18,10 @@ object BrandModule extends ModuleTrait {
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
 
         case msg_BrandSearch(data) => searchBrand(data)
-        case msg_BrandSearchService(data) => searchBrandService(data)(pr)
+        case msg_BrandServiceBinding(data) => brandServiceBinding(data)(pr)
+        case msg_SearchServiceBrand(data) => searchServiceBrand(data)(pr)
+        case msg_HomeBrandServiceBinding(data) => homeBrandServiceBinding(data)(pr)
+        case msg_HomeSearchServiceBrand(data) => homeSearchServiceBrand(data)(pr)
 
     }
 
@@ -46,30 +49,124 @@ object BrandModule extends ModuleTrait {
         }
     }
 
-    def searchBrandService(data : JsValue)
-                   (pr : Option[Map[String, JsValue]])
-                   (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+    def brandServiceBinding(data : JsValue)
+                           (pr : Option[Map[String, JsValue]])
+                           (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
 
-            val brands = pr.get.get("brands").get.asOpt[List[JsValue]].getOrElse(throw new Exception("search brands input error"))
-            val hasBrandCondition = pr.get.get("hasBrandCondition").get.asOpt[Int].getOrElse(throw new Exception("search brands input error"))
+            import inner_traits.bsbc
+            import inner_traits.bsbr
 
-            import inner_traits.sbsc
-            import inner_traits.sbsr
+            val services = pr.get.get("services").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
+            val brands = pr.get.get("brands").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
+            var reVal : List[Map[String, JsValue]] = List.empty
+            var result : List[Map[String, JsValue]] = List.empty
+            var hasBrandCondition = 0
 
-            val reVal = if (hasBrandCondition == 0) List.empty else brands.map{ x =>
-                val o : DBObject = x
-                db.queryMultipleObject(o, "brand_service", skip = skip, take = take)
-            }.flatMap(x => x)
+            if (services.nonEmpty){
+                result = services.map{x =>
+                    val o : DBObject = x
+                    val r = db.queryObject(o, "brand_service")
+                    x.asOpt[Map[String, JsValue]].get + ("brand_id" -> r.get.get("brand_id").get)
+                }
+            }
 
-            (Some(Map("brand_service" -> toJson(reVal), "hasBrandCondition" -> toJson(hasBrandCondition)
+            if (brands.nonEmpty){
+                hasBrandCondition = pr.get.get("hasBrandCondition").get.asOpt[Int].getOrElse(throw new Exception("search brands input error"))
+                reVal = if (hasBrandCondition == 0) List.empty else brands.map{ x =>
+                    val o : DBObject = x
+                    db.queryMultipleObject(o, "brand_service", skip = skip, take = take)
+                }.flatMap(x => x)
+            }
+
+            (Some(Map("services" -> toJson(result), "brand_service" -> toJson(reVal), "hasBrandCondition" -> toJson(hasBrandCondition)
             )), None)
         } catch {
             case ex : Exception => println(s"searchBrandService.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def searchServiceBrand(data : JsValue)
+                             (pr : Option[Map[String, JsValue]])
+                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.ssbc
+            import inner_traits.sbr
+            val services = pr.get.get("services").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
+            var result : List[Map[String, JsValue]] = List.empty
+            if (services.nonEmpty){
+                result = services.map{x =>
+                    val o : DBObject = x
+                    val r = db.queryObject(o, "brands")
+                    x.asOpt[Map[String, JsValue]].get + ("brand" -> toJson(r.get)) - "brand_id"
+                }
+            }
+            (Some(Map("services" -> toJson(result)
+            )), None)
+        } catch {
+            case ex : Exception => println(s"searchServiceBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def homeBrandServiceBinding(data : JsValue)
+                                  (pr : Option[Map[String, JsValue]])
+                                  (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.bsbc
+            import inner_traits.bsbr
+            val homepage_services = pr.get.get("homepage_services").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
+            var result : List[Map[String, JsValue]] = List.empty
+            if (homepage_services.nonEmpty){
+                result = homepage_services.map{ hs_one =>
+                    val services = (hs_one \ "services").asOpt[List[JsValue]].getOrElse(List.empty)
+                    val services_r = services.map{ s =>
+                        val o : DBObject = s
+                        val r = db.queryObject(o, "brand_service")
+                        s.asOpt[Map[String, JsValue]].get + ("brand_id" -> r.get.get("brand_id").get)
+                    }
+                    hs_one.asOpt[Map[String, JsValue]].get + ("services" -> toJson(services_r))
+                }
+            }
+            (Some(Map("homepage_services" -> toJson(result)
+            )), None)
+        } catch {
+            case ex : Exception => println(s"homeBrandServiceBinding.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def homeSearchServiceBrand(data : JsValue)
+                                 (pr : Option[Map[String, JsValue]])
+                                 (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.ssbc
+            import inner_traits.sbr
+            val homepage_services = pr.get.get("homepage_services").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
+            var result : List[Map[String, JsValue]] = List.empty
+            if (homepage_services.nonEmpty){
+                result = homepage_services.map{ hs_one =>
+                    val services = (hs_one \ "services").asOpt[List[JsValue]].getOrElse(List.empty)
+                    val services_r = services.map{ s =>
+                        val o : DBObject = s
+                        val r = db.queryObject(o, "brands")
+                        s.asOpt[Map[String, JsValue]].get + ("brands" -> toJson(r.get))
+                    }
+                    hs_one.asOpt[Map[String, JsValue]].get + ("services" -> toJson(services_r))
+                }
+            }
+            (Some(Map("homepage_services" -> toJson(result)
+            )), None)
+        } catch {
+            case ex : Exception => println(s"homeSearchServiceBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }
