@@ -18,6 +18,7 @@ object LocationModule extends ModuleTrait {
         case msg_LocationSearch(data) => searchLocation(data)
         case msg_LocationServiceBinding(data) => locationServiceBinding(data)(pr)
         case msg_SearchServiceLocation(data) => searchServiceLocation(data)(pr)
+        case msg_SearchServiceLocationDetail(data) => searchServiceLocationDetail(data)(pr)
         case msg_HomeLocationServiceBinding(data) => homeLocationServiceBinding(data)(pr)
         case msg_HomeSearchServiceLocation(data) => homeSearchServiceLocation(data)(pr)
     }
@@ -34,7 +35,7 @@ object LocationModule extends ModuleTrait {
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
 
             import inner_traits.slc
-            import inner_traits.slr
+            import inner_traits.sldr
             val o : DBObject = data
             val hasLocationCondition = if (o.toMap.size() == 0) 0 else 1
             val reVal = db.queryMultipleObject(o, "locations", skip = skip, take = take)
@@ -101,6 +102,30 @@ object LocationModule extends ModuleTrait {
                 result = services.map{x =>
                     val o : DBObject = x
                     val r = db.queryObject(o, "locations")
+                    x.asOpt[Map[String, JsValue]].get ++ r.get
+                }
+            }
+            (Some(Map("services" -> toJson(result)
+            )), None)
+        } catch {
+            case ex : Exception => println(s"searchLocationService.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def searchServiceLocationDetail(data : JsValue)
+                              (pr : Option[Map[String, JsValue]])
+                              (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.sslc
+            import inner_traits.sldr
+            val services = pr.get.get("services").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
+            var result : List[Map[String, JsValue]] = List.empty
+            if (services.nonEmpty){
+                result = services.map{x =>
+                    val o : DBObject = x
+                    val r = db.queryObject(o, "locations")
                     x.asOpt[Map[String, JsValue]].get + ("location" -> toJson(r.get)) - "location_id"
                 }
             }
@@ -146,7 +171,7 @@ object LocationModule extends ModuleTrait {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             import inner_traits.sslc
-            import inner_traits.slr
+            import inner_traits.hsslr
             val homepage_services = pr.get.get("homepage_services").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
             var result : List[Map[String, JsValue]] = List.empty
             if (homepage_services.nonEmpty){
@@ -155,7 +180,7 @@ object LocationModule extends ModuleTrait {
                     val services_r = services.map{ s =>
                         val o : DBObject = s
                         val r = db.queryObject(o, "locations")
-                        s.asOpt[Map[String, JsValue]].get + ("location" -> toJson(r.get))
+                        s.asOpt[Map[String, JsValue]].get ++ r.get
                     }
                     hs_one.asOpt[Map[String, JsValue]].get + ("services" -> toJson(services_r))
                 }

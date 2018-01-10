@@ -18,6 +18,7 @@ trait ServiceSearchConditions {
         } else {
             service_id_lst.filterNot(x => x == "").map(s => builder += "_id" -> new ObjectId(s))
         }
+        (js \ "condition" \ "category").asOpt[String].map (x => builder += "category" -> x).getOrElse(Unit)
         (js \ "condition" \ "service_type").asOpt[String].map (x => builder += "service_type" -> x).getOrElse(Unit)
         (js \ "condition" \ "service_tags").asOpt[String].map (x => builder += "service_tags" -> x).getOrElse(Unit)
         (js \ "condition" \ "service_leaf").asOpt[String].map (x => builder += "service_leaf" -> x).getOrElse(Unit)

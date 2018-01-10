@@ -12,6 +12,7 @@ object LocationMessage {
     case class msg_LocationSearch(data : JsValue) extends msg_LocationCommand
     case class msg_LocationServiceBinding(data : JsValue) extends msg_LocationCommand
     case class msg_SearchServiceLocation(data : JsValue) extends msg_LocationCommand
+    case class msg_SearchServiceLocationDetail(data : JsValue) extends msg_LocationCommand
     case class msg_HomeLocationServiceBinding(data : JsValue) extends msg_LocationCommand
     case class msg_HomeSearchServiceLocation(data : JsValue) extends msg_LocationCommand
 }

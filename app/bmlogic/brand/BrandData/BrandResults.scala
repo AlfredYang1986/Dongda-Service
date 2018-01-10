@@ -10,10 +10,22 @@ import play.api.libs.json.Json.toJson
 trait BrandResults {
     implicit val sbr : DBObject => Map[String, JsValue] = { obj =>
         Map(
+            "brand_name" -> toJson(obj.get("brand_name").asInstanceOf[String])
+        )
+    }
+
+    implicit val sbdr : DBObject => Map[String, JsValue] = { obj =>
+        Map(
             "brand_id" -> toJson(obj.get("_id").asInstanceOf[ObjectId].toString),
             "brand_name" -> toJson(obj.get("brand_name").asInstanceOf[String]),
             "brand_tag" -> toJson(obj.get("brand_tag").asInstanceOf[String]),
-            "about_brand" -> toJson(obj.get("about_brand").asInstanceOf[String])
+            "about_brand" -> toJson(obj.get("about_brand").asInstanceOf[String].replaceAll("\\n", ""))
+        )
+    }
+
+    implicit val hssbr : DBObject => Map[String, JsValue] = { obj =>
+        Map(
+            "brand_name" -> toJson(obj.get("brand_name").asInstanceOf[String])
         )
     }
 

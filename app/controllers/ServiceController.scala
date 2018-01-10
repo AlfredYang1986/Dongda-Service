@@ -55,8 +55,8 @@ class ServiceController @Inject ()(as_inject : ActorSystem, dbt : DBTrait, att :
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search homepage services"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_ServiceDetail(jv)
-            :: msg_LocationServiceBinding(jv) :: msg_SearchServiceLocation(jv)
-            :: msg_BrandServiceBinding(jv) :: msg_SearchServiceBrand(jv)
+            :: msg_LocationServiceBinding(jv) :: msg_SearchServiceLocationDetail(jv)
+            :: msg_BrandServiceBinding(jv) :: msg_SearchServiceBrandDetail(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 

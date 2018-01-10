@@ -10,8 +10,10 @@ abstract class msg_BrandCommand extends CommonMessage(cat = "brand", mt = BrandM
 
 object BrandMessage {
     case class msg_BrandSearch(data : JsValue) extends msg_BrandCommand
+    case class msg_BrandDetail(data : JsValue) extends msg_BrandCommand
     case class msg_BrandServiceBinding(data : JsValue) extends msg_BrandCommand
     case class msg_SearchServiceBrand(data : JsValue) extends msg_BrandCommand
+    case class msg_SearchServiceBrandDetail(data : JsValue) extends msg_BrandCommand
     case class msg_HomeBrandServiceBinding(data : JsValue) extends msg_BrandCommand
     case class msg_HomeSearchServiceBrand(data : JsValue) extends msg_BrandCommand
 }

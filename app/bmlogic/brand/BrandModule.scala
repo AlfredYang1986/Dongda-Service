@@ -18,8 +18,10 @@ object BrandModule extends ModuleTrait {
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
 
         case msg_BrandSearch(data) => searchBrand(data)
+        case msg_BrandDetail(data) => brandDetail(data)
         case msg_BrandServiceBinding(data) => brandServiceBinding(data)(pr)
         case msg_SearchServiceBrand(data) => searchServiceBrand(data)(pr)
+        case msg_SearchServiceBrandDetail(data) => searchServiceBrandDetail(data)(pr)
         case msg_HomeBrandServiceBinding(data) => homeBrandServiceBinding(data)(pr)
         case msg_HomeSearchServiceBrand(data) => homeSearchServiceBrand(data)(pr)
 
@@ -37,7 +39,7 @@ object BrandModule extends ModuleTrait {
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
 
             import inner_traits.sbc
-            import inner_traits.sbr
+            import inner_traits.sbdr
             val o : DBObject = data
             val hasBrandCondition = if (o.toMap.size() == 0) 0 else 1
             val reVal = db.queryMultipleObject(o, "brands", skip = skip, take = take)
@@ -46,6 +48,22 @@ object BrandModule extends ModuleTrait {
             )), None)
         } catch {
             case ex : Exception => println(s"searchBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def brandDetail(data : JsValue)
+                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.sbc
+            import inner_traits.sbdr
+            val o : DBObject = data
+            val reVal = db.queryObject(o, "brands")
+
+            (Some(Map("brand" -> toJson(reVal.get))), None)
+        } catch {
+            case ex : Exception => println(s"brandDetail.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
@@ -104,10 +122,34 @@ object BrandModule extends ModuleTrait {
                 result = services.map{x =>
                     val o : DBObject = x
                     val r = db.queryObject(o, "brands")
-                    x.asOpt[Map[String, JsValue]].get + ("brand" -> toJson(r.get)) - "brand_id"
+                    x.asOpt[Map[String, JsValue]].get ++ r.get
                 }
             }
             (Some(Map("services" -> toJson(result)
+            )), None)
+        } catch {
+            case ex : Exception => println(s"searchServiceBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def searchServiceBrandDetail(data : JsValue)
+                             (pr : Option[Map[String, JsValue]])
+                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.ssbc
+            import inner_traits.sbdr
+            val services = pr.get.get("services").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
+            var result : List[Map[String, JsValue]] = List.empty
+            if (services.nonEmpty){
+                result = services.map{x =>
+                    val o : DBObject = x
+                    val r = db.queryObject(o, "brands")
+                    x.asOpt[Map[String, JsValue]].get + ("brand" -> toJson(r.get)) - "brand_id"
+                }
+            }
+            (Some(Map("service" -> toJson(result.head)
             )), None)
         } catch {
             case ex : Exception => println(s"searchServiceBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -149,7 +191,7 @@ object BrandModule extends ModuleTrait {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             import inner_traits.ssbc
-            import inner_traits.sbr
+            import inner_traits.hssbr
             val homepage_services = pr.get.get("homepage_services").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
             var result : List[Map[String, JsValue]] = List.empty
             if (homepage_services.nonEmpty){
@@ -158,7 +200,7 @@ object BrandModule extends ModuleTrait {
                     val services_r = services.map{ s =>
                         val o : DBObject = s
                         val r = db.queryObject(o, "brands")
-                        s.asOpt[Map[String, JsValue]].get + ("brands" -> toJson(r.get))
+                        s.asOpt[Map[String, JsValue]].get ++ r.get
                     }
                     hs_one.asOpt[Map[String, JsValue]].get + ("services" -> toJson(services_r))
                 }

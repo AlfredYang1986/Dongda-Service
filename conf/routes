@@ -97,6 +97,7 @@ POST    /al/homepage/service                    controllers.ServiceController.ho
 
 # brand 品牌相关
 POST    /al/brand/search                        controllers.BrandController.searchBrands
+POST    /al/brand/detail                        controllers.BrandController.brandDetail
 POST    /al/brand/service                       controllers.BrandController.brandServiceBinding
 
 # location 场地相关

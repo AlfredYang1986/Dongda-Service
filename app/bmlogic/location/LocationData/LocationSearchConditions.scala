@@ -1,6 +1,6 @@
 package bmlogic.location.LocationData
 
-import com.mongodb.casbah.Imports.{DBObject, MongoDBObject, ObjectId}
+import com.mongodb.casbah.Imports.{$and, DBObject, MongoDBList, MongoDBObject, ObjectId}
 import play.api.libs.json.JsValue
 
 /**
@@ -10,9 +10,30 @@ trait LocationSearchConditions {
     implicit val slc : JsValue => DBObject = { js =>
         val builder = MongoDBObject.newBuilder
         (js \ "condition" \ "location_id").asOpt[String].map (x => builder += "_id" -> new ObjectId(x)).getOrElse(Unit)
-        (js \ "condition" \ "location").asOpt[String].map (x => builder += "location" -> x).getOrElse(Unit)
+        (js \ "condition" \ "address").asOpt[String].map (x => builder += "address" -> x).getOrElse(Unit)
         (js \ "condition" \ "friendliness").asOpt[String].map (x => builder += "friendliness" -> x).getOrElse(Unit)
-        builder.result
+
+        val pin_condition =
+            (js \ "condition" \ "pin").asOpt[JsValue].map { pin =>
+                val lat = (pin \ "latitude").asOpt[Float].map(x => x).getOrElse(throw new Exception("search service input error"))
+                val log = (pin \ "longitude").asOpt[Float].map(x => x).getOrElse(throw new Exception("search service input error"))
+                val tmp = MongoDBObject(
+                    "location.pin" -> MongoDBObject(
+                        "$nearSphere" -> MongoDBObject(
+                            "type" -> "Point",
+                            "coordinates" -> MongoDBList(log, lat)
+                        ),
+                        "$maxDistance" -> 5000))
+                Some(tmp)
+            }.getOrElse(None)
+
+        (Some(builder.result) ::
+            pin_condition :: Nil).filterNot(_ == None).map (_.get) match {
+            case Nil => DBObject()
+            case head :: Nil => head
+            case lst : List[DBObject] => $and(lst)
+        }
+
     }
 
     implicit val lsbc : JsValue => DBObject = { js =>

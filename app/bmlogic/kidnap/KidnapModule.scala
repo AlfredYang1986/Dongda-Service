@@ -62,8 +62,10 @@ object KidnapModule extends ModuleTrait {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
+            println(s"pushService.data=${data}")
             import inner_traits.pc
             val o : DBObject = data
+            println(s"pushService.o=${o}")
             db.insertObject(o, "kidnap", "service_id")
 
             val service = (data \ "service").get
@@ -80,7 +82,7 @@ object KidnapModule extends ModuleTrait {
             )), None)
 
         } catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"pushService.ex=${ex}"); (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 

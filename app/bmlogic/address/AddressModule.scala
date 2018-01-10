@@ -80,7 +80,7 @@ object AddressModule extends ModuleTrait {
             }
 
         } catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"pushAddress.ex=${ex}"); (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 

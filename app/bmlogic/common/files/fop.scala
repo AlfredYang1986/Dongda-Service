@@ -15,7 +15,7 @@ import play.api.libs.json.JsValue
 object fop {
 	def uploadFile(data : MultipartFormData[TemporaryFile]) : JsValue = {
 	  	data.file("upload").map { x =>
-            Files.TemporaryFile(x.ref.file).moveTo(new File("upload/" + x.filename), true)
+            Files.TemporaryFile(x.ref.file).moveTo(new File("images/" + x.filename), true)
 
 			Json.toJson(Map("status" -> toJson("ok"),
                             "file_name" -> toJson(x.filename),
@@ -27,7 +27,7 @@ object fop {
 	}
 
 	def downloadFile(name : String) : Array[Byte] = {
-	  	val file = new File("upload/" + name)
+	  	val file = new File("images/" + name)
 		val reVal : Array[Byte] = new Array[Byte](file.length.intValue)
 		new FileInputStream(file).read(reVal)
 		reVal
