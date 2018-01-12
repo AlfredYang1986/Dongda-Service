@@ -13,20 +13,22 @@ import bmlogic.emxmpp.EMMessages.msg_RegisterEMUser
 import com.pharbers.bmmessages._
 import com.pharbers.bmpattern.LogMessage.msg_log
 import com.pharbers.bmpattern.ResultMessage.msg_CommonResultMessage
+import com.pharbers.driver.util.PhRedisTrait
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
 
-class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, ddn : DDNTrait) extends Controller {
+class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, ddn : DDNTrait, prt : PhRedisTrait) extends Controller {
     implicit val as = as_inject
 
     def authLogin = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
             import com.pharbers.bmpattern.LogMessage.common_log
             import com.pharbers.bmpattern.ResultMessage.common_result
             MessageRoutes(msg_log(toJson(Map("method" -> toJson("dongda login"))), jv)
-                :: msg_AuthLogin(jv) :: msg_RegisterEMUser(jv) :: msg_GenerateToken()
+                :: msg_AuthLogin(jv) :: msg_RegisterEMUser(jv)
+                :: msg_ForceOfflineOrNot() :: msg_GenerateToken()
                 :: msg_CommonResultMessage() :: Nil, None)(
                 CommonModules(Some(Map(
-                    "db" -> dbt, "att" -> att,
+                     "db" -> dbt, "att" -> att, "prt" -> prt,
                     "ddn" -> ddn, "as" -> as))))
         })
 
@@ -35,10 +37,11 @@ class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : A
             import com.pharbers.bmpattern.ResultMessage.common_result
             MessageRoutes(msg_log(toJson(Map("method" -> toJson("dongda login phone code"))), jv)
                 :: msg_CheckSMSCode(jv)
-                :: msg_AuthLogin(jv) :: msg_RegisterEMUser(jv) :: msg_GenerateToken()
+                :: msg_AuthLogin(jv) :: msg_RegisterEMUser(jv)
+                :: msg_ForceOfflineOrNot() :: msg_GenerateToken()
                 :: msg_CommonResultMessage() :: Nil, None)(
                 CommonModules(Some(Map(
-                    "db" -> dbt, "att" -> att,
+                     "db" -> dbt, "att" -> att, "prt" -> prt,
                     "ddn" -> ddn, "as" -> as))))
         })
 
@@ -46,10 +49,11 @@ class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : A
             import com.pharbers.bmpattern.LogMessage.common_log
             import com.pharbers.bmpattern.ResultMessage.common_result
             MessageRoutes(msg_log(toJson(Map("method" -> toJson("dongda login phone code"))), jv)
-                :: msg_AuthLogin(jv) :: msg_RegisterEMUser(jv) :: msg_GenerateToken()
+                :: msg_AuthLogin(jv) :: msg_RegisterEMUser(jv)
+                :: msg_ForceOfflineOrNot() :: msg_GenerateToken()
                 :: msg_CommonResultMessage() :: Nil, None)(
                 CommonModules(Some(Map(
-                    "db" -> dbt, "att" -> att,
+                     "db" -> dbt, "att" -> att, "prt" -> prt,
                     "ddn" -> ddn, "as" -> as))))
         })
 
@@ -58,6 +62,6 @@ class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : A
         import com.pharbers.bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("auth token is expire"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_AuthTokenIsExpired(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 }

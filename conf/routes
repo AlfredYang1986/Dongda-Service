@@ -14,36 +14,36 @@ POST    /al/profile/update                      controllers.ProfileController.up
 POST    /al/profile/lst                         controllers.ProfileController.lstProfile
 
 # kidnap 用户服务相关功能
-POST    /al/kidnap/push                         controllers.KidnapController.pushService
-POST    /al/kidnap/pop                          controllers.KidnapController.popService
-POST    /al/kidnap/detail                       controllers.KidnapController.detailService
-POST    /al/kidnap/search                       controllers.KidnapController.searchService
-POST    /al/kidnap/multi                        controllers.KidnapController.multiQueryService
-POST    /al/kidnap/update                       controllers.KidnapController.updateService
+#POST    /al/kidnap/push                         controllers.KidnapController.pushService
+#POST    /al/kidnap/pop                          controllers.KidnapController.popService
+#POST    /al/kidnap/detail                       controllers.KidnapController.detailService
+#POST    /al/kidnap/search                       controllers.KidnapController.searchService
+#POST    /al/kidnap/multi                        controllers.KidnapController.multiQueryService
+#POST    /al/kidnap/update                       controllers.KidnapController.updateService
 
 # 拆分kidnap数据库抽去location独立为address数据表
-POST    /al/kidnap/refactor/split               controllers.KidnapController.refactorSplit
+#POST    /al/kidnap/refactor/split               controllers.KidnapController.refactorSplit
 
 # 在order表中添加【单位时间价格（看顾-小时/日/月；课程-单次/学期）】
-POST    /al/order/refactor/split                controllers.OrderController.refactorSplit
+#POST    /al/order/refactor/split                controllers.OrderController.refactorSplit
 
 # order 相关功能
-POST    /al/order/push                          controllers.OrderController.pushOrder
-POST    /al/order/pop                           controllers.OrderController.popOrder
-POST    /al/order/detail                        controllers.OrderController.detailOrder
-POST    /al/order/search                        controllers.OrderController.searchOrders
-POST    /al/order/multi                         controllers.OrderController.queryMultiOrders
-POST    /al/order/update                        controllers.OrderController.updateOrder
-
-POST    /al/order/accept                        controllers.OrderController.acceptOrder
-POST    /al/order/reject                        controllers.OrderController.rejectOrder
-POST    /al/order/cancel                        controllers.OrderController.cancelOrder
-POST    /al/order/accomplish                    controllers.OrderController.accomplishOrder
-POST    /al/order/paid                          controllers.OrderController.paidOrder
-
-POST    /al/order/prepay                        controllers.OrderController.prepayOrder
-
-POST    /al/order/date/lst                      controllers.OrderController.lstOrdersDateSorted
+#POST    /al/order/push                          controllers.OrderController.pushOrder
+#POST    /al/order/pop                           controllers.OrderController.popOrder
+#POST    /al/order/detail                        controllers.OrderController.detailOrder
+#POST    /al/order/search                        controllers.OrderController.searchOrders
+#POST    /al/order/multi                         controllers.OrderController.queryMultiOrders
+#POST    /al/order/update                        controllers.OrderController.updateOrder
+#
+#POST    /al/order/accept                        controllers.OrderController.acceptOrder
+#POST    /al/order/reject                        controllers.OrderController.rejectOrder
+#POST    /al/order/cancel                        controllers.OrderController.cancelOrder
+#POST    /al/order/accomplish                    controllers.OrderController.accomplishOrder
+#POST    /al/order/paid                          controllers.OrderController.paidOrder
+#
+#POST    /al/order/prepay                        controllers.OrderController.prepayOrder
+#
+#POST    /al/order/date/lst                      controllers.OrderController.lstOrdersDateSorted
 
 # auth 用户授权 End Point (详情参考概要设计，@Alfred)
 # 这个是直接登陆，后面去掉不要直接调用
@@ -61,10 +61,10 @@ POST	/alipay/callback						controllers.AlipayController.alipaycallback
 POST	/alipay/redirect						controllers.AlipayController.redirecturi
 
 # time manage 相关
-POST    /al/tm/push                             controllers.TimemanagerController.pushTM
-POST    /al/tm/query                            controllers.TimemanagerController.detailTM
-POST    /al/tm/pop                              controllers.TimemanagerController.popTM
-POST    /al/tm/update                           controllers.TimemanagerController.updateTM
+#POST    /al/tm/push                             controllers.TimemanagerController.pushTM
+#POST    /al/tm/query                            controllers.TimemanagerController.detailTM
+#POST    /al/tm/pop                              controllers.TimemanagerController.popTM
+#POST    /al/tm/update                           controllers.TimemanagerController.updateTM
 
 # address manage 相关
 POST    /al/address/push                        controllers.AddressController.pushAddress
@@ -73,20 +73,38 @@ POST    /al/address/update                      controllers.AddressController.up
 POST    /al/address/detail                      controllers.AddressController.detailAddress
 
 # collection 用户收藏相关
-POST    /al/collections/push                    controllers.CollectionsController.pushCollection
-POST    /al/collections/pop                     controllers.CollectionsController.popCollection
-POST    /al/user/collections                    controllers.CollectionsController.queryUserCollections
-POST    /al/collected/users                     controllers.CollectionsController.queryCollectedUser
-
-POST    /al/user/collected/services             controllers.CollectionsController.queryUserCollectedServices
+#POST    /al/collections/push                    controllers.CollectionsController.pushCollection
+#POST    /al/collections/pop                     controllers.CollectionsController.popCollection
+#POST    /al/user/collections                    controllers.CollectionsController.queryUserCollections
+#POST    /al/collected/users                     controllers.CollectionsController.queryCollectedUser
+#
+#POST    /al/user/collected/services             controllers.CollectionsController.queryUserCollectedServices
 
 # 邮件发送相关
 POST    /al/email/privacy                       controllers.emailController.sendEmail
 
 # Dongda严选热门相关
-POST    /al/selected/push                       controllers.SelectedController.pushSelectedService
-POST    /al/selected/pop                        controllers.SelectedController.popSelectedService
-POST    /al/selected/search                     controllers.SelectedController.searchSelectedService
+#POST    /al/selected/push                       controllers.SelectedController.pushSelectedService
+#POST    /al/selected/pop                        controllers.SelectedController.popSelectedService
+#POST    /al/selected/search                     controllers.SelectedController.searchSelectedService
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
+
+# New Dongda database operation below
+# 首页
+POST    /al/homepage/service                    controllers.ServiceController.homePageServices
+
+# brand 品牌相关
+POST    /al/brand/search                        controllers.BrandController.searchBrands
+POST    /al/brand/detail                        controllers.BrandController.brandDetail
+POST    /al/brand/service                       controllers.BrandController.brandServiceBinding
+
+# location 场地相关
+POST    /al/location/search                     controllers.LocationController.searchLocations
+POST    /al/location/service                    controllers.LocationController.locationServiceBinding
+
+# service 服务相关
+POST    /al/service/search                      controllers.ServiceController.searchServices
+POST    /al/service/detail                      controllers.ServiceController.serviceDetail
+

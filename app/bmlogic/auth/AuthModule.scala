@@ -6,7 +6,6 @@ import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 import AuthMessage._
 import akka.actor.ActorSystem
-import com.pharbers.token.AuthTokenTrait
 import com.pharbers.cliTraits.DBTrait
 import bmlogic.auth.AuthData.AuthData
 import bmlogic.common.sercurity.Sercurity
@@ -18,7 +17,7 @@ import com.pharbers.ErrorCode
 import scala.collection.immutable.Map
 import com.mongodb.casbah.Imports._
 import com.pharbers.baseModules.PharbersInjectModule
-import com.pharbers.driver.redis.phRedisDriver
+import com.pharbers.driver.util.PhRedisTrait
 import com.pharbers.xmpp.DDNTrait
 
 object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
@@ -36,6 +35,8 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
 
         case msg_CheckTokenExpire(data) => checkAuthTokenExpire(data)(pr)
         case msg_AuthTokenIsExpired(data) => authTokenIsExpired(data)(pr)
+
+        case msg_ForceOfflineOrNot() => forceOfflineUser(pr)
         case msg_GenerateToken() => setToken2Redis(pr)
 
 		case _ => ???
@@ -92,11 +93,11 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
 
     def authTokenParser(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val redisDriver = phRedisDriver().commonDriver
+            val prt = cm.modules.get.get("prt").map (x => x.asInstanceOf[PhRedisTrait]).getOrElse(throw new Exception("no redis connection"))
             val access_token = (data \ "token").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
-            val redis_map = redisDriver.hgetall1(access_token).getOrElse(Map("expired" -> "1"))
-            val auth_map2 = redis_map.map(x => (x._1 -> toJson(x._2)))
-            val auth = toJson(auth_map2)
+
+            val redis_map = if (prt.exsits(access_token)) prt.getMapAllValue(access_token) else Map("expired" -> "1")
+            val auth = toJson(redis_map.map(x => (x._1 -> toJson(x._2))))
             (Some(Map("auth" -> auth)), None)
 
         } catch {
@@ -135,28 +136,39 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
         }
     }
 
+    def forceOfflineUser(pr : Option[Map[String, JsValue]])
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val prt = cm.modules.get.get("prt").map (x => x.asInstanceOf[PhRedisTrait]).getOrElse(throw new Exception("no redis connection"))
+            val user = pr.get.get("user").get
+            val user_id = (user \ "user_id").asOpt[String].getOrElse(throw new Exception("no user_id"))
+            val new_cdi = (user \ "current_device_id").asOpt[String].getOrElse("")
+            val accessToken = s"bearer${user_id}"
+
+            if (prt.exsits(accessToken)) {
+                val old_cdi = prt.getMapValue(accessToken, "current_device_id")
+                if (new_cdi != old_cdi) forceOffline(user_id)
+            }
+            (pr, None)
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
     def setToken2Redis(pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val user = pr.get.get("user").get
+
+            val prt = cm.modules.get.get("prt").map (x => x.asInstanceOf[PhRedisTrait]).getOrElse(throw new Exception("no redis connection"))
             val date = new Date().getTime
+            val user = pr.get.get("user").get
             val user_id = (user \ "user_id").asOpt[String].getOrElse(throw new Exception("no user_id"))
             val accessToken = s"bearer${user_id}"
-
-            val redisDriver = phRedisDriver().commonDriver
             val user_map = user.as[JsObject].value.toMap + ("last_update_time" -> toJson(date)) + ("expired" -> toJson(0))
-            val new_cdi = (user \ "current_device_id").asOpt[String].getOrElse("")
-            redisDriver.hget(accessToken, "current_device_id") match {
-                case None => println("This user is generate new token to Redis!")
-                case cdi: Option[String] => {
-                    println(s"This user has old token in Redis! The old cdi is ${cdi.get}")
-                    if (new_cdi != cdi.get) forceOffline(user_id)
-                }
-            }
-
-            m2r(user_map).foreach(x => redisDriver.hset(accessToken, x._1, x._2))
-            redisDriver.expire(accessToken, token_expire)
+            prt.addMap(accessToken, m2r(user_map))
+            prt.expire(accessToken, token_expire)
             (Some(Map("user" -> user, "auth_token" -> toJson(accessToken))), None)
 
         } catch {

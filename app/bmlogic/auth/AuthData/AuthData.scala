@@ -68,7 +68,7 @@ trait AuthData {
         )
     }
 
-    implicit val m2r: Map[String, JsValue] => Map[String, Any] = { obj =>
+    implicit val m2r: Map[String, JsValue] => Map[Any, Any] = { obj =>
         val date = new Date().getTime
         Map(
             "user_id" -> obj.get("user_id").map(x => x.asOpt[String].get).getOrElse(""),
@@ -80,21 +80,6 @@ trait AuthData {
             "expired" -> obj.get("expired").map(x => x.asOpt[Int].get).getOrElse(0),
             "is_service_provider" -> obj.get("is_service_provider").map(x => x.asOpt[Int].get).getOrElse(0),
             "has_auth_phone" -> obj.get("has_auth_phone").map(x => x.asOpt[Int].get).getOrElse(0)
-        )
-    }
-
-    implicit val r2m: Map[String, String] => Map[String, JsValue] = { obj =>
-        val date = new Date().getTime
-        Map(
-            "user_id" -> toJson(obj.get("user_id").map(x => x).getOrElse("")),
-            "current_device_type" -> toJson(obj.get("current_device_type").map(x => x).getOrElse("")),
-            "current_device_id" -> toJson(obj.get("current_device_id").map(x => x).getOrElse("")),
-            "last_update_time" -> toJson(obj.get("last_update_time").map(x => x.toLong).getOrElse(date)),
-            "screen_name" -> toJson(obj.get("screen_name").map(x => x).getOrElse("")),
-            "screen_photo" -> toJson(obj.get("screen_photo").map(x => x).getOrElse("")),
-            "expired" -> toJson(obj.get("expired").map(x => x.toInt).getOrElse(0)),
-            "is_service_provider" -> toJson(obj.get("is_service_provider").map(x => x.toInt).getOrElse(0)),
-            "has_auth_phone" -> toJson(obj.get("has_auth_phone").map(x => x.toInt).getOrElse(0))
         )
     }
 
