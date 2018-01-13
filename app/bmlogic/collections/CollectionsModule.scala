@@ -312,7 +312,7 @@ object CollectionsModule extends ModuleTrait {
             val reVal = services.map { x =>
                 val iter = x.as[JsObject].value.toMap
                 val service_id = iter.get("service_id").get.asOpt[String].get
-                println(user_collections.contains(service_id))
+//                println(user_collections.contains(service_id))
                 toJson(
                     iter + ("is_collected" -> toJson(user_collections.contains(service_id)))
                 )
