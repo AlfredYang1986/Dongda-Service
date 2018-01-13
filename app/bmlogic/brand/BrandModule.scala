@@ -118,14 +118,17 @@ object BrandModule extends ModuleTrait {
             import inner_traits.sbr
             val services = pr.get.get("services").map(x => x.asOpt[List[JsValue]].get).getOrElse(List.empty)
             var result : List[Map[String, JsValue]] = List.empty
-            if (services.nonEmpty){
+
+            if (services.nonEmpty) {
                 result = services.map{x =>
                     val o : DBObject = x
                     val r = db.queryObject(o, "brands")
                     x.asOpt[Map[String, JsValue]].get ++ r.get
                 }
             }
-            (Some(Map("services" -> toJson(result)
+
+            (Some(Map(
+                "services" -> toJson(result)
             )), None)
         } catch {
             case ex : Exception => println(s"searchServiceBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))

@@ -18,6 +18,7 @@ object CollectionsModule extends ModuleTrait {
         case msg_QueryCollectedUsers(data) => queryCollectedUsers(data)
         case msg_QueryUserCollections(data) => queryUserCollections(data)
         case msg_QueryIsCollected(data) => queryIsCollected(data)(pr)
+        case msg_QueryIsCollectedLst(data) => queryIsCollectedLst(data)(pr)
         case msg_UserCollectionsServices(data) => userCollectionServices(data)(pr)
         case _ => ???
     }
@@ -238,6 +239,43 @@ object CollectionsModule extends ModuleTrait {
                     service + ("is_collected" -> toJson(reVal))
                 )
             )), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def queryIsCollectedLst(data : JsValue)
+                           (pr : Option[Map[String, JsValue]])
+                           (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val js = MergeStepResult(data, pr)
+
+            val services = (js \ "services").asOpt[List[JsValue]].get
+
+            import inner_trait.dc
+            import inner_trait.drbu
+            val o : DBObject = data
+
+            val user_collections = db.queryObject(o, "user_service").map { x =>
+                x.get("services").get.asOpt[List[String]].get
+            }.getOrElse(Nil)
+
+            val reVal = services.map { x =>
+                val iter = x.as[JsObject].value.toMap
+                val service_id = iter.get("service_id").get.asOpt[String].get
+                toJson(
+                    iter + ("is_collected" -> toJson(user_collections.contains(service_id)))
+                )
+            }
+
+            (Some(Map(
+                "services" -> toJson(reVal)
+            )), None)
+
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

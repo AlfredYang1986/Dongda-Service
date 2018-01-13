@@ -23,6 +23,7 @@ trait ServiceSearchConditions {
         (js \ "condition" \ "service_tags").asOpt[String].map (x => builder += "service_tags" -> x).getOrElse(Unit)
         (js \ "condition" \ "service_leaf").asOpt[String].map (x => builder += "service_leaf" -> x).getOrElse(Unit)
         (js \ "condition" \ "operation").asOpt[String].map (x => builder += "operation" -> x).getOrElse(Unit)
+        (js \ "condition" \ "album").asOpt[String].map (x => builder += "album" -> x).getOrElse(Unit)
 
         builder.result
     }
