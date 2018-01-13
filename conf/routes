@@ -31,11 +31,11 @@ GET     /query/downloadFile/:name               controllers.FopController.downlo
 #POST    /al/address/detail                      controllers.AddressController.detailAddress
 
 # collection 用户收藏相关
-#POST    /al/collections/push                    controllers.CollectionsController.pushCollection
-#POST    /al/collections/pop                     controllers.CollectionsController.popCollection
+POST    /al/collections/push                    controllers.CollectionsController.pushCollection
+POST    /al/collections/pop                     controllers.CollectionsController.popCollection
 #POST    /al/user/collections                    controllers.CollectionsController.queryUserCollections
 #POST    /al/collected/users                     controllers.CollectionsController.queryCollectedUser
-#
+
 #POST    /al/user/collected/services             controllers.CollectionsController.queryUserCollectedServices
 
 # 邮件发送相关

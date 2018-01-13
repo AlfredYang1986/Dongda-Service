@@ -108,7 +108,7 @@ object ServiceModule extends ModuleTrait {
     }
 
     def serviceConditionMerge(lst : List[Map[String, JsValue]])
-                          (pr : Option[Map[String, JsValue]]) : Map[String, JsValue] = {
+                             (pr : Option[Map[String, JsValue]]) : Map[String, JsValue] = {
 
         val para = MergeParallelResult(lst)
 

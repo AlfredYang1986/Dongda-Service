@@ -8,7 +8,7 @@ import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 
 object CollectionsModule extends ModuleTrait {
@@ -31,6 +31,8 @@ object CollectionsModule extends ModuleTrait {
 
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            println(data)
 
             {
                 import inner_trait.pcbu
@@ -215,8 +217,27 @@ object CollectionsModule extends ModuleTrait {
                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            // TODO: 以后补
-            null
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val js = MergeStepResult(data, pr)
+
+            val service = (js \ "service").asOpt[JsValue].get.as[JsObject].value.toMap
+            val service_id = (data \ "condition" \ "service_id").asOpt[String].get
+//            val user_id = (data \ "user_id").asOpt[String].get
+
+            import inner_trait.dc
+            import inner_trait.drbu
+            val o : DBObject = data
+
+            val reVal = db.queryObject(o, "user_service").map { x =>
+                x.get("services").get.asOpt[List[String]].get.contains(service_id)
+            }.getOrElse(false)
+
+            (Some(Map(
+                "service" -> toJson(
+                    service + ("is_collected" -> toJson(reVal))
+                )
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

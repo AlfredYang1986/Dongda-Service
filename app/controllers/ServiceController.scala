@@ -5,6 +5,7 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.brand.BrandMessage._
+import bmlogic.collections.CollectionsMessage.msg_QueryIsCollected
 import bmlogic.common.requestArgsQuery
 import bmlogic.location.LocationMessage._
 import bmlogic.service.ServiceMessage.{msg_HomeServices, msg_ServiceDetail, msg_ServiceSearch}
@@ -57,6 +58,7 @@ class ServiceController @Inject ()(as_inject : ActorSystem, dbt : DBTrait, att :
             :: msg_ServiceDetail(jv)
             :: msg_LocationServiceBinding(jv) :: msg_SearchServiceLocationDetail(jv)
             :: msg_BrandServiceBinding(jv) :: msg_SearchServiceBrandDetail(jv)
+            :: msg_QueryIsCollected(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 

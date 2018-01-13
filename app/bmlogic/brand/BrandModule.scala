@@ -197,7 +197,7 @@ object BrandModule extends ModuleTrait {
             if (homepage_services.nonEmpty){
                 result = homepage_services.map{ hs_one =>
                     val services = (hs_one \ "services").asOpt[List[JsValue]].getOrElse(List.empty)
-                    val services_r = services.map{ s =>
+                    val services_r = services.map { s =>
                         val o : DBObject = s
                         val r = db.queryObject(o, "brands")
                         s.asOpt[Map[String, JsValue]].get ++ r.get

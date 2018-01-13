@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import bmlogic.address.AddressMessage.msg_SearchAddress
+//import bmlogic.address.AddressMessage.msg_SearchAddress
 import com.pharbers.cliTraits.DBTrait
 import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
@@ -24,24 +24,24 @@ import play.api.mvc.Action
 class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, prt : PhRedisTrait) {
     implicit val as = as_inject
 
-//    def pushCollection = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-//        import com.pharbers.bmpattern.LogMessage.common_log
-//        import com.pharbers.bmpattern.ResultMessage.common_result
-//        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push collection"))), jv)
-//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-//            :: msg_CollectionPush(jv)
-//            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
-//    })
-//
-//    def popCollection = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-//        import com.pharbers.bmpattern.LogMessage.common_log
-//        import com.pharbers.bmpattern.ResultMessage.common_result
-//        MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop collection"))), jv)
-//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-//            :: msg_CollectionPop(jv)
-//            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
-//    })
-//
+    def pushCollection = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push collection"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_CollectionPush(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
+    })
+
+    def popCollection = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("pop collection"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_CollectionPop(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
+    })
+
 //    def queryUserCollections = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
 //        import com.pharbers.bmpattern.LogMessage.common_log
 //        import com.pharbers.bmpattern.ResultMessage.common_result
