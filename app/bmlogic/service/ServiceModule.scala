@@ -93,6 +93,9 @@ object ServiceModule extends ModuleTrait {
                     Map("service_type" -> toJson("艺术"), "count" -> toJson(6))
                 ))   //  首页默认展示此四类服务
 
+//            val user_id = (data \ "condition" \"user_id").asOpt[String].get
+//            println(user_id)
+
             val reVal = service_type_lmap.map { service_type_map =>
                 val service_type = service_type_map.get("service_type").get.asOpt[String].get
                 val dbo = DBObject("service_type" -> service_type)

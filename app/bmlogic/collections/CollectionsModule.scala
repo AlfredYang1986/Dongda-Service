@@ -19,6 +19,7 @@ object CollectionsModule extends ModuleTrait {
         case msg_QueryUserCollections(data) => queryUserCollections(data)
         case msg_QueryIsCollected(data) => queryIsCollected(data)(pr)
         case msg_QueryIsCollectedLst(data) => queryIsCollectedLst(data)(pr)
+        case msg_QueryIsCollectedLstInHome(data) => queryIsCollectedLstInHome(data)(pr)
         case msg_UserCollectionsServices(data) => userCollectionServices(data)(pr)
         case _ => ???
     }
@@ -245,6 +246,50 @@ object CollectionsModule extends ModuleTrait {
         }
     }
 
+    def queryIsCollectedLstInHome(data : JsValue)
+                                 (pr : Option[Map[String, JsValue]])
+                                 (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val js = MergeStepResult(data, pr)
+
+            import inner_trait.dc
+            import inner_trait.drbu
+            val o : DBObject = data
+
+            val user_collections = db.queryObject(o, "user_service").map { x =>
+                x.get("services").get.asOpt[List[String]].get
+            }.getOrElse(Nil)
+
+            val homepage_services = (js \ "homepage_services").asOpt[List[JsValue]].get
+
+            val result =
+            if (homepage_services.nonEmpty) {
+                homepage_services.map { hs_one =>
+                    val services = (hs_one \ "services").asOpt[List[JsValue]].getOrElse(List.empty)
+
+                    val reVal = services.map { x =>
+                        val iter = x.as[JsObject].value.toMap
+                        val service_id = iter.get("service_id").get.asOpt[String].get
+//                        println(user_collections.contains(service_id))
+                        toJson(
+                            iter + ("is_collected" -> toJson(user_collections.contains(service_id)))
+                        )
+                    }
+                    toJson(
+                        hs_one.asOpt[Map[String, JsValue]].get + ("services" -> toJson(reVal))
+                    )
+                }
+            } else (Nil)
+            (Some(Map("homepage_services" -> toJson(result))), None)
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
     def queryIsCollectedLst(data : JsValue)
                            (pr : Option[Map[String, JsValue]])
                            (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -267,6 +312,7 @@ object CollectionsModule extends ModuleTrait {
             val reVal = services.map { x =>
                 val iter = x.as[JsObject].value.toMap
                 val service_id = iter.get("service_id").get.asOpt[String].get
+                println(user_collections.contains(service_id))
                 toJson(
                     iter + ("is_collected" -> toJson(user_collections.contains(service_id)))
                 )
