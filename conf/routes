@@ -46,6 +46,8 @@ POST    /al/brand/service                       controllers.BrandController.bran
 POST    /al/location/search                     controllers.LocationController.searchLocations
 POST    /al/location/service                    controllers.LocationController.locationServiceBinding
 
+POST    /al/location/near                       controllers.LocationController.searchNearSphere
+
 # service 服务相关
 POST    /al/service/search                      controllers.ServiceController.searchServices
 POST    /al/service/detail                      controllers.ServiceController.serviceDetail

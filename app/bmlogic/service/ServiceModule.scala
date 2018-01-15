@@ -52,8 +52,7 @@ object ServiceModule extends ModuleTrait {
                 }
             }
 
-            (Some(Map(
-                "services" -> toJson(reVal)
+            (Some(Map("services" -> toJson(reVal)
             )), None)
         } catch {
             case ex : Exception => println(s"searchService.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -143,7 +142,7 @@ object ServiceModule extends ModuleTrait {
 
             (Some(Map("services" -> toJson(reVal))), None)
         } catch {
-            case ex : Exception => println(s"queryMultipleServices.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"homePageServices.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

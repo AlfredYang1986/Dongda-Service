@@ -84,4 +84,10 @@ trait LocationResults {
             "service_id" -> toJson(obj.get("service_id").asInstanceOf[ObjectId].toString)
         )
     }
+
+    implicit val idr : DBObject => Map[String, JsValue] = { obj =>
+        Map(
+            "location_id" -> toJson(obj.getAs[ObjectId]("_id").get.toString)
+        )
+    }
 }

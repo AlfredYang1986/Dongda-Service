@@ -1,5 +1,6 @@
 package bmlogic.location
 
+import bmlogic.common.mergestepresult.MergeStepResult
 import bmlogic.location.LocationData.{LocationResults, LocationSearchConditions}
 import bmlogic.location.LocationMessage._
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
@@ -21,10 +22,13 @@ object LocationModule extends ModuleTrait {
         case msg_SearchServiceLocationDetail(data) => searchServiceLocationDetail(data)(pr)
         case msg_HomeLocationServiceBinding(data) => homeLocationServiceBinding(data)(pr)
         case msg_HomeSearchServiceLocation(data) => homeSearchServiceLocation(data)(pr)
+
+        case msg_LocationNearSphere(data) => locationNearSphere(data)
+        case msg_LocationToService(data) => locationToService(data)(pr)
     }
 
     object inner_traits extends LocationSearchConditions
-        with LocationResults
+                           with LocationResults
 
     def searchLocation(data : JsValue)
                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -32,7 +36,7 @@ object LocationModule extends ModuleTrait {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
-            val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
+            val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(10)
 
             import inner_traits.slc
             import inner_traits.sldr
@@ -40,7 +44,9 @@ object LocationModule extends ModuleTrait {
             val hasLocationCondition = if (o.toMap.size() == 0) 0 else 1
             val reVal = db.queryMultipleObject(o, "locations", skip = skip, take = take)
 
-            (Some(Map("locations" -> toJson(reVal), "hasLocationCondition" -> toJson(hasLocationCondition)
+            (Some(Map(
+                "locations" -> toJson(reVal),
+                "hasLocationCondition" -> toJson(hasLocationCondition)
             )), None)
         } catch {
             case ex : Exception => println(s"searchLocation.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -192,4 +198,54 @@ object LocationModule extends ModuleTrait {
         }
     }
 
+    def locationNearSphere(data : JsValue)
+                          (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
+            val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(10)
+
+            import inner_traits.slc
+            import inner_traits.idr
+            val o : DBObject = data
+
+            val reVal = db.queryMultipleObject(o, "locations", skip = skip, take = take).
+                            map (x => x.get("location_id").get.asOpt[String].get)
+
+            (Some(Map(
+                "locations" -> toJson(reVal)
+            )), None)
+
+        } catch {
+            case ex : Exception => println(s"locationNearSphere.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def locationToService(data : JsValue)
+                         (pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val js = MergeStepResult(data, pr)
+
+            import inner_traits.mqc
+            import inner_traits.lsbr
+            val o : DBObject = js
+
+            val reVal = db.queryMultipleObject(o, "service_location").map { x =>
+                x.get("service_id").get.asOpt[String].get
+            }
+
+            (Some(Map(
+                "services" -> toJson(reVal)
+            )), None)
+
+        } catch {
+            case ex : Exception => println(s"locationNearSphere.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
 }
