@@ -1,6 +1,6 @@
 package bmlogic.service.ServiceData
 
-import com.mongodb.casbah.Imports.{DBObject, MongoDBObject, ObjectId}
+import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 
 /**
@@ -34,4 +34,9 @@ trait ServiceSearchConditions {
         builder.result
     }
 
+    implicit val mdc : JsValue => DBObject = { js =>
+        val lst = (js \ "services").asOpt[List[String]].get
+        if (!lst.isEmpty) $or(lst.map (x => DBObject("_id" -> new ObjectId(x))))
+        else DBObject("fuck" -> "yes")
+    }
 }

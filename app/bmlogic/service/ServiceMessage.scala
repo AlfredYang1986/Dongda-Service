@@ -12,4 +12,5 @@ object ServiceMessage {
     case class msg_ServiceSearch(data : JsValue) extends msg_ServiceCommand
     case class msg_ServiceDetail(data : JsValue) extends msg_ServiceCommand
     case class msg_HomeServices(data : JsValue) extends msg_ServiceCommand
+    case class msg_ServiceQueryMulti(data : JsValue) extends msg_ServiceCommand
 }

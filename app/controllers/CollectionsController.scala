@@ -3,19 +3,16 @@ package controllers
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-//import bmlogic.address.AddressMessage.msg_SearchAddress
+import bmlogic.brand.BrandMessage.{msg_BrandServiceBinding, msg_SearchServiceBrand}
+import bmlogic.location.LocationMessage.{msg_LocationServiceBinding, msg_SearchServiceLocation}
+import bmlogic.service.ServiceMessage.{msg_ServiceQueryMulti}
 import com.pharbers.cliTraits.DBTrait
 import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
 import bmlogic.collections.CollectionsMessage._
 import bmlogic.common.requestArgsQuery
-//import bmlogic.dongdaselectedservice.SelectedServiceMessages.msg_LstServiceSelected
-//import bmlogic.kidnap.KidnapMessage.msg_KidnapMultiQuery
-//import bmlogic.kidnap.KidnapModule.serviceResultMerge
-import bmlogic.profile.ProfileMessage.msg_ProfileMultiQuery
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
-import com.pharbers.bmpattern.ParallelMessage
 import com.pharbers.bmpattern.ResultMessage.msg_CommonResultMessage
 import com.pharbers.driver.util.PhRedisTrait
 import play.api.libs.json.Json.toJson
@@ -42,38 +39,17 @@ class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, 
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 
-//    def queryUserCollections = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-//        import com.pharbers.bmpattern.LogMessage.common_log
-//        import com.pharbers.bmpattern.ResultMessage.common_result
-//        MessageRoutes(msg_log(toJson(Map("method" -> toJson("user collections"))), jv)
-//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-//            :: msg_QueryUserCollections(jv)
-//            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
-//    })
-//
-//    def queryCollectedUser = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-//        import com.pharbers.bmpattern.LogMessage.common_log
-//        import com.pharbers.bmpattern.ResultMessage.common_result
-//        MessageRoutes(msg_log(toJson(Map("method" -> toJson("collected users"))), jv)
-//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-//            :: msg_QueryCollectedUsers(jv)
-//            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
-//    })
-//
-//    def queryUserCollectedServices = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
-//        import com.pharbers.bmpattern.LogMessage.common_log
-//        import com.pharbers.bmpattern.ResultMessage.common_result
-//        implicit val cm = (CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
-//        MessageRoutes(msg_log(toJson(Map("method" -> toJson("user collections"))), jv)
-//            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-//            :: msg_QueryUserCollections(jv)
-//            :: msg_UserCollectionsServices(jv)
-//            :: msg_KidnapMultiQuery(jv) :: msg_SearchAddress(jv)
-//            ::
-//            ParallelMessage(
-//                MessageRoutes(msg_LstServiceSelected(jv) :: Nil, None) ::
-//                MessageRoutes(msg_QueryUserCollections(jv) :: Nil, None) ::
-//                MessageRoutes(msg_ProfileMultiQuery(jv) :: Nil, None) :: Nil, serviceResultMerge)
-//            :: msg_CommonResultMessage() :: Nil, None)
-//    })
+    def queryUserCollectedServices = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        implicit val cm = (CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("user collections"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_UserCollectionsServices(jv)
+            :: msg_ServiceQueryMulti(jv)
+            :: msg_LocationServiceBinding(jv) :: msg_SearchServiceLocation(jv)
+            :: msg_BrandServiceBinding(jv) :: msg_SearchServiceBrand(jv)
+            :: msg_QueryIsCollectedLst(jv)
+            :: msg_CommonResultMessage() :: Nil, None)
+    })
 }

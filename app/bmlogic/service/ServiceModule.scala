@@ -2,7 +2,7 @@ package bmlogic.service
 
 import bmlogic.common.mergestepresult.{MergeParallelResult, MergeStepResult}
 import bmlogic.service.ServiceData.{ServiceResults, ServiceSearchConditions}
-import bmlogic.service.ServiceMessage.{msg_HomeServices, msg_ServiceDetail, msg_ServiceSearch}
+import bmlogic.service.ServiceMessage.{msg_HomeServices, msg_ServiceDetail, msg_ServiceQueryMulti, msg_ServiceSearch}
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.cliTraits.DBTrait
@@ -19,7 +19,7 @@ object ServiceModule extends ModuleTrait {
         case msg_ServiceSearch(data) => searchService(data)(pr)
         case msg_ServiceDetail(data) => serviceDetail(data)(pr)
         case msg_HomeServices(data) => homePageServices(data)
-
+        case msg_ServiceQueryMulti(data) => queryMultipleServices(data)(pr)
     }
 
     object inner_traits extends ServiceSearchConditions
@@ -52,7 +52,8 @@ object ServiceModule extends ModuleTrait {
                 }
             }
 
-            (Some(Map("services" -> toJson(reVal)
+            (Some(Map(
+                "services" -> toJson(reVal)
             )), None)
         } catch {
             case ex : Exception => println(s"searchService.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -79,7 +80,7 @@ object ServiceModule extends ModuleTrait {
     }
 
     def homePageServices(data : JsValue)
-                   (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
@@ -92,9 +93,6 @@ object ServiceModule extends ModuleTrait {
                     Map("service_type" -> toJson("运动"), "count" -> toJson(6)),
                     Map("service_type" -> toJson("艺术"), "count" -> toJson(6))
                 ))   //  首页默认展示此四类服务
-
-//            val user_id = (data \ "condition" \"user_id").asOpt[String].get
-//            println(user_id)
 
             val reVal = service_type_lmap.map { service_type_map =>
                 val service_type = service_type_map.get("service_type").get.asOpt[String].get
@@ -127,5 +125,25 @@ object ServiceModule extends ModuleTrait {
         val hasOtherCondition = if(hasBrandCondition == 0 && hasLocationCondition == 0) 0 else 1
 
         Map("other_conditions" -> toJson(conditions.toList), "hasOtherCondition" -> toJson(hasOtherCondition))
+    }
+
+    def queryMultipleServices(data : JsValue)
+                             (pr : Option[Map[String, JsValue]])
+                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val js = MergeStepResult(data, pr)
+
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_traits.mdc
+            import inner_traits.ssr
+            val o : DBObject = js
+
+            val reVal = db.queryMultipleObject(o, "services")
+
+            (Some(Map("services" -> toJson(reVal))), None)
+        } catch {
+            case ex : Exception => println(s"queryMultipleServices.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
     }
 }

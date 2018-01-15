@@ -20,7 +20,8 @@ object CollectionsModule extends ModuleTrait {
         case msg_QueryIsCollected(data) => queryIsCollected(data)(pr)
         case msg_QueryIsCollectedLst(data) => queryIsCollectedLst(data)(pr)
         case msg_QueryIsCollectedLstInHome(data) => queryIsCollectedLstInHome(data)(pr)
-        case msg_UserCollectionsServices(data) => userCollectionServices(data)(pr)
+//        case msg_UserCollectionsServices(data) => userCollectionServices(data)(pr)
+        case msg_UserCollectionsServices(data) => userCollectionServices2(data)//(pr)
         case _ => ???
     }
 
@@ -33,8 +34,6 @@ object CollectionsModule extends ModuleTrait {
 
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-
-            println(data)
 
             {
                 import inner_trait.pcbu
@@ -322,6 +321,30 @@ object CollectionsModule extends ModuleTrait {
                 "services" -> toJson(reVal)
             )), None)
 
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def userCollectionServices2(data : JsValue)
+                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            import inner_trait.dc
+            import inner_trait.drbu
+            val o : DBObject = data
+
+            val tmp = db.queryObject(o, "user_service")
+            val reVal = tmp.map { x =>
+                x.get("services").get.asOpt[List[String]].get
+            }.getOrElse(Nil)
+
+            (Some(Map(
+                "services" -> toJson(reVal)
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
