@@ -43,7 +43,7 @@ object ServiceModule extends ModuleTrait {
 
             if (hasOtherCondition == 0){
                 val o : DBObject = data
-                reVal = db.queryMultipleObject(o, "services", skip = skip, take = take)
+                reVal = db.queryMultipleObject(o, "services", skip = skip, take = take, sort = "scores")
             } else {
                 val other_conditions = pr.get.get("other_conditions").getOrElse(throw new Exception("data not exist"))
                 other_conditions.asOpt[List[Map[String, JsValue]]].get.map{x =>
