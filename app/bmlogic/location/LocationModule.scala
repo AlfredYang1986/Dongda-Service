@@ -231,14 +231,17 @@ object LocationModule extends ModuleTrait {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             val js = MergeStepResult(data, pr)
+            val lst = (js \ "locations").asOpt[List[String]].get
 
             import inner_traits.mqc
             import inner_traits.lsbr
             val o : DBObject = js
 
             val reVal = db.queryMultipleObject(o, "service_location").map { x =>
-                x.get("service_id").get.asOpt[String].get
-            }
+                val l_id = x.get("location_id").get.asOpt[String].get
+                val index = lst.indexOf(l_id)
+                (index, x.get("service_id").get.asOpt[String].get)
+            }.sortBy(p => p._1).map (_._2)
 
             (Some(Map(
                 "services" -> toJson(reVal)

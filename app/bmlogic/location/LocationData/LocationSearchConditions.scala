@@ -23,7 +23,7 @@ trait LocationSearchConditions {
                             "type" -> "Point",
                             "coordinates" -> MongoDBList(log, lat)
                         ),
-                        "$maxDistance" -> 10000))
+                        "$maxDistance" -> 5000))
                 Some(tmp)
             }.getOrElse(None)
 
