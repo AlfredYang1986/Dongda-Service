@@ -27,7 +27,7 @@ object ServiceModule extends ModuleTrait {
 
     def searchService(data : JsValue)
                      (pr : Option[Map[String, JsValue]])
-                   (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
@@ -93,10 +93,15 @@ object ServiceModule extends ModuleTrait {
                     Map("service_type" -> toJson("艺术"), "count" -> toJson(6))
                 ))   //  首页默认展示此四类服务
 
-            val reVal = service_type_lmap.map { service_type_map =>
+            val reVal = service_type_lmap.zipWithIndex.map { tmp  =>
+                val (service_type_map, index) = tmp
                 val service_type = service_type_map.get("service_type").get.asOpt[String].get
                 val dbo = DBObject("service_type" -> service_type)
-                val reVal_tmp = db.queryMultipleObject(dbo, "services", take = service_type_map.get("count").get.asOpt[Int].get)
+
+                val reVal_tmp =
+                    if (index == 0) db.queryMultipleObject(dbo, "services", take = service_type_map.get("count").get.asOpt[Int].get, sort = "scores")
+                    else db.queryMultipleObject(dbo, "services", take = service_type_map.get("count").get.asOpt[Int].get)
+
                 val count = db.queryCount(dbo, "services").get
                 service_type_map - "count" + ("totalCount" -> toJson(count)) + ("services" -> toJson(reVal_tmp))
             }
