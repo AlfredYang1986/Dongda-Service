@@ -71,6 +71,7 @@ trait ServiceResults {
             "teacher_num" -> toJson(obj.get("teacher_num").asInstanceOf[Int]),
             "punchline" -> toJson(obj.get("punchline").asInstanceOf[String]),
             "description" -> toJson(obj.get("description").asInstanceOf[String]),
+            "album" -> toJson(obj.get("album").asInstanceOf[String]),
 //            "service_images" -> toJson(if (ser_img.isEmpty) List.empty else ser_img.toList.map(x =>
 //                Map("image" -> toJson(x.asInstanceOf[DBObject].getAs[String]("image").getOrElse("")),
 //                    "tag" -> toJson(x.asInstanceOf[DBObject].getAs[String]("tag").getOrElse("")))
