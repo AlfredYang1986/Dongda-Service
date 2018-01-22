@@ -39,6 +39,8 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
         case msg_ForceOfflineOrNot() => forceOfflineUser(pr)
         case msg_GenerateToken() => setToken2Redis(pr)
 
+        case msg_CheckUserExisting() => checkUserExisting(pr)
+
 		case _ => ???
 	}
 
@@ -126,11 +128,11 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
 
         try {
             val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
-            val expired = (auth \ "expired").asOpt[Int].map (x => x).getOrElse(throw new Exception("token parse error"))
+            val expired = (auth \ "expired").asOpt[String].map (x => x.toInt).getOrElse(throw new Exception("token parse error"))
 
-            if (expired == 1) {
-                (Some(Map("isExpired" -> toJson(1))), None)
-            } else (Some(Map("isExpired" -> toJson(0))), None)
+            if (expired == 0) {
+                (Some(Map("isExpired" -> toJson(0), "auth" -> toJson(auth))), None)
+            } else throw new Exception("token expired")
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
@@ -187,6 +189,26 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
             println("Force offline succeed!")
         } catch {
             case ex : Exception => ex.printStackTrace()
+        }
+    }
+
+    def checkUserExisting(pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
+            val user_id = (auth \ "user_id").asOpt[String].map (x => x).getOrElse(throw new Exception("token parse error"))
+
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val o : DBObject = conditions(auth)
+            val reVal = db.queryObject(o, "users")
+
+            if (!reVal.isEmpty) {
+                (Some(Map("token" -> toJson("success"))), None)
+            } else throw new Exception("token parse error")
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }
