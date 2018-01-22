@@ -96,11 +96,21 @@ object ServiceModule extends ModuleTrait {
             val reVal = service_type_lmap.zipWithIndex.map { tmp  =>
                 val (service_type_map, index) = tmp
                 val service_type = service_type_map.get("service_type").get.asOpt[String].get
-                val dbo = DBObject("service_type" -> service_type)
+
+                val start_scroes = service_type match {
+                    case "看顾" => -1
+                    case "科学" => -76
+                    case "运动" => -310
+                    case "艺术" => -148
+                }
+
+//                val dbo = DBObject("service_type" -> service_type)
+                val dbo = "scores" $lte start_scroes
 
                 val reVal_tmp =
-                    if (index == 0) db.queryMultipleObject(dbo, "services", take = service_type_map.get("count").get.asOpt[Int].get, sort = "scores")
-                    else db.queryMultipleObject(dbo, "services", take = service_type_map.get("count").get.asOpt[Int].get)
+//                    if (index == 0) db.queryMultipleObject(dbo, "services", take = service_type_map.get("count").get.asOpt[Int].get, sort = "scores")
+//                    else db.queryMultipleObject(dbo, "services", take = service_type_map.get("count").get.asOpt[Int].get)
+                    db.queryMultipleObject(dbo, "services", take = service_type_map.get("count").get.asOpt[Int].get, sort = "scores")
 
                 val count = db.queryCount(dbo, "services").get
                 service_type_map - "count" + ("totalCount" -> toJson(count)) + ("services" -> toJson(reVal_tmp))
