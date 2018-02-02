@@ -1,6 +1,7 @@
 package bmlogic.phonecode.PhoneCodeData
 
 import bmlogic.common.sercurity.Sercurity
+import bmlogic.common.sms.smsModule
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
@@ -11,8 +12,14 @@ trait PhoneCodeData {
 
         val phoneNo = (js \ "phone").asOpt[String].map (x => x).getOrElse(throw new Exception("reg push error"))
         val reg_token = Sercurity.md5Hash(phoneNo + Sercurity.getTimeSpanWithMinutes)
-        val code = 1111.toString // fake one
-//		val code = (scala.util.Random.nextInt(9000) + 1000).toString
+//        val code = 1111.toString // fake one
+		val code = (scala.util.Random.nextInt(9000) + 1000).toString
+
+        /**
+		 * send code to the phone
+		 */
+		import play.api.Play.current
+		smsModule().sendSMS(phoneNo, code.toString)
 
         builder += "phone" -> phoneNo
         builder += "code" -> code

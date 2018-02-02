@@ -35,11 +35,6 @@ object PhoneCodeModule extends ModuleTrait with PhoneCodeData {
                 case None => db.insertObject(o, "reg", "phone")
                 case Some(one) => db.updateObject(o, "reg", "phone")
             }
-			/**
-			 * send code to the phone
-			 */	
-//			import play.api.Play.current
-//			smsModule().sendSMS(phoneNo, code.toString)
 
             val result = toJson(d2m(o) + ("is_reg" -> toJson(is_reg)))
 			(Some(Map("reg" -> result)), None)
@@ -54,6 +49,7 @@ object PhoneCodeModule extends ModuleTrait with PhoneCodeData {
 		try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
+            println(data)
             val phoneNo = (data \ "phone").asOpt[String].map (x => x).getOrElse(throw new Exception("wrong input"))
     		val code = (data \ "code").asOpt[String].map (x => x).getOrElse(throw new Exception("wrong input"))
 			val reg_token = (data \ "reg_token").asOpt[String].map (x => x).getOrElse(throw new Exception("wrong input"))

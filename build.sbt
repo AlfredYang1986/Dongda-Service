@@ -20,7 +20,7 @@ libraryDependencies ++= Seq(
     "com.pharbers" % "pharbers-cli-traits" % "0.2",
     "com.pharbers" % "mongodb-driver" % "0.2",
     "com.pharbers" % "errorcode" % "0.2",
-    "com.pharbers" % "xmpp-em" % "0.2",
+//    "com.pharbers" % "xmpp-em" % "0.2",
     "com.pharbers" % "http" % "0.2",
     "com.pharbers" % "auth-token" % "0.2",
     "com.pharbers" % "pharbers-pattern" % "0.2",

@@ -18,7 +18,7 @@ import scala.collection.immutable.Map
 import com.mongodb.casbah.Imports._
 import com.pharbers.baseModules.PharbersInjectModule
 import com.pharbers.driver.util.PhRedisTrait
-import com.pharbers.xmpp.DDNTrait
+//import com.pharbers.xmpp.DDNTrait
 
 object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
 
@@ -36,7 +36,7 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
         case msg_CheckTokenExpire(data) => checkAuthTokenExpire(data)(pr)
         case msg_AuthTokenIsExpired(data) => authTokenIsExpired(data)(pr)
 
-        case msg_ForceOfflineOrNot() => forceOfflineUser(pr)
+//        case msg_ForceOfflineOrNot() => forceOfflineUser(pr)
         case msg_GenerateToken() => setToken2Redis(pr)
 
         case msg_CheckUserExisting() => checkUserExisting(pr)
@@ -138,25 +138,25 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
         }
     }
 
-    def forceOfflineUser(pr : Option[Map[String, JsValue]])
-                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
-
-        try {
-            val prt = cm.modules.get.get("prt").map (x => x.asInstanceOf[PhRedisTrait]).getOrElse(throw new Exception("no redis connection"))
-            val user = pr.get.get("user").get
-            val user_id = (user \ "user_id").asOpt[String].getOrElse(throw new Exception("no user_id"))
-            val new_cdi = (user \ "current_device_id").asOpt[String].getOrElse("")
-            val accessToken = s"bearer${user_id}"
-
-            if (prt.exsits(accessToken)) {
-                val old_cdi = prt.getMapValue(accessToken, "current_device_id")
-                if (new_cdi != old_cdi) forceOffline(user_id)
-            }
-            (pr, None)
-        } catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
-        }
-    }
+//    def forceOfflineUser(pr : Option[Map[String, JsValue]])
+//                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+//
+//        try {
+//            val prt = cm.modules.get.get("prt").map (x => x.asInstanceOf[PhRedisTrait]).getOrElse(throw new Exception("no redis connection"))
+//            val user = pr.get.get("user").get
+//            val user_id = (user \ "user_id").asOpt[String].getOrElse(throw new Exception("no user_id"))
+//            val new_cdi = (user \ "current_device_id").asOpt[String].getOrElse("")
+//            val accessToken = s"bearer${user_id}"
+//
+//            if (prt.exsits(accessToken)) {
+//                val old_cdi = prt.getMapValue(accessToken, "current_device_id")
+//                if (new_cdi != old_cdi) forceOffline(user_id)
+//            }
+//            (pr, None)
+//        } catch {
+//            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+//        }
+//    }
 
     def setToken2Redis(pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -178,19 +178,19 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
         }
     }
 
-    def forceOffline(user_id: String) (implicit cm : CommonModules) = {
-
-        try {
-            val ddn = cm.modules.get.get("ddn").map (x => x.asInstanceOf[DDNTrait]).getOrElse(throw new Exception("no db connection"))
-            implicit  val as = cm.modules.get.get("as").map (x => x.asInstanceOf[ActorSystem]).getOrElse(throw new Exception("no db connection"))
-            val jsValue = ddn.forceOffline(user_id)(as)
-            val result = (jsValue \ "data" \ "result").asOpt[Boolean].getOrElse(throw new Exception("http get failed"))
-            if (!result) throw new Exception(s"force offline failed!")
-            println("Force offline succeed!")
-        } catch {
-            case ex : Exception => ex.printStackTrace()
-        }
-    }
+//    def forceOffline(user_id: String) (implicit cm : CommonModules) = {
+//
+//        try {
+//            val ddn = cm.modules.get.get("ddn").map (x => x.asInstanceOf[DDNTrait]).getOrElse(throw new Exception("no db connection"))
+//            implicit  val as = cm.modules.get.get("as").map (x => x.asInstanceOf[ActorSystem]).getOrElse(throw new Exception("no db connection"))
+//            val jsValue = ddn.forceOffline(user_id)(as)
+//            val result = (jsValue \ "data" \ "result").asOpt[Boolean].getOrElse(throw new Exception("http get failed"))
+//            if (!result) throw new Exception(s"force offline failed!")
+//            println("Force offline succeed!")
+//        } catch {
+//            case ex : Exception => ex.printStackTrace()
+//        }
+//    }
 
     def checkUserExisting(pr : Option[Map[String, JsValue]])
                          (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
