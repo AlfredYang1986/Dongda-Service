@@ -111,7 +111,8 @@ object ProfileModule extends ModuleTrait {
                 obj
 
             }.getOrElse(throw new Exception("user not exist"))
-            (Some(Map("profile" -> toJson(reVal))), None)
+            val token = (data \ "token").asOpt[String].get
+            (Some(Map("profile" -> toJson(reVal + ("token" -> toJson(token))))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
