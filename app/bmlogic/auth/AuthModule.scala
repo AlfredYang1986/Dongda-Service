@@ -5,8 +5,6 @@ import java.util.Date
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.json.Json.toJson
 import AuthMessage._
-import akka.actor.ActorSystem
-import com.pharbers.cliTraits.DBTrait
 import bmlogic.auth.AuthData.AuthData
 import bmlogic.common.sercurity.Sercurity
 import com.pharbers.bmmessages.MessageDefines
@@ -17,6 +15,7 @@ import com.pharbers.ErrorCode
 import scala.collection.immutable.Map
 import com.mongodb.casbah.Imports._
 import com.pharbers.baseModules.PharbersInjectModule
+import com.pharbers.cliTraits.DBTrait
 import com.pharbers.driver.util.PhRedisTrait
 //import com.pharbers.xmpp.DDNTrait
 
@@ -201,7 +200,7 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
 
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-            val o : DBObject = conditions(auth)
+            val o : DBObject = existing_check(auth)
             val reVal = db.queryObject(o, "users")
 
             if (!reVal.isEmpty) {

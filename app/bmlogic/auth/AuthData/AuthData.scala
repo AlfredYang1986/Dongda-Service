@@ -11,6 +11,15 @@ import play.api.libs.json.Json.toJson
   */
 trait AuthData {
 
+    def existing_check(data : JsValue) : DBObject = {
+        val builder = MongoDBObject.newBuilder
+
+        (data \ "user_id").asOpt[String].map (x => builder += "user_id" -> x).getOrElse(throw new Exception("token parse error"))
+
+        builder.result
+    }
+
+
     def conditions(data : JsValue) : DBObject = {
         val builder = MongoDBObject.newBuilder
 

@@ -49,7 +49,6 @@ object PhoneCodeModule extends ModuleTrait with PhoneCodeData {
 		try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-            println(data)
             val phoneNo = (data \ "phone").asOpt[String].map (x => x).getOrElse(throw new Exception("wrong input"))
     		val code = (data \ "code").asOpt[String].map (x => x).getOrElse(throw new Exception("wrong input"))
 			val reg_token = (data \ "reg_token").asOpt[String].map (x => x).getOrElse(throw new Exception("wrong input"))
