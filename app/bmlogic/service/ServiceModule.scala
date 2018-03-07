@@ -8,6 +8,7 @@ import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.cliTraits.DBTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
+import com.pharbers.dbManagerTrait.dbInstanceManager
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 
@@ -29,7 +30,8 @@ object ServiceModule extends ModuleTrait {
                      (pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
@@ -63,7 +65,8 @@ object ServiceModule extends ModuleTrait {
                      (pr : Option[Map[String, JsValue]])
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             import inner_traits.sdc
             import inner_traits.sdr
@@ -81,17 +84,19 @@ object ServiceModule extends ModuleTrait {
     def homePageServices(data : JsValue)
                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             import inner_traits.hpsr
 
             val service_type_lmap = (data \ "condition" \ "service_type_list").asOpt[List[Map[String, JsValue]]].map(x => x).
-                getOrElse(List(
+            getOrElse(List(
                     Map("service_type" -> toJson("看顾"), "count" -> toJson(6)),
                     Map("service_type" -> toJson("科学"), "count" -> toJson(6)),
                     Map("service_type" -> toJson("运动"), "count" -> toJson(6)),
                     Map("service_type" -> toJson("艺术"), "count" -> toJson(6))
-                ))   //  首页默认展示此四类服务
+            ))   //  首页默认展示此四类服务
+
 
             val reVal = service_type_lmap.zipWithIndex.map { tmp  =>
                 val (service_type_map, index) = tmp
@@ -115,7 +120,6 @@ object ServiceModule extends ModuleTrait {
                 val count = db.queryCount(dbo, "services").get
                 service_type_map - "count" + ("totalCount" -> toJson(count)) + ("services" -> toJson(reVal_tmp))
             }
-
             (Some(Map("homepage_services" -> toJson(reVal))), None)
         } catch {
             case ex : Exception => println(s"homePageServices.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -147,7 +151,8 @@ object ServiceModule extends ModuleTrait {
         try {
             val js = MergeStepResult(data, pr)
 
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             import inner_traits.mdc
             import inner_traits.ssr

@@ -1,0 +1,6 @@
+<pharbers-modules>
+    <mongodb-connect-nodes>
+        <connect-config-path name="baby" value="pharbers_config/baby_connect.xml" />
+        <connect-config-path name="baby_user" value="pharbers_config/user_connect.xml" />
+    </mongodb-connect-nodes>
+</pharbers-modules>

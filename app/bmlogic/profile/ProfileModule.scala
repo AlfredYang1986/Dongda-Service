@@ -8,6 +8,7 @@ import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
+import com.pharbers.dbManagerTrait.dbInstanceManager
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 
@@ -31,7 +32,8 @@ object ProfileModule extends ModuleTrait {
                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
 
             val auth = pr.get.get("auth").get
             val user_id = (auth \ "user_id").asOpt[String].get
@@ -51,7 +53,8 @@ object ProfileModule extends ModuleTrait {
             import inner_conditions.oc
             import inner_conditions.dr
 
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
             val o : DBObject = MergeStepResult(data, pr)
             val reVal = db.queryObject(o, "users").map (x => x).getOrElse(throw new Exception("user not exist"))
             (Some(Map("profile" -> toJson(reVal))), None)
@@ -69,7 +72,8 @@ object ProfileModule extends ModuleTrait {
             import inner_conditions.qc
             import inner_conditions.dr
 
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
             val o : DBObject = MergeStepResult(data, pr)
             val reVal = db.queryObject(o, "users").map (x => x).getOrElse(throw new Exception("user not exist"))
             (Some(Map("profile" -> toJson(reVal))), None)
@@ -85,7 +89,8 @@ object ProfileModule extends ModuleTrait {
         try {
             import inner_conditions.qc
 
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
             val reVal = db.queryObject(data, "users") { obj =>
                 val user_id = (data \ "condition" \ "user_id").asOpt[String]
                                 .map (x => x).getOrElse(throw new Exception("profile update input error"))
@@ -126,7 +131,8 @@ object ProfileModule extends ModuleTrait {
         try {
             import inner_conditions.mc
 
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
             val o : DBObject = MergeStepResult(data, pr)
 
             if (!o.isEmpty) {
@@ -151,7 +157,8 @@ object ProfileModule extends ModuleTrait {
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
 
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
             val reVal = db.queryMultipleObject(data, "users", skip = skip, take = take)
             (Some(Map("profile" -> toJson(reVal))), None)
 
@@ -188,7 +195,8 @@ object ProfileModule extends ModuleTrait {
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
 
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
 
             import inner_conditions.sr
             val reVal = db.queryMultipleObject(o, "users", take = take, skip = skip)

@@ -16,6 +16,7 @@ import scala.collection.immutable.Map
 import com.mongodb.casbah.Imports._
 import com.pharbers.baseModules.PharbersInjectModule
 import com.pharbers.cliTraits.DBTrait
+import com.pharbers.dbManagerTrait.dbInstanceManager
 import com.pharbers.driver.util.PhRedisTrait
 //import com.pharbers.xmpp.DDNTrait
 
@@ -45,7 +46,10 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
 
     def authLogin(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            println(data)
+
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
             val auth_phone = (data \ "phone").asOpt[String].map (x => x).getOrElse("")
             val third_uid = (data \ "third" \ "provide_uid").asOpt[String].map (x => x).getOrElse("")
 
@@ -79,7 +83,8 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
 
     def queryUser(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
 
             val c = conditions(data)
             db.queryObject(c, "users") match {
@@ -168,6 +173,7 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
             val user_id = (user \ "user_id").asOpt[String].getOrElse(throw new Exception("no user_id"))
             val accessToken = s"bearer${user_id}"
             val user_map = user.as[JsObject].value.toMap + ("last_update_time" -> toJson(date)) + ("expired" -> toJson(0))
+            println(user_map)
             prt.addMap(accessToken, m2r(user_map))
             prt.expire(accessToken, token_expire)
             (Some(Map("user" -> user, "auth_token" -> toJson(accessToken))), None)
@@ -198,7 +204,8 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
             val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
             val user_id = (auth \ "user_id").asOpt[String].map (x => x).getOrElse(throw new Exception("token parse error"))
 
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
 
             val o : DBObject = existing_check(auth)
             val reVal = db.queryObject(o, "users")

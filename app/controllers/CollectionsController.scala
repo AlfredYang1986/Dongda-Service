@@ -5,7 +5,7 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import bmlogic.brand.BrandMessage.{msg_BrandServiceBinding, msg_SearchServiceBrand}
 import bmlogic.location.LocationMessage.{msg_LocationServiceBinding, msg_SearchServiceLocation}
-import bmlogic.service.ServiceMessage.{msg_ServiceQueryMulti}
+import bmlogic.service.ServiceMessage.msg_ServiceQueryMulti
 import com.pharbers.cliTraits.DBTrait
 import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
@@ -14,11 +14,12 @@ import bmlogic.common.requestArgsQuery
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
 import com.pharbers.bmpattern.LogMessage.msg_log
 import com.pharbers.bmpattern.ResultMessage.msg_CommonResultMessage
+import com.pharbers.dbManagerTrait.dbInstanceManager
 import com.pharbers.driver.util.PhRedisTrait
 import play.api.libs.json.Json.toJson
 import play.api.mvc.Action
 
-class CollectionsController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, prt : PhRedisTrait) {
+class CollectionsController @Inject () (as_inject : ActorSystem, dbt: dbInstanceManager, att : AuthTokenTrait, prt : PhRedisTrait) {
     implicit val as = as_inject
 
     def pushCollection = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>

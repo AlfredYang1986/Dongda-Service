@@ -37,6 +37,9 @@ POST    /al/email/privacy                       controllers.emailController.send
 # 首页
 POST    /al/homepage/service                    controllers.ServiceController.homePageServices
 
+# 获取Oss Security Token
+POST    /al/oss/gst                             controllers.OssController.getSecurityToken
+
 # brand 品牌相关
 POST    /al/brand/search                        controllers.BrandController.searchBrands
 POST    /al/brand/detail                        controllers.BrandController.brandDetail

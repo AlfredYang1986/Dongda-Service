@@ -18,6 +18,7 @@ libraryDependencies ++= Seq(
     "com.pharbers" % "encrypt" % "0.2",
     "com.pharbers" % "mongodb-connect" % "0.2",
     "com.pharbers" % "pharbers-cli-traits" % "0.2",
+    "com.pharbers" % "mongodb-manager" % "0.2",
     "com.pharbers" % "mongodb-driver" % "0.2",
     "com.pharbers" % "errorcode" % "0.2",
 //    "com.pharbers" % "xmpp-em" % "0.2",
@@ -25,6 +26,11 @@ libraryDependencies ++= Seq(
     "com.pharbers" % "auth-token" % "0.2",
     "com.pharbers" % "pharbers-pattern" % "0.2",
     "com.pharbers" % "redis-driver" % "0.2",
+
+    "com.aliyun.oss" % "aliyun-sdk-oss" % "3.0.0",
+    "com.aliyun" % "aliyun-java-sdk-sts" % "3.0.0",
+    "com.aliyun" % "aliyun-java-sdk-core" % "3.5.0",
+
     "net.debasishg" % "redisclient_2.11" % "3.4",
     "org.apache.commons" % "commons-email" % "1.4",
     "org.apache.spark" %% "spark-core" % "2.0.0",

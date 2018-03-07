@@ -4,6 +4,7 @@ import javax.inject._
 
 import akka.actor.ActorSystem
 import com.pharbers.cliTraits.DBTrait
+import com.pharbers.dbManagerTrait.dbInstanceManager
 //import com.pharbers.xmpp.DDNTrait
 import com.pharbers.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage._
@@ -17,7 +18,7 @@ import com.pharbers.driver.util.PhRedisTrait
 import play.api.libs.json.Json.toJson
 import play.api.mvc._
 
-class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait, /*ddn : DDNTrait,*/ prt : PhRedisTrait) extends Controller {
+class AuthController @Inject () (as_inject : ActorSystem, dbt: dbInstanceManager, att : AuthTokenTrait, /*ddn : DDNTrait,*/ prt : PhRedisTrait) extends Controller {
     implicit val as = as_inject
 
     def authLogin = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>

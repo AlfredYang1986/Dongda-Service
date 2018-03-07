@@ -8,6 +8,7 @@ import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.cliTraits.DBTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
+import com.pharbers.dbManagerTrait.dbInstanceManager
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 
@@ -33,7 +34,8 @@ object LocationModule extends ModuleTrait {
     def searchLocation(data : JsValue)
                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(10)
@@ -57,7 +59,8 @@ object LocationModule extends ModuleTrait {
                               (pr : Option[Map[String, JsValue]])
                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(20)
@@ -98,7 +101,8 @@ object LocationModule extends ModuleTrait {
                               (pr : Option[Map[String, JsValue]])
                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             import inner_traits.sslc
             import inner_traits.slr
@@ -122,7 +126,8 @@ object LocationModule extends ModuleTrait {
                               (pr : Option[Map[String, JsValue]])
                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             import inner_traits.sslc
             import inner_traits.sldr
@@ -146,7 +151,8 @@ object LocationModule extends ModuleTrait {
                               (pr : Option[Map[String, JsValue]])
                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             import inner_traits.lsbc
             import inner_traits.lsbr
@@ -174,7 +180,8 @@ object LocationModule extends ModuleTrait {
                               (pr : Option[Map[String, JsValue]])
                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             import inner_traits.sslc
             import inner_traits.hsslr
@@ -202,7 +209,8 @@ object LocationModule extends ModuleTrait {
                           (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             val skip = (data \ "skip").asOpt[Int].map (x => x).getOrElse(0)
             val take = (data \ "take").asOpt[Int].map (x => x).getOrElse(10)
@@ -228,7 +236,8 @@ object LocationModule extends ModuleTrait {
                          (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
             val js = MergeStepResult(data, pr)
             val lst = (js \ "locations").asOpt[List[String]].get
