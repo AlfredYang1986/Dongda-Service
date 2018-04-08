@@ -1,8 +1,8 @@
 <pharbers-modules>
     <oss-config>
-        <endpoint value="" />
-        <accessKeyId value="" />
-        <accessKeySecret value="" />
-        <roleArn value="" />
+        <endpoint value="sts.cn-beijing.aliyuncs.com" />
+        <accessKeyId value="LTAINO7wSDoWJRfN" />
+        <accessKeySecret value="PcDzLSOE86DsnjQn8IEgbaIQmyBzt6" />
+        <roleArn value="acs:ram::1696525727043311:role/aliyunosstokengeneratorrole" />
     </oss-config>
 </pharbers-modules>

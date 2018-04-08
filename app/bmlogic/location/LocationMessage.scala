@@ -18,4 +18,6 @@ object LocationMessage {
 
     case class msg_LocationNearSphere(data : JsValue) extends msg_LocationCommand
     case class msg_LocationToService(data : JsValue) extends msg_LocationCommand
+
+    case class msg_LstLocations(data : JsValue) extends msg_LocationCommand
 }

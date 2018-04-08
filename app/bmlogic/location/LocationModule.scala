@@ -26,6 +26,8 @@ object LocationModule extends ModuleTrait {
 
         case msg_LocationNearSphere(data) => locationNearSphere(data)
         case msg_LocationToService(data) => locationToService(data)(pr)
+
+        case msg_LstLocations(data) => lstLocationDetails(data)(pr)
     }
 
     object inner_traits extends LocationSearchConditions
@@ -258,6 +260,30 @@ object LocationModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"locationNearSphere.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def lstLocationDetails(data : JsValue)
+                         (pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
+
+            val js = MergeStepResult(data, pr)
+            val lst = (js \ "locations").asOpt[List[String]].get
+
+            import inner_traits.mqc
+            import inner_traits.sldr
+            val o : DBObject = js
+
+            val reVal = db.queryMultipleObject(o, "service_location")
+
+            (Some(Map("locations" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"lstLocationDetails.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

@@ -14,17 +14,11 @@ object QueryFirstImageObjects {
                             .find(p => p.getString("tag") == "1").map (x => x)
                             .getOrElse(images.head.asInstanceOf[BasicDBObject])
 
-//            val head = images.head.asInstanceOf[BasicDBObject]
-//            val tag = toJson(head.getAs[String]("tag").get)
             val image_lst = head.getAs[List[String]]("image").get
             val image = toJson(if (image_lst.isEmpty) ""
                                else image_lst.head)
 
             image
-//            toJson(Map(
-//                "tag" -> tag,
-//                "image" -> image
-//            ))
 
         } else toJson("")
     }
