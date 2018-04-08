@@ -44,10 +44,12 @@ POST    /al/oss/gst                             controllers.OssController.getSec
 POST    /al/brand/search                        controllers.BrandController.searchBrands
 POST    /al/brand/detail                        controllers.BrandController.brandDetail
 POST    /al/brand/service                       controllers.BrandController.brandServiceBinding
+POST    /al/brand/locations                     controllers.BrandController.lstBrandLocations
 
 # location 场地相关
 POST    /al/location/search                     controllers.LocationController.searchLocations
 POST    /al/location/service                    controllers.LocationController.locationServiceBinding
+POST    /al/location/lst/service                controllers.LocationController.lstLoctionServices
 
 POST    /al/location/near                       controllers.LocationController.searchNearSphere
 

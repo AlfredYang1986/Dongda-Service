@@ -7,7 +7,6 @@ import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
-import com.mongodb.spark.sql.types.BsonCompatibility.ObjectId
 import com.pharbers.dbManagerTrait.dbInstanceManager
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
