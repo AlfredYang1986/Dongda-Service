@@ -82,7 +82,7 @@ trait recruitResult {
             }.getOrElse(Map.empty)
 
         Map(
-            "recruit_id" -> toJson(obj.getAs[ObjectId]("recurit_id").get.toString),
+            "recruit_id" -> toJson(obj.getAs[ObjectId]("_id").get.toString),
             "service_id" -> toJson(obj.getAs[String]("service_id").get)
         ) ++ age_boundary ++ stud_boundary ++ stud_tech ++ payment_time ++
             payment_membership ++ payment_monthly ++ payment_daily

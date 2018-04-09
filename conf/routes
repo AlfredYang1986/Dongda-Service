@@ -53,6 +53,13 @@ POST    /al/location/lst/service                controllers.LocationController.l
 
 POST    /al/location/near                       controllers.LocationController.searchNearSphere
 
+# recruit 招生相关
+POST    /al/recruit/push                        controllers.RecruitController.pushRecruit
+POST    /al/recruit/pop                         controllers.RecruitController.popRecruit
+POST    /al/recruit/update                      controllers.RecruitController.updateRecruit
+POST    /al/recruit/query                       controllers.RecruitController.queryRecruit
+POST    /al/recruit/query/multi                 controllers.RecruitController.queryRecruitMulti
+
 # service 服务相关
 POST    /al/service/search                      controllers.ServiceController.searchServices
 POST    /al/service/detail                      controllers.ServiceController.serviceDetail

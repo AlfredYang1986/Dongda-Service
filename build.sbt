@@ -25,9 +25,10 @@ libraryDependencies ++= Seq(
     "com.aliyun" % "aliyun-java-sdk-sts" % "3.0.0",
     "com.aliyun" % "aliyun-java-sdk-core" % "3.5.0",
 
-//    "net.debasishg" % "redisclient_2.11" % "3.4",
+    "net.debasishg" % "redisclient_2.11" % "3.4",
     "org.apache.commons" % "commons-email" % "1.4",
     "commons-httpclient" % "commons-httpclient" % "3.1",
+    "log4j" % "log4j" % "1.2.17",
 //    "org.apache.spark" %% "spark-core" % "2.0.0",
 //    "org.apache.spark" %% "spark-sql" % "2.0.0",
 //    "org.mongodb.scala" %% "mongo-scala-driver" % "1.2.1",

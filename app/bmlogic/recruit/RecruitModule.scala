@@ -2,10 +2,12 @@ package bmlogic.recruit
 
 import bmlogic.recruit.RecruitMessage._
 import bmlogic.recruit.recruitConditions.{recruitConditions, recruitCreation, recruitResult}
+import com.mongodb.DBObject
 import com.pharbers.ErrorCode
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
 import com.pharbers.dbManagerTrait.dbInstanceManager
+import org.bson.types.ObjectId
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 
@@ -30,12 +32,14 @@ object RecruitModule extends ModuleTrait {
             val db = conn.queryDBInstance("baby").get
 
             import inner_traits.rc
-            db.insertObject(data, "recruit", "recruit_id")
+            val o : DBObject = data
+            db.insertObject(o, "recruit", "_id")
+            val reVal = o.get("_id").asInstanceOf[ObjectId].toString
 
-            (Some(Map("push recruit" -> toJson("success"))), None)
+            (Some(Map("recruit_id" -> toJson(reVal))), None)
 
         } catch {
-            case ex : Exception => println(s"searchBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception => println(s"pushRecruit.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
@@ -46,10 +50,10 @@ object RecruitModule extends ModuleTrait {
             val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
             val db = conn.queryDBInstance("baby").get
 
-            import inner_traits.rc
-            db.deleteObject(data, "recruit", "recruit_id")
+            import inner_traits.qc
+            db.deleteObject(data, "recruit", "_id")
 
-            (Some(Map("push recruit" -> toJson("success"))), None)
+            (Some(Map("pop recruit" -> toJson("success"))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -60,8 +64,13 @@ object RecruitModule extends ModuleTrait {
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
 
-            null
+            import inner_traits.qc
+            val reVal = db.queryObject(data, "recruit")(x => inner_traits.dbr(inner_traits.rupc(x, data)))
+
+            (Some(Map("recruit" -> toJson(reVal))), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

@@ -424,4 +424,60 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def pushRecruit(recruit_info : JsValue) = {
+        ws.url(baseUrl + "/al/recruit/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(recruit_info)
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def popRecruit(token : String, recruit_id : String) = {
+        ws.url(baseUrl + "/al/recruit/pop")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "recruit_id" -> toJson(recruit_id)
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def queryRecruit(token : String, recruit_id : String) = {
+        ws.url(baseUrl + "/al/recruit/query")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "recruit_id" -> toJson(recruit_id)
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def updateRecruit(token : String, recruit_id : String, update_info : JsValue) = {
+        ws.url(baseUrl + "/al/recruit/update")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "recruit_id" -> toJson(recruit_id)
+                )),
+                "recruit" -> update_info
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
 }

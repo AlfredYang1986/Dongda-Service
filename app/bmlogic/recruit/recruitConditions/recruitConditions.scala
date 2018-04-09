@@ -5,9 +5,8 @@ import play.api.libs.json.JsValue
 
 trait recruitConditions {
     implicit val qc : JsValue => DBObject = { js =>
-        DBObject("user_id" ->
-            (js \ "condition" \ "recruit_id")
-                .asOpt[String].getOrElse(throw new Exception("recruit input error")))
+        val recruit_id = (js \ "condition" \ "recruit_id").asOpt[String].getOrElse(throw new Exception("recruit input error"))
+        DBObject("_id" -> new ObjectId(recruit_id))
     }
 
     implicit val mc : JsValue => DBObject = { js =>
