@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject.Inject
 import akka.actor.ActorSystem
-import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire}
-import bmlogic.brand.BrandMessage.{msg_BrandDetail, msg_BrandSearch, msg_BrandServiceBinding, msg_LstBrandLocations}
+import bmlogic.auth.AuthMessage.{msg_AuthTokenParser, msg_CheckTokenExpire, msg_UserID2OpenID}
+import bmlogic.brand.BrandMessage._
 import bmlogic.common.requestArgsQuery
 import bmlogic.location.LocationMessage.msg_LstLocations
 import com.pharbers.bmmessages.{CommonModules, MessageRoutes}
@@ -51,6 +51,44 @@ class BrandController @Inject ()(as_inject : ActorSystem, dbt: dbInstanceManager
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("search brand"))), jv)
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_LstBrandLocations(jv) :: msg_LstLocations(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
+    })
+
+    def pushBrand = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push brand"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_BrandPush(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
+    })
+
+    def popBrand = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push brand"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_BrandPop(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
+    })
+
+    def combineBrand2User = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push brand"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_UserID2OpenID(jv)
+            :: msg_CombineBrandUser(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
+    })
+
+    def queryBrandByUser = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push brand"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_UserID2OpenID(jv)
+            :: msg_BrandByUser(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 }

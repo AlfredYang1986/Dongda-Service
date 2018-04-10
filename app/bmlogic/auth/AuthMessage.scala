@@ -15,4 +15,6 @@ object AuthMessage {
 	case class msg_GenerateToken() extends msg_AuthCommand
 
 	case class msg_CheckUserExisting() extends msg_AuthCommand
+
+	case class msg_UserID2OpenID(data : JsValue) extends msg_AuthCommand
 }

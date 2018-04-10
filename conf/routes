@@ -46,6 +46,11 @@ POST    /al/brand/detail                        controllers.BrandController.bran
 POST    /al/brand/service                       controllers.BrandController.brandServiceBinding
 POST    /al/brand/locations                     controllers.BrandController.lstBrandLocations
 
+POST    /al/brand/push                          controllers.BrandController.pushBrand
+POST    /al/brand/pop                           controllers.BrandController.popBrand
+POST    /al/brand/user/combine                  controllers.BrandController.combineBrand2User
+POST    /al/brand/from/user                     controllers.BrandController.queryBrandByUser
+
 # location 场地相关
 POST    /al/location/search                     controllers.LocationController.searchLocations
 POST    /al/location/service                    controllers.LocationController.locationServiceBinding

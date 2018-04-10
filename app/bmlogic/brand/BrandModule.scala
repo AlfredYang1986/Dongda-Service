@@ -1,6 +1,6 @@
 package bmlogic.brand
 
-import bmlogic.brand.BrandData.{BrandResults, BrandSearchConditions}
+import bmlogic.brand.BrandData.{BrandCreation, BrandResults, BrandSearchConditions}
 import bmlogic.brand.BrandMessage._
 import bmlogic.common.mergestepresult.MergeStepResult
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
@@ -28,10 +28,14 @@ object BrandModule extends ModuleTrait {
 
         case msg_LstBrandLocations(data) => lstBrandLocations(data)(pr)
 
+        case msg_BrandPush(data) => pushBrand(data)
+        case msg_BrandPop(data) => popBrand(data)
+        case msg_CombineBrandUser(data) => CombineBrandUser(data)(pr)
+        case msg_BrandByUser(data) => BrandByUserID(data)(pr)
     }
 
     object inner_traits extends BrandSearchConditions
-                        with BrandResults
+                        with BrandResults with BrandCreation
 
     def searchBrand(data : JsValue)
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -248,6 +252,85 @@ object BrandModule extends ModuleTrait {
 
         } catch {
             case ex : Exception => println(s"lstBrandLocations.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def pushBrand(data : JsValue)
+                 (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
+
+            import inner_traits.bc
+            val o : DBObject = data
+            db.insertObject(o, "brands", "_id")
+
+            val reVal = inner_traits.sbdr(o).get("brand_id").get.asOpt[String].get
+
+            (Some(Map("brand_id" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"pushBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def popBrand(data : JsValue)
+                 (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
+
+            import inner_traits.sbc
+            db.deleteObject(data, "brands", "_id")
+
+            (Some(Map("pop brand" -> toJson("success"))), None)
+
+        } catch {
+            case ex : Exception => println(s"popBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def CombineBrandUser(data : JsValue)
+                        (pr : Option[Map[String, JsValue]])
+                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
+
+            val js = MergeStepResult(data, pr)
+
+            import inner_traits.bubc
+            db.insertObject(js, "brand_user", "_id")
+
+            (Some(Map("combine" -> toJson("success"))), None)
+
+        } catch {
+            case ex : Exception => println(s"CombineBrandUser.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def BrandByUserID(data : JsValue)
+                     (pr : Option[Map[String, JsValue]])
+                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
+
+            val js = MergeStepResult(data, pr)
+
+            import inner_traits.buss
+            import inner_traits.bubr
+            val tmp = db.queryObject(js, "brand_user")
+            val reVal = db.queryObject(js, "brand_user").map (x => x.get("brand_id").get.asOpt[String].get)
+
+            (Some(Map("brand_id" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"BrandByUser.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

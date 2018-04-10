@@ -38,6 +38,7 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
         case msg_GenerateToken() => setToken2Redis(pr)
 
         case msg_CheckUserExisting() => checkUserExisting(pr)
+        case msg_UserID2OpenID(data) => userID2OpenID(data)
 
 		case _ => ???
 	}
@@ -209,6 +210,24 @@ object AuthModule extends ModuleTrait with AuthData with PharbersInjectModule {
             if (!reVal.isEmpty) {
                 (Some(Map("token" -> toJson("success"))), None)
             } else throw new Exception("token parse error")
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+
+    def userID2OpenID(data : JsValue)
+                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby_user").get
+
+            val o : DBObject = conditions((data \ "condition").asOpt[JsValue].get)
+            val reVal = db.queryObject(o, "users")(u2op).get
+
+            (Some(Map("user" -> toJson(reVal))), None)
+
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }

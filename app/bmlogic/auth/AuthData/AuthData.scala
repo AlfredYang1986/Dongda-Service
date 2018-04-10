@@ -77,6 +77,13 @@ trait AuthData {
         )
     }
 
+    val u2op : DBObject => Map[String, JsValue] = { obj =>
+        Map(
+            "_id" -> toJson(obj.getAs[ObjectId]("_id").map (x => x.toString).getOrElse(throw new Exception("db prase error"))),
+            "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("db prase error")))
+        )
+    }
+
     implicit val m2r: Map[String, JsValue] => Map[Any, Any] = { obj =>
         val date = new Date().getTime
         Map(

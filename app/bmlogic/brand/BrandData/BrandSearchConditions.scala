@@ -22,6 +22,13 @@ trait BrandSearchConditions {
         builder.result
     }
 
+    implicit val buss : JsValue => DBObject = { js =>
+        val builder = MongoDBObject.newBuilder
+        (js \ "user" \ "_id").asOpt[String].map (user_id => builder += "user_id" -> new ObjectId(user_id)).getOrElse(Unit)
+        (js \ "condition" \ "brand_id").asOpt[String].map (brand_id => builder += "brand_id" -> new ObjectId(brand_id)).getOrElse(Unit)
+        builder.result
+    }
+
     implicit val ssbc : JsValue => DBObject = { js =>
         val builder = MongoDBObject.newBuilder
         (js \ "brand_id").asOpt[String].map (x => builder += "_id" -> new ObjectId(x)).getOrElse(Unit)

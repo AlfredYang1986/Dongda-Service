@@ -1,11 +1,12 @@
 import java.util.Date
-import javax.inject.Inject
 
+import javax.inject.Inject
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import play.api.libs.ws.WSClient
+import play.api.test.WsTestClient
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
   * Created by alfredyang on 07/07/2017.
@@ -500,6 +501,80 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
             .post(toJson(Map(
                 "token" -> toJson(token),
                 "locations" -> toJson(location_id :: Nil)
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def pushBrand(token : String, brand_info : JsValue) ={
+        ws.url(baseUrl + "/al/brand/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "brand" -> brand_info
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def popBrand(token : String, brand_id : String) ={
+        ws.url(baseUrl + "/al/brand/pop")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "brand_id" -> toJson(brand_id)
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def queryBrand(token : String, brand_id : String) ={
+        ws.url(baseUrl + "/al/brand/detail")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "brand_id" -> toJson(brand_id)
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def combineBrandToUser(token : String, brand_id : String, user_id : String) ={
+        ws.url(baseUrl + "/al/brand/user/combine")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "brand_id" -> toJson(brand_id),
+                    "user_id" -> toJson(user_id)
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def queryBrandByUser(token : String, user_id : String) ={
+        ws.url(baseUrl + "/al/brand/from/user")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "user_id" -> toJson(user_id)
+                ))
             )))
             .map { response =>
                 // println(response.json)

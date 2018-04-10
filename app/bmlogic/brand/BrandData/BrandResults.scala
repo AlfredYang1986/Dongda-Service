@@ -36,4 +36,11 @@ trait BrandResults {
             "service_id" -> toJson(obj.get("service_id").asInstanceOf[ObjectId].toString)
         )
     }
+
+    implicit val bubr : DBObject => Map[String, JsValue] = { obj =>
+        Map(
+            "brand_id" -> toJson(obj.get("brand_id").asInstanceOf[ObjectId].toString),
+            "user_id" -> toJson(obj.get("user_id").asInstanceOf[ObjectId].toString)
+        )
+    }
 }
