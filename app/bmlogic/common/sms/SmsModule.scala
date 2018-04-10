@@ -10,10 +10,10 @@ import akka.pattern.ask
 import akka.util.Timeout
 import akka.actor.ActorRef
 
-import java.io.UnsupportedEncodingException
-import org.apache.commons.httpclient.Header
+//import java.io.UnsupportedEncodingException
+//import org.apache.commons.httpclient.Header
 import org.apache.commons.httpclient.HttpClient
-import org.apache.commons.httpclient.NameValuePair
+//import org.apache.commons.httpclient.NameValuePair
 import org.apache.commons.httpclient.methods.PostMethod
 import java.io.BufferedReader
 import java.io.InputStreamReader

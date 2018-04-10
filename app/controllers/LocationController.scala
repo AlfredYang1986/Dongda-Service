@@ -52,4 +52,14 @@ class LocationController @Inject ()(as_inject : ActorSystem, dbt: dbInstanceMana
             :: msg_QueryIsCollectedLst(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
+
+    def lstLoctionServices = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import com.pharbers.bmpattern.LogMessage.common_log
+        import com.pharbers.bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("search location"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_LocationToService(jv)
+            :: msg_ServiceQueryMulti(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
+    })
 }

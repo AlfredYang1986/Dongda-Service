@@ -2,9 +2,9 @@ package bmlogic.brand
 
 import bmlogic.brand.BrandData.{BrandResults, BrandSearchConditions}
 import bmlogic.brand.BrandMessage._
+import bmlogic.common.mergestepresult.MergeStepResult
 import com.pharbers.bmmessages.{CommonModules, MessageDefines}
 import com.pharbers.bmpattern.ModuleTrait
-import com.pharbers.cliTraits.DBTrait
 import com.pharbers.ErrorCode
 import com.mongodb.casbah.Imports._
 import com.pharbers.dbManagerTrait.dbInstanceManager
@@ -25,6 +25,8 @@ object BrandModule extends ModuleTrait {
         case msg_SearchServiceBrandDetail(data) => searchServiceBrandDetail(data)(pr)
         case msg_HomeBrandServiceBinding(data) => homeBrandServiceBinding(data)(pr)
         case msg_HomeSearchServiceBrand(data) => homeSearchServiceBrand(data)(pr)
+
+        case msg_LstBrandLocations(data) => lstBrandLocations(data)(pr)
 
     }
 
@@ -220,6 +222,32 @@ object BrandModule extends ModuleTrait {
             )), None)
         } catch {
             case ex : Exception => println(s"homeSearchServiceBrand.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def lstBrandLocations(data : JsValue)
+                         (pr : Option[Map[String, JsValue]])
+                         (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+
+        try {
+            val tmp = MergeStepResult(data, pr)
+            val brand_id = (tmp \ "brand_id").asOpt[String].get
+
+            val conn = cm.modules.get.get("db").map(x => x.asInstanceOf[dbInstanceManager]).getOrElse(throw new Exception("no db connection"))
+            val db = conn.queryDBInstance("baby").get
+
+            val reVal =
+                db.queryMultipleObject(DBObject("brand_id" -> new ObjectId(brand_id)), "brand_location") { obj =>
+                    Map(
+                        "location_id" -> toJson(obj.getAs[ObjectId]("location_id").get.toString)
+                    )
+                }.map (x => x.get("location_id").get.asOpt[String].get)
+
+            (Some(Map("locations" -> toJson(reVal))), None)
+
+        } catch {
+            case ex : Exception => println(s"lstBrandLocations.error=${ex.getMessage}");(None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 }

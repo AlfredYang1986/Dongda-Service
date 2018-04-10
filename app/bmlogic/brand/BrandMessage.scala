@@ -16,4 +16,5 @@ object BrandMessage {
     case class msg_SearchServiceBrandDetail(data : JsValue) extends msg_BrandCommand
     case class msg_HomeBrandServiceBinding(data : JsValue) extends msg_BrandCommand
     case class msg_HomeSearchServiceBrand(data : JsValue) extends msg_BrandCommand
+    case class msg_LstBrandLocations(data : JsValue) extends msg_BrandCommand
 }
