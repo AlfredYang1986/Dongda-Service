@@ -60,9 +60,6 @@ class LocationController @Inject ()(as_inject : ActorSystem, dbt: dbInstanceMana
             :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
             :: msg_LocationToService(jv)
             :: msg_ServiceQueryMulti(jv)
-            :: msg_LocationServiceBinding(jv) :: msg_SearchServiceLocation(jv)
-            :: msg_BrandServiceBinding(jv) :: msg_SearchServiceBrand(jv)
-            :: msg_QueryIsCollectedLst(jv)
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map( "db" -> dbt, "att" -> att, "prt" -> prt))))
     })
 }

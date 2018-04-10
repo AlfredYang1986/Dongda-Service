@@ -274,11 +274,11 @@ object LocationModule extends ModuleTrait {
             val js = MergeStepResult(data, pr)
             val lst = (js \ "locations").asOpt[List[String]].get
 
-            import inner_traits.mqc
+            import inner_traits.anmqc
             import inner_traits.sldr
             val o : DBObject = js
 
-            val reVal = db.queryMultipleObject(o, "service_location")
+            val reVal = db.queryMultipleObject(o, "locations")
 
             (Some(Map("locations" -> toJson(reVal))), None)
 

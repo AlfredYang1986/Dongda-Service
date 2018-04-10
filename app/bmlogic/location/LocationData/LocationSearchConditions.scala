@@ -53,4 +53,10 @@ trait LocationSearchConditions {
         if (!lst.isEmpty) $or(lst.map (x => DBObject("location_id" -> new ObjectId(x))))
         else DBObject("fuck" -> "yes")
     }
+
+    implicit val anmqc : JsValue => DBObject = { js =>
+        val lst = (js \ "locations").asOpt[List[String]].get
+        if (!lst.isEmpty) $or(lst.map (x => DBObject("_id" -> new ObjectId(x))))
+        else DBObject("fuck" -> "yes")
+    }
 }

@@ -480,4 +480,30 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def LstBrandLocations(token : String, brand_id : String) = {
+        ws.url(baseUrl + "/al/brand/locations")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "brand_id" -> toJson(brand_id)
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def LstLocationService(token : String, location_id : String) ={
+        ws.url(baseUrl + "/al/location/lst/service")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "locations" -> toJson(location_id :: Nil)
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
 }
