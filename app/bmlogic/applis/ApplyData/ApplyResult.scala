@@ -10,6 +10,8 @@ trait ApplyResult {
             "apply_id" -> toJson(obj.getAs[ObjectId]("_id").get.toString),
             "name" -> toJson(obj.getAs[String]("name").get.toString),
             "brand_name" -> toJson(obj.getAs[String]("brand_name").get),
+            "category" -> toJson(obj.getAs[String]("category").map (x => x).getOrElse("")),
+            "phone" -> toJson(obj.getAs[String]("phone").map (x => x).getOrElse("")),
             "bound_user_id" -> toJson(obj.getAs[String]("bound_user_id").get),
             "approved" -> toJson(obj.getAs[Number]("approved").get.intValue),
             "date" -> toJson(obj.getAs[Number]("date").get.longValue)

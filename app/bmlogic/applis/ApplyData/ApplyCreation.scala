@@ -15,6 +15,8 @@ trait ApplyCreation {
         builder += "_id" -> ObjectId.get()
         builder += "name" -> (data \ "name").asOpt[String].get
         builder += "brand_name" -> (data \ "brand_name").asOpt[String].map (x => x).getOrElse("")
+        builder += "phone" -> (data \ "phone").asOpt[String].map (x => x).getOrElse("")
+        builder += "category" -> (data \ "category").asOpt[String].map (x => x).getOrElse("")
         builder += "bound_user_id" -> user_id
         builder += "approved" -> 0
         builder += "date" -> new Date().getTime
@@ -27,6 +29,8 @@ trait ApplyCreation {
 
         (data \ "name").asOpt[String].map (x => obj += "name" -> x).getOrElse(Unit)
         (data \ "brand_name").asOpt[String].map (x => obj += "brand_name" -> x).getOrElse(Unit)
+        (data \ "phone").asOpt[String].map (x => obj += "phone" -> x).getOrElse(Unit)
+        (data \ "category").asOpt[String].map (x => obj += "category" -> x).getOrElse(Unit)
         (data \ "approved").asOpt[Int].map (x => obj += "approved" -> x.asInstanceOf[Number]).getOrElse(Unit)
         (data \ "date").asOpt[Long].map (x => obj += "date" -> x.asInstanceOf[Number]).getOrElse(Unit)
 
