@@ -581,4 +581,66 @@ class DongdaClient(ws: WSClient, baseUrl: String)(implicit ec: ExecutionContext)
                 response.json
             }
     }
+
+    def pushRecruitApply(token : String, user_id : String, apply_info : JsValue) ={
+        ws.url(baseUrl + "/al/apply/push")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "user_id" -> toJson(user_id)
+                )),
+                "apply" -> apply_info
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def popRecruitApply(token : String, apply_id : String) ={
+        ws.url(baseUrl + "/al/apply/pop")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "apply_id" -> toJson(apply_id)
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def queryRecruitApply(token : String, apply_id : String) ={
+        ws.url(baseUrl + "/al/apply/query")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "apply_id" -> toJson(apply_id)
+                ))
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
+
+    def updateRecruitApply(token : String, apply_id : String, update_info : JsValue) ={
+        ws.url(baseUrl + "/al/apply/update")
+            .withHeaders("Accept" -> "application/json", "Content-Type" -> "application/json")
+            .post(toJson(Map(
+                "token" -> toJson(token),
+                "condition" -> toJson(Map(
+                    "apply_id" -> toJson(apply_id)
+                )),
+                "apply" -> update_info
+            )))
+            .map { response =>
+                // println(response.json)
+                response.json
+            }
+    }
 }

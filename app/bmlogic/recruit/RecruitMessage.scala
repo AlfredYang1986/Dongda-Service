@@ -3,7 +3,7 @@ package bmlogic.recruit
 import play.api.libs.json.JsValue
 import com.pharbers.bmmessages.CommonMessage
 
-abstract class msg_RecruitCommand extends CommonMessage(cat = "profile", mt = RecruitModule)
+abstract class msg_RecruitCommand extends CommonMessage(cat = "recruit", mt = RecruitModule)
 
 object RecruitMessage {
     case class msg_pushRecruit(data : JsValue) extends msg_RecruitCommand

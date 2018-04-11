@@ -69,5 +69,12 @@ POST    /al/recruit/query/multi                 controllers.RecruitController.qu
 POST    /al/service/search                      controllers.ServiceController.searchServices
 POST    /al/service/detail                      controllers.ServiceController.serviceDetail
 
+# recruit apply 提交成为服务方申请
+POST    /al/apply/push                          controllers.RecruitAppliesController.pushRecruitApply
+POST    /al/apply/pop                           controllers.RecruitAppliesController.popRecruitApply
+POST    /al/apply/update                        controllers.RecruitAppliesController.updateRecruitApply
+POST    /al/apply/query                         controllers.RecruitAppliesController.queryRecruitApply
+POST    /al/apply/multi                         controllers.RecruitAppliesController.searchRecruitApply
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
