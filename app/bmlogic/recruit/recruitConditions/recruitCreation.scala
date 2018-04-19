@@ -82,6 +82,7 @@ trait recruitCreation {
         val builder = MongoDBObject.newBuilder
         builder += "_id" -> new ObjectId
         builder += "service_id" -> (data \ "service_id").asOpt[String].get
+        (data \ "stud_limits").asOpt[Int].map (x => builder += "stud_limits" -> x).getOrElse(Unit)
         age_boundary.map (x => builder += "age_boundary" -> x).getOrElse(Unit)
         stud_boundary.map (x => builder += "stud_boundary" -> x).getOrElse(Unit)
         stud_tech.map (x => builder += "stud_tech" -> x).getOrElse(Unit)
@@ -168,6 +169,7 @@ trait recruitCreation {
             }.getOrElse(None)
         }
 
+        (data \ "stud_limits").asOpt[Int].map (x => obj += "stud_limits" -> x).getOrElse(Unit)
         age_boundary.map (x => obj += "age_boundary" -> x).getOrElse(Unit)
         stud_boundary.map (x => obj += "stud_boundary" -> x).getOrElse(Unit)
         stud_tech.map (x => obj += "stud_tech" -> x).getOrElse(Unit)

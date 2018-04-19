@@ -83,7 +83,8 @@ trait recruitResult {
 
         Map(
             "recruit_id" -> toJson(obj.getAs[ObjectId]("_id").get.toString),
-            "service_id" -> toJson(obj.getAs[String]("service_id").get)
+            "service_id" -> toJson(obj.getAs[String]("service_id").get),
+            "stud_limits"-> toJson(obj.getAs[Number]("stud_limits").map (x => x.intValue).getOrElse(0))
         ) ++ age_boundary ++ stud_boundary ++ stud_tech ++ payment_time ++
             payment_membership ++ payment_monthly ++ payment_daily
     }
