@@ -169,7 +169,7 @@ trait recruitCreation {
             }.getOrElse(None)
         }
 
-        (data \ "stud_limits").asOpt[Int].map (x => obj += "stud_limits" -> x).getOrElse(Unit)
+        (data \ "stud_limits").asOpt[Int].map (x => obj += "stud_limits" -> x.asInstanceOf[Number]).getOrElse(Unit)
         age_boundary.map (x => obj += "age_boundary" -> x).getOrElse(Unit)
         stud_boundary.map (x => obj += "stud_boundary" -> x).getOrElse(Unit)
         stud_tech.map (x => obj += "stud_tech" -> x).getOrElse(Unit)
