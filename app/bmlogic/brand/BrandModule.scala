@@ -324,7 +324,6 @@ object BrandModule extends ModuleTrait {
 
             import inner_traits.buss
             import inner_traits.bubr
-            val tmp = db.queryObject(js, "brand_user")
             val reVal = db.queryObject(js, "brand_user").map (x => x.get("brand_id").get.asOpt[String].get)
 
             (Some(Map("brand_id" -> toJson(reVal))), None)
